@@ -22,18 +22,26 @@ class API::V1::UsersController < ApplicationController
       render json: @user.errors, status: :unprocessable_entity
     end
   end
-# 
+  # GET /api/v1/users/:id/friendships
   def friendships
-    @friendships = @user.friendships
-    render json: @friendships, status: :ok
+    user = User.find(params[:id])
+    friendships = user.friendships.includes(:friend)
+    render json: friendships.map { |friendship| friendship.friend }, status: :ok
   end
 
+  # POST /api/v1/users/:id/friendships
   def create_friendship
-    @friendship = @user.friendships.build(friendship_params)
-    if @friendship.save
-      render json: @friendship, status: :created
+    friend = User.find_by(id: params[:friend_id])
+    return render json: { error: 'Friend not found' }, status: :not_found unless friend
+  
+    bar = Bar.find_by(id: params[:bar_id]) if params[:bar_id]
+  
+    friendship = @user.friendships.build(friend: friend, bar: bar)
+  
+    if friendship.save
+      render json: friendship, status: :created
     else
-      render json: @friendship.errors, status: :unprocessable_entity
+      render json: friendship.errors, status: :unprocessable_entity
     end
   end
 
@@ -53,7 +61,5 @@ class API::V1::UsersController < ApplicationController
     )
   end
 
-  def friendship_params
-    params.require(:friendship).permit(:friend_id, :bar_id)
-  end
+
 end
