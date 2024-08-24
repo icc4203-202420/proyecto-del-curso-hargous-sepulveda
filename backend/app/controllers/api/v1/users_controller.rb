@@ -1,5 +1,7 @@
 class API::V1::UsersController < ApplicationController
   respond_to :json
+  # autenticación
+  before_action :verify_jwt_token, only: [:update, :friendships, :create_friendship]
   before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
 
   def show
@@ -58,6 +60,11 @@ class API::V1::UsersController < ApplicationController
         reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]
       }
     )
+  end
+# autenticación
+  def verify_jwt_token
+    authenticate_user!
+    head :unauthorized unless current_user
   end
 
 
