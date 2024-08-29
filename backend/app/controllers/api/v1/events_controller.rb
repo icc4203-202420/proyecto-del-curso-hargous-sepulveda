@@ -6,18 +6,17 @@ class API::V1::EventsController < ApplicationController
   before_action :set_event, only: [:show, :update, :destroy]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
-
-  # GET /api/v1/events/:id
+  # GET /api/v1/events
   def index
-    @event = Event.all
-    render json: { event: @event }, status: :ok
+    @events = Event.all
+    render json: { events: @events }, status: :ok
   end
 
   # GET /api/v1/events/:id
   def show
-    if @event.image.attached?
+    if @event.flyer.attached?
       render json: @event.as_json.merge({ 
-        image_url: url_for(@event.image), 
+        flyer_url: url_for(@event.flyer), 
         thumbnail_url: url_for(@event.thumbnail)
       }), status: :ok
     else
@@ -27,11 +26,11 @@ class API::V1::EventsController < ApplicationController
 
   # POST /api/v1/events
   def create
-    @event = event.new(event_params.except(:image_base64))
-    handle_image_attachment if event_params[:image_base64]
+    @event = Event.new(event_params.except(:flyer_base64))
+    handle_flyer_attachment if event_params[:flyer_base64]
 
     if @event.save
-      render json: { event: @event, message: 'event created successfully.' }, status: :created
+      render json: { event: @event, message: 'Event created successfully.' }, status: :created
     else
       render json: @event.errors, status: :unprocessable_entity
     end
@@ -39,10 +38,10 @@ class API::V1::EventsController < ApplicationController
   
   # PATCH/PUT /api/v1/events/:id
   def update
-    handle_image_attachment if event_params[:image_base64]
+    handle_flyer_attachment if event_params[:flyer_base64]
 
-    if @event.update(event_params.except(:image_base64))
-      render json: { event: @event, message: 'event updated successfully.' }, status: :ok
+    if @event.update(event_params.except(:flyer_base64))
+      render json: { event: @event, message: 'Event updated successfully.' }, status: :ok
     else
       render json: @event.errors, status: :unprocessable_entity
     end
@@ -56,29 +55,25 @@ class API::V1::EventsController < ApplicationController
   
   private
 
- 
   def set_event
     @event = Event.find_by(id: params[:id])
-    render json: { error: 'event not found' }, status: :not_found if @event.nil?
+    render json: { error: 'Event not found' }, status: :not_found if @event.nil?
   end  
-  
 
   def event_params
     params.require(:event).permit(:name, :event_type, 
       :style, :hop, :yeast, :malts, 
       :ibu, :alcohol, :blg, :brand_id, :avg_rating,
-      :image_base64)
+      :flyer_base64)
   end
 
-
-  def handle_image_attachment
-    decoded_image = decode_image(event_params[:image_base64])
-    @event.image.attach(io: decoded_image[:io], 
-      filename: decoded_image[:filename], 
-      content_type: decoded_image[:content_type])
+  def handle_flyer_attachment
+    decoded_flyer = decode_image(event_params[:flyer_base64])
+    @event.flyer.attach(io: decoded_flyer[:io], 
+      filename: decoded_flyer[:filename], 
+      content_type: decoded_flyer[:content_type])
+    # Close the file if needed (not shown in the example)
   end 
-  
- 
   def verify_jwt_token
     authenticate_user!
     head :unauthorized unless current_user
