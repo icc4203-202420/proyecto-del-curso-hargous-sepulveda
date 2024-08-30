@@ -1,0 +1,45 @@
+#fondo {                                   /* No Borrar*/    
+    background-color: #2E2E42; /* No Borrar*/
+    width: 100%;/* No Borrar*/
+}/* No Borrar*/
+.css-13p3xcz-MuiContainer-root {/* No Borrar*/
+    padding-left: 0px !important;/* No Borrar*/
+    padding-right: 0px !important;/* No Borrar*/
+}/* No Borrar*/
+@media (min-width: 1200px) {/* No Borrar*/
+    .css-13p3xcz-MuiContainer-root {/* No Borrar*/
+        max-width: 100% !important;/* No Borrar*/
+    }                                      /* No Borrar*/  
+}                                          /* No Borrar*/
+.event-card {
+  border-radius: 8px;       
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  transition: box-shadow 0.3s ease-in-out; 
+}
+
+.event-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); 
+}
+
+
+.test-event-card {
+  background-color: #1d192b; 
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.test-event-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.event-card-content {
+  padding: 16px;
+  background-color: #CCCBCE; 
+  
+  color: #1D1B20;
+}
+
+.event-card-media {
+  width: 140px;
+}

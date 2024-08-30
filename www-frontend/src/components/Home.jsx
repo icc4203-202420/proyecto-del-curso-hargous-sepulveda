@@ -4,12 +4,10 @@ import './Home.css'
 function Home() {
 
   return (
-    <>
-      <div>
-        <p>Holaaaaaaaaaaaaaa</p>
-      </div>
-    </>
-  )
+    <div className="container">
+      <p className='map-text'>Aquí va el mapa</p>
+    </div>
+  );
 }
 
 

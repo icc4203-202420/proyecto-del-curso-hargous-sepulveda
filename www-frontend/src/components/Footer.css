@@ -1,25 +1,19 @@
  
-.footer {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 20px 10px;
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  font-size: 1rem;
+#bottom-navigation {
+  background-color: #A6A7B5; 
 }
 
-.footer p {
-  margin: 0;
-  padding: 0;
+#bottom-navigation .MuiBottomNavigationAction-root {
+  color: #1D1B20;
 }
 
- 
+#bottom-navigation-action.selected {
+  color: #ffeb3b; /* Color for selected item */
+  background-color: #333; /* Background color for selected item (optional) */
+  border-radius: 4px; /* Optional rounded corners for selected item */
+}
+
+
 @media (max-width: 1200px) {
   .footer {
     font-size: 0.9rem;

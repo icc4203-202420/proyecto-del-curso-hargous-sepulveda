@@ -1,0 +1,11 @@
+
+#barra {
+    background-color: #DBDBE0;
+}
+#barra::placeholder{
+  color: #49454F;
+  font-style: normal;
+}
+#barra_fondo{
+  background-color: #525277; 
+}
