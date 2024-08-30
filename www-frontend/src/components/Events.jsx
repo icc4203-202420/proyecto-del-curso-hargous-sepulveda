@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';  
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -6,30 +7,65 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import './Events.css'
+import './Events.css';
 
 const Events = () => {
+  const [events, setEvents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        
+        const response = await axios.get('http://localhost:3001/api/v1/events');  
+        setEvents(response.data.events);  
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+    fetchEvents();
+  }, []);
+ 
+  const filteredEvents = events.filter(event =>
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div class='container' id='fondo' disableGutters maxWidth={false}>
-            <Card className="event-card" sx={{ maxWidth: 345 }}>
+    <div className='container' id='fondo'>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search for an event..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <ul>
+        {filteredEvents.map(event => (
+          <li key={event.id}>
+            <Card sx={{ maxWidth: 345 }}>
               <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CardContent className="event-card-content" sx={{ flex: 1 }}>
+                <CardContent sx={{ flex: 1 }}>
                   <Typography gutterBottom variant="h5" component="div">
-                    Test Event
+                    {event.name}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Address
+                    {event.address}
                   </Typography>
-                  </CardContent>
-              <Box sx={{ width: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p>Here goes the photo of the event</p>
-          </Box>
-        </Box>
-      </Card>
-
+                </CardContent>
+                <CardMedia
+                  component="img"
+                  sx={{ width: 140 }}
+                  image={event.image || 'default-image.jpg'}  
+                  alt={event.name}
+                />
+              </Box>
+            </Card>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
-  
-export default  Events;
+
+export default Events;
