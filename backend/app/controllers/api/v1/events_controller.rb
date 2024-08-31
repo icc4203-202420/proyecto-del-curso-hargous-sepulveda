@@ -14,13 +14,14 @@ class API::V1::EventsController < ApplicationController
 
   # GET /api/v1/events/:id
   def show
-    event_data = @event.as_json
-    event_data.merge!({
-      flyer_url: url_for(@event.flyer) if @event.flyer.attached?,
-      thumbnail_url: url_for(@event.thumbnail) if @event.thumbnail.attached?
-    })
+    event_data = @event.as_json.tap do |data|
+      data[:flyer_url] = url_for(@event.flyer) if @event.flyer.attached?
+      data[:thumbnail_url] = url_for(@event.thumbnail) if @event.thumbnail.attached?
+    end
+    
     render json: { event: event_data }, status: :ok
   end
+  
 
   # POST /api/v1/events
   def create

@@ -2,7 +2,7 @@
 #barra {
     background-color: #DBDBE0;
 }
-#barra::placeholder{
+#barra{
   color: #49454F;
   font-style: normal;
 }
