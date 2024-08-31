@@ -28,35 +28,29 @@ const BarList = () => {
   );
 
   return (
-    <div className="container" id="fondo">
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search for a bar..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <div className="beer-cards-container">
+    <div className="bar-list-content">  
+      <div className="bar-list">
         {filteredBars.map(bar => (
-          <Card key={bar.id} sx={{ maxWidth: 345 }} className="beer-card">
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-              <CardContent sx={{ flex: 1 }}>
-                <Typography gutterBottom variant="h5" component="div">
-                  {bar.name}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {bar.address}
-                </Typography>
-              </CardContent>
-              <CardMedia
-                component="img"
-                sx={{ width: 140 }}
-                image={bar.image || 'default-image.jpg'}
-                alt={bar.name}
-              />
-            </Box>
-          </Card>
+          <div key={bar.name} className="bar-card">
+            <Card sx={{ maxWidth: 345 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <CardContent sx={{ flex: 1 }}>
+                  <Typography gutterBottom variant="h5" component="div">
+                    {bar.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {bar.avg_rating ? `${bar.avg_rating}/5` : 'No rating'}
+                  </Typography>
+                </CardContent>
+                <CardMedia
+                  component="img"
+                  sx={{ width: 140, maxWidth: '100%' }}
+                  image={bar.image || 'default-image.jpg'}
+                  alt={bar.name}
+                />
+              </Box>
+            </Card>
+          </div>
         ))}
       </div>
     </div>
@@ -64,4 +58,5 @@ const BarList = () => {
 };
 
 export default BarList;
+
 
