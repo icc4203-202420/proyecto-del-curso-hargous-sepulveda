@@ -75,4 +75,11 @@
   max-height: fit-content;
   flex-wrap: wrap;
   gap: 16px;
+  margin-bottom: 24px;
+  background-color: #FFFFFF;
+  align-items: center;
+  border-radius: 16px;
+}
+#card{
+  background-color: #BDBBC1;
 }

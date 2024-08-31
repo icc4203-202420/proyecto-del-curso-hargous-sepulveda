@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Card from '@mui/material/Card';
+import Card, { cardClasses } from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
@@ -43,9 +43,9 @@ const BeerList = () => {
           <div className="beer-list">
             {beersByType[type].map(beer => (
               <div key={beer.name} className="beer-card">
-                <Card sx={{ maxWidth: 345 }}>
+                <Card sx={{ maxWidth: 345}}>
                   <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <CardContent sx={{ flex: 1 }}>
+                    <CardContent sx={{ flex: 1 }} id = "card">
                       <Typography gutterBottom variant="h5" component="div">
                         {beer.name}
                       </Typography>
@@ -57,7 +57,7 @@ const BeerList = () => {
                       component="img"
                       sx={{ width: 140, maxWidth: '100%' }}
                       image={beer.image || 'default-image.jpg'}
-                      alt={beer.name}
+                      alt='no photo yet'
                     />
                   </Box>
                 </Card>

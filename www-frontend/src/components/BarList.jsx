@@ -34,26 +34,26 @@ const BarList = () => {
           <div key={bar.name} className="bar-card">
             <Card sx={{ maxWidth: 345 }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <CardContent sx={{ flex: 1 }}>
+                <CardContent sx={{ flex: 1 }}id = "card">
                   <Typography gutterBottom variant="h5" component="div">
                     {bar.name}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {bar.avg_rating ? `${bar.avg_rating}/5` : 'No rating'}
+                    {bar.address_id ? `Address id:${bar.address_id}` : 'No Address'}
                   </Typography>
                 </CardContent>
                 <CardMedia
                   component="img"
                   sx={{ width: 140, maxWidth: '100%' }}
                   image={bar.image || 'default-image.jpg'}
-                  alt={bar.name}
+                  alt='no photo yet'
                 />
               </Box>
             </Card>
           </div>
         ))}
+        </div>
       </div>
-    </div>
   );
 };
 

@@ -31,39 +31,31 @@ const Events = () => {
   );
 
   return (
-    <div className='container' id='fondo'>
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search for an event..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <ul>
+    <div className="event-list-content">  
+      <div className="event-list">
         {filteredEvents.map(event => (
-          <li key={event.id}>
+          <div key={event.name} className="event-card">
             <Card sx={{ maxWidth: 345 }}>
-              <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CardContent sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <CardContent sx={{ flex: 1 }}id = "card">
                   <Typography gutterBottom variant="h5" component="div">
                     {event.name}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {event.address}
+                  {event.bar_id ? `Bar id: ${event.bar_id}` : 'No Bar'}
                   </Typography>
                 </CardContent>
                 <CardMedia
                   component="img"
-                  sx={{ width: 140 }}
-                  image={event.image || 'default-image.jpg'}  
-                  alt={event.name}
+                  sx={{ width: 140, maxWidth: '100%' }}
+                  image={event.image || 'default-image.jpg'}
+                  alt='no photo yet'
                 />
               </Box>
             </Card>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
