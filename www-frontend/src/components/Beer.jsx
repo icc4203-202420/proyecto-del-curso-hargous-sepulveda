@@ -11,24 +11,30 @@ import './Beer.css';
 const Beer = () => {
   const { id } = useParams();
   const [beer, setBeer] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchBeer = async () => {
+    const fetchBeerAndReviews = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/v1/beers/${id}`);
-        console.log('Beer data:', response.data);
-        setBeer(response.data.beer);
+        // Fetch beer details
+        const beerResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}`);
+        setBeer(beerResponse.data.beer);
+
+        // Fetch reviews for the beer
+        const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
+        setReviews(reviewsResponse.data.reviews || []);
+
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching beer details:', error);
-        setError('Error fetching beer details');
+        console.error('Error fetching beer details or reviews:', error);
+        setError('Error fetching beer details or reviews');
         setLoading(false);
       }
     };
-    
-    fetchBeer();
+
+    fetchBeerAndReviews();
   }, [id]);
 
   if (loading) return <div>Loading...</div>;
@@ -36,7 +42,6 @@ const Beer = () => {
 
   return (
     beer && (
-    <div>
       <Card className="beer-card">
         <Box className="beer-card-container">
           {beer.image_url && (
@@ -79,15 +84,40 @@ const Beer = () => {
               <span className="beer-card-strong">BLG:</span> {beer.blg ?? 'N/A'}
             </Typography>
           </CardContent>
+
+          {/* Reviews Section */}
+          <Box className="reviews-section" sx={{ marginTop: '20px', width: '100%' }}>
+            <Typography variant="h5" component="div" sx={{ marginBottom: '16px' }}>
+              Reviews
+            </Typography>
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <Box key={review.id} className="review-card" sx={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px' }}>
+                  <Typography variant="body1" className="review-text">
+                    {review.text}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Rating:</strong> {review.rating}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>By:</strong> {review.reviewer_name}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No reviews available for this beer.
+              </Typography>
+            )}
+          </Box>
         </Box>
       </Card>
-  
-    </div>
     )
   );
 };
 
 export default Beer;
+
 
 //<Card className="beer-review-card">
 //<Box className="beer-review-card-container">
