@@ -12,7 +12,7 @@ const Beer = () => {
   const { id } = useParams();
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
-  // const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -22,10 +22,10 @@ const Beer = () => {
         // Fetch beer details
         const beerResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}`);
         setBeer(beerResponse.data.beer);
-
-        // Fetch reviews for the beer
-        // const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
-        // setReviews(reviewsResponse.data.reviews || []);
+        
+        //Fetch reviews for the beer
+        const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
+        setReviews(reviewsResponse.data || []); 
         
         if (beerResponse.data.beer.brand_id) {
           const brandResponse = await axios.get(`http://localhost:3001/api/v1/brands/${beerResponse.data.beer.brand_id}`);
@@ -46,31 +46,32 @@ const Beer = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
+
   return (
     beer && (
       <Card className="beer-card">
         <Box className="beer-card-container">
-          {beer.image_url && (
-            <CardMedia
-              component="img"
-              className="beer-card-img"
-              image={beer.image_url}
-              alt={`${beer.name} image`}
-            />
-          )}
+          <Box className="beer-card-media-container">
+            {beer.image_url && (
+              <CardMedia
+                component="img"
+                className="beer-card-img"
+                image={beer.image_url}
+                alt={`${beer.name} image`}
+              />
+            )}
+            {/* Bubble for average rating */}
+            <Box className="average-rating-bubble">
+              Rating:{beer.avg_rating || 'N/A'}/5
+            </Box>
+          </Box>
           <CardContent className="beer-card-content">
             <Typography className="beer-card-title" variant="h4" component="div">
               {beer.name || 'N/A'}
             </Typography>
             <Typography className="beer-card-text">
-              <span className="beer-card-strong">Type:</span> {beer.beer_type ?? 'N/A'}
+              <span className="beer-card-strong">Brand Name:</span> {beer.brand ?? 'N/A'}
             </Typography>
-            <Typography className="beer-card-text">
-              <span className="beer-card-strong">Brand ID:</span> {beer.brand_id ?? 'N/A'}
-            </Typography>
-            <Typography className="beer-card-text">
-                <span className="beer-card-strong">Brand Name:</span> {brand ?? 'N/A'}
-              </Typography>
             <Typography className="beer-card-text">
               <span className="beer-card-strong">Style:</span> {beer.style ?? 'N/A'}
             </Typography>
@@ -94,31 +95,30 @@ const Beer = () => {
             </Typography>
           </CardContent>
 
-          {/* Reviews Section
-          // <Box className="reviews-section" sx={{ marginTop: '20px', width: '100%' }}>
-          //   <Typography variant="h5" component="div" sx={{ marginBottom: '16px' }}>
-          //     Reviews
-          //   </Typography>
-          //   {reviews.length > 0 ? (
-          //     reviews.map((review) => (
-          //       <Box key={review.id} className="review-card" sx={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px' }}>
-          //         <Typography variant="body1" className="review-text">
-          //           {review.text}
-          //         </Typography>
-          //         <Typography variant="body2" color="text.secondary">
-          //           <strong>Rating:</strong> {review.rating}
-          //         </Typography>
-          //         <Typography variant="body2" color="text.secondary">
-          //           <strong>By:</strong> {review.reviewer_name}
-          //         </Typography>
-          //       </Box>
-          //     ))
-          //   ) : (
-          //     <Typography variant="body2" color="text.secondary">
-          //       No reviews available for this beer.
-          //     </Typography>
-          //   )}
-          // </Box> */}
+          <Box className="reviews-section">
+            <Typography variant="h5" component="div" className="reviews-title">
+              Reviews
+            </Typography>
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <Box key={review.id} className="review-card">
+                  <Typography variant="body1" className="review-text">
+                    {review.text}
+                  </Typography>
+                  <Typography variant="body2" className="review-rating">
+                    <strong>Rating:</strong> {review.rating}
+                  </Typography>
+                  <Typography variant="body2" className="review-reviewer">
+                    <strong>By:</strong> {review.reviewer_name}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2" className="no-reviews">
+                No reviews available for this beer.
+              </Typography>
+            )}
+          </Box>
         </Box>
       </Card>
     )

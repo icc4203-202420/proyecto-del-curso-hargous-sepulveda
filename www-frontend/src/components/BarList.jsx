@@ -27,6 +27,7 @@ const BarList = () => {
     bar.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  
   return (
     <div className="bar-list-content">  
       <div className="bar-list">

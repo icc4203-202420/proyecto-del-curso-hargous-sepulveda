@@ -4,8 +4,19 @@ class API::V1::ReviewsController < ApplicationController
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    @reviews = Review.where(user: @user)
+    if params[:user_id]
+      # Fetch reviews for a specific user
+      @user = User.find(params[:user_id])
+      @reviews = Review.where(user: @user)
+    else
+      # Fetch reviews for a specific beer
+      @beer = Beer.find(params[:beer_id])
+      @reviews = @beer.reviews
+    end
+  
     render json: { reviews: @reviews }, status: :ok
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: e.message }, status: :not_found
   end
 
   def show
@@ -46,7 +57,9 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def set_user
-    @user = User.find(params[:user_id]) 
+    if params[:user_id]
+      @user = User.find(params[:user_id]) 
+    end
   end
 
   def review_params
