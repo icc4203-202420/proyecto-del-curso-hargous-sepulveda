@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :bars
       resources :beers
+      resources :brands, only: [:show]
       resources :events, only: [:index, :show, :create, :update, :destroy]   
       
       resources :users do
