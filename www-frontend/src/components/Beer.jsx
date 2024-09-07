@@ -81,18 +81,7 @@ const Beer = () => {
           </CardContent>
         </Box>
       </Card>
-      <Card className="beer-review-card">
-        <Box className="beer-review-card-container">
-          <CardContent className="beer-review-card-content">
-            <Typography className="beer-review-card-title" variant="h4" component="div">
-              {review.rating}
-            </Typography>
-            <Typography className="beer-review-card-text">
-              {review.text}
-            </Typography>
-          </CardContent>
-        </Box>
-      </Card>      
+  
     </div>
     )
   );
@@ -100,5 +89,16 @@ const Beer = () => {
 
 export default Beer;
 
-
+//<Card className="beer-review-card">
+//<Box className="beer-review-card-container">
+//  <CardContent className="beer-review-card-content">
+//    <Typography className="beer-review-card-title" variant="h4" component="div">
+//      {review.rating}
+//    </Typography>
+//    <Typography className="beer-review-card-text">
+//      {review.text}
+//    </Typography>
+//  </CardContent>
+//</Box>
+//</Card>    
 
