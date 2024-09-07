@@ -11,7 +11,8 @@ import './Beer.css';
 const Beer = () => {
   const { id } = useParams();
   const [beer, setBeer] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [brand, setBrand] = useState(null);
+  // const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,9 +24,14 @@ const Beer = () => {
         setBeer(beerResponse.data.beer);
 
         // Fetch reviews for the beer
-        const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
-        setReviews(reviewsResponse.data.reviews || []);
-
+        // const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
+        // setReviews(reviewsResponse.data.reviews || []);
+        
+        if (beerResponse.data.beer.brand_id) {
+          const brandResponse = await axios.get(`http://localhost:3001/api/v1/brands/${beerResponse.data.beer.brand_id}`);
+     
+          setBrand(brandResponse.data.name);
+        }
         setLoading(false);
       } catch (error) {
         console.error('Error fetching beer details or reviews:', error);
@@ -63,6 +69,9 @@ const Beer = () => {
               <span className="beer-card-strong">Brand ID:</span> {beer.brand_id ?? 'N/A'}
             </Typography>
             <Typography className="beer-card-text">
+                <span className="beer-card-strong">Brand Name:</span> {brand ?? 'N/A'}
+              </Typography>
+            <Typography className="beer-card-text">
               <span className="beer-card-strong">Style:</span> {beer.style ?? 'N/A'}
             </Typography>
             <Typography className="beer-card-text">
@@ -85,31 +94,31 @@ const Beer = () => {
             </Typography>
           </CardContent>
 
-          {/* Reviews Section */}
-          <Box className="reviews-section" sx={{ marginTop: '20px', width: '100%' }}>
-            <Typography variant="h5" component="div" sx={{ marginBottom: '16px' }}>
-              Reviews
-            </Typography>
-            {reviews.length > 0 ? (
-              reviews.map((review) => (
-                <Box key={review.id} className="review-card" sx={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px' }}>
-                  <Typography variant="body1" className="review-text">
-                    {review.text}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Rating:</strong> {review.rating}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>By:</strong> {review.reviewer_name}
-                  </Typography>
-                </Box>
-              ))
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                No reviews available for this beer.
-              </Typography>
-            )}
-          </Box>
+          {/* Reviews Section
+          // <Box className="reviews-section" sx={{ marginTop: '20px', width: '100%' }}>
+          //   <Typography variant="h5" component="div" sx={{ marginBottom: '16px' }}>
+          //     Reviews
+          //   </Typography>
+          //   {reviews.length > 0 ? (
+          //     reviews.map((review) => (
+          //       <Box key={review.id} className="review-card" sx={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px' }}>
+          //         <Typography variant="body1" className="review-text">
+          //           {review.text}
+          //         </Typography>
+          //         <Typography variant="body2" color="text.secondary">
+          //           <strong>Rating:</strong> {review.rating}
+          //         </Typography>
+          //         <Typography variant="body2" color="text.secondary">
+          //           <strong>By:</strong> {review.reviewer_name}
+          //         </Typography>
+          //       </Box>
+          //     ))
+          //   ) : (
+          //     <Typography variant="body2" color="text.secondary">
+          //       No reviews available for this beer.
+          //     </Typography>
+          //   )}
+          // </Box> */}
         </Box>
       </Card>
     )
