@@ -1,0 +1,51 @@
+/* Beer.css */
+
+/* Container for the card */
+.beer-card-container {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Card styles */
+  .beer-card {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Card media for the image */
+  .beer-card img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+  }
+  
+  /* Card content styles */
+  .beer-card-content {
+    padding: 1rem;
+  }
+  
+  /* Title styling */
+  .beer-card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  /* General text styling */
+  .beer-card-text {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Strong text styling */
+  .beer-card-strong {
+    font-weight: bold;
+  }
+  

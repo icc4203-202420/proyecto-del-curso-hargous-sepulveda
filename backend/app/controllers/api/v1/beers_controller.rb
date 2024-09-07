@@ -24,7 +24,9 @@ class API::V1::BeersController < ApplicationController
     if @beer.image.attached?
       render json: @beer.as_json.merge({ 
         image_url: url_for(@beer.image), 
-        thumbnail_url: url_for(@beer.thumbnail)}),
+        thumbnail_url: url_for(@beer.thumbnail),
+        #add brand name
+        }),
         status: :ok
     else
       render json: { beer: @beer.as_json }, status: :ok

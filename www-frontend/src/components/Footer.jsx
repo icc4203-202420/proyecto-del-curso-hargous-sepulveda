@@ -11,6 +11,7 @@ import Account from './Account.jsx';
 import BeerList from './BeerList.jsx';
 import BarList from './BarList.jsx';
 import Events from './Events.jsx';
+import Beer from './Beer.jsx';
 const Footer = ({ value, onChange }) => {
   return (
     
@@ -21,6 +22,7 @@ const Footer = ({ value, onChange }) => {
           <Route path="/beers" element={<BeerList />} />
           <Route path="/bars" element={<BarList />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/beers/:id" element={<Beer />} />
         </Routes>
       </Container>
       <BottomNavigation value={value} onChange={onChange} id="bottom-navigation">

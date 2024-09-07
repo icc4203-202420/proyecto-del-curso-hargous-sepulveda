@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Card, { cardClasses } from '@mui/material/Card';
+import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import './BeerList.css';
+import { Link } from 'react-router-dom';
 
 const BeerList = () => {
   const [beers, setBeers] = useState([]);
@@ -28,24 +29,24 @@ const BeerList = () => {
   );
 
   const beersByType = filteredBeers.reduce((acc, beer) => {
-    if (!acc[beer.type]) {
-      acc[beer.type] = [];
+    if (!acc[beer.style]) {
+      acc[beer.style] = [];
     }
-    acc[beer.type].push(beer);
+    acc[beer.style].push(beer);
     return acc;
   }, {});
 
   return (
     <div className="beer-list-content">
-      {Object.keys(beersByType).map(type => (
-        <div key={type} className="type-section">
-          <h6 className="type-title">{type}</h6>
+      {Object.keys(beersByType).map(style => (
+        <div key={style} className="type-section" sx={{ minWidth: 200}}>
+          <h6 className="type-title">{style}</h6>
           <div className="beer-list">
-            {beersByType[type].map(beer => (
-              <div key={beer.name} className="beer-card">
-                <Card sx={{ maxWidth: 345}}>
+            {beersByType[style].map(beer => (
+              <Link to={`/beers/${beer.id}`} key={beer.name} className="beer-card-link">
+                <Card sx={{ maxWidth: 400, minWidth: 200}} className="beer-card">
                   <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <CardContent sx={{ flex: 1 }} id = "card">
+                    <CardContent sx={{ flex: 1 }} id="card">
                       <Typography gutterBottom variant="h5" component="div">
                         {beer.name}
                       </Typography>
@@ -56,12 +57,12 @@ const BeerList = () => {
                     <CardMedia
                       component="img"
                       sx={{ width: 140, maxWidth: '100%' }}
-                      image={beer.image || 'default-image.jpg'}
+                      image={beer.thumbnail_url || 'default-image.jpg'}
                       alt='no photo yet'
                     />
                   </Box>
                 </Card>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -71,6 +72,7 @@ const BeerList = () => {
 };
 
 export default BeerList;
+
 
 
 
