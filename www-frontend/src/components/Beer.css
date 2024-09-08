@@ -9,20 +9,32 @@
   background-color: #2E2E42 !important; 
   box-shadow: none !important;
 }
+#content img {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
 
 .beer-card-container {
+  display: flex;
+  justify-content: flex-start;
   max-width: 600px;
   margin: 20px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
+.close-button {
+  background-color: #9E9CB2 !important;
+  color: #1D1B20 !important;
+  align-self: flex-end;
+  margin-right: 16px;
+  margin-top: 8px;
+}
 .beer-card {
   width: 100%;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  position: relative; /* To position the bubble correctly */
 }
 
 .beer-card img {
@@ -52,12 +64,8 @@
 .beer-card-strong {
   font-weight: bold;
 }
-
-
 .average-rating-bubble {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  position: relative;
   padding: 1%;
   display: flex;
   align-items: center;
@@ -67,6 +75,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   color: #FFFFFF;
   font-size: 1.2rem;
+  align-self: flex-end;
 }
 
 
