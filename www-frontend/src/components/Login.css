@@ -72,12 +72,13 @@
     font-size: 14px;
   }
   
-  a {
+  .redirect {
     color: #1877f2;
     text-decoration: none;
-  }
-  
-  a:hover {
+    cursor: pointer;
+}
+
+.redirect:hover {
     text-decoration: underline;
-  }
-  
+    color: #165dbb;
+}
