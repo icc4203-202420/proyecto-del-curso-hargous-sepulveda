@@ -12,6 +12,9 @@ import BeerList from './BeerList.jsx';
 import BarList from './BarList.jsx';
 import Events from './Events.jsx';
 import Beer from './Beer.jsx';
+import Signup from './Signup'; // Usando ruta relativa
+import Login from './Login.jsx';
+
 const Footer = ({ value, onChange }) => {
   return (
     
@@ -23,6 +26,8 @@ const Footer = ({ value, onChange }) => {
           <Route path="/bars" element={<BarList />} />
           <Route path="/events" element={<Events />} />
           <Route path="/beers/:id" element={<Beer />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Container>
       <BottomNavigation value={value} onChange={onChange} id="bottom-navigation">
