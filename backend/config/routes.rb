@@ -28,7 +28,10 @@ Rails.application.routes.draw do
         member do
           get :bars
         end
+  
+        resources :reviews, only: [:index, :show, :create, :update, :destroy]
       end
+  
       resources :beers, only: [:show, :create, :update, :destroy]
       resources :brands, only: [:show]
       resources :events, only: [:index, :show, :create, :update, :destroy]
