@@ -24,8 +24,8 @@ const Beer = () => {
         setBeer(beerResponse.data.beer);
         
         //Fetch reviews for the beer
-        const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
-        setReviews(reviewsResponse.data || []); 
+        //const reviewsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
+        //setReviews(reviewsResponse.data || []); 
         
         if (beerResponse.data.beer.brand_id) {
           const brandResponse = await axios.get(`http://localhost:3001/api/v1/brands/${beerResponse.data.beer.brand_id}`);
@@ -99,25 +99,28 @@ const Beer = () => {
             <Typography variant="h5" component="div" className="reviews-title">
               Reviews
             </Typography>
-            {reviews.length > 0 ? (
-              reviews.map((review) => (
-                <Box key={review.id} className="review-card">
-                  <Typography variant="body1" className="review-text">
-                    {review.text}
-                  </Typography>
-                  <Typography variant="body2" className="review-rating">
-                    <strong>Rating:</strong> {review.rating}
-                  </Typography>
-                  <Typography variant="body2" className="review-reviewer">
-                    <strong>By:</strong> {review.reviewer_name}
-                  </Typography>
-                </Box>
-              ))
-            ) : (
-              <Typography variant="body2" className="no-reviews">
-                No reviews available for this beer.
-              </Typography>
-            )}
+{/* 
+{reviews.length > 0 ? (
+  reviews.map((review) => (
+    <Box key={review.id} className="review-card">
+      <Typography variant="body1" className="review-text">
+        {review.text}
+      </Typography>
+      <Typography variant="body2" className="review-rating">
+        <strong>Rating:</strong> {review.rating}
+      </Typography>
+      <Typography variant="body2" className="review-reviewer">
+        <strong>By:</strong> {review.reviewer_name}
+      </Typography>
+    </Box>
+  ))
+) : (
+  <Typography variant="body2" className="no-reviews">
+    No reviews available for this beer.
+  </Typography>
+)}
+*/}
+
           </Box>
         </Box>
       </Card>

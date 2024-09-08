@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -53,14 +53,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Header() {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (query.trim()) { // Ensure query is not empty or just spaces
-      navigate(`/beers?q=${query}`);
-    } else {
-      navigate('/beers'); // Redirect to the default beers page
+    // Check if we are on the '/beers' page
+    if (location.pathname === '/beers') {
+      if (query.trim()) {
+        navigate(`/beers?q=${query}`);
+      } else {
+        navigate('/beers');
+      }
     }
-  }, [query, navigate]);
+  }, [query, navigate, location.pathname]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

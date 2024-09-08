@@ -19,12 +19,12 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :bars
-      resources :beers do
+      resources :beers, only: [:index] do
         collection do
-          get 'search'  # This defines the search route for beers
+          get 'search'
         end
-        resources :reviews, only: [:index]
       end
+      resources :beers, only: [:show, :create, :update, :destroy]
       resources :brands, only: [:show]
       resources :events, only: [:index, :show, :create, :update, :destroy]
       resources :users do

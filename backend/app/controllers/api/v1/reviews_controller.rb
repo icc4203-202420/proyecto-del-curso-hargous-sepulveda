@@ -4,15 +4,8 @@ class API::V1::ReviewsController < ApplicationController
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    if params[:user_id]
-      # Fetch reviews for a specific user
-      @user = User.find(params[:user_id])
-      @reviews = Review.where(user: @user)
-    else
-      # Fetch reviews for a specific beer
-      @beer = Beer.find(params[:beer_id])
-      @reviews = @beer.reviews
-    end
+    @reviews = Review.where(user: @user)
+  end
   
     render json: { reviews: @reviews }, status: :ok
   rescue ActiveRecord::RecordNotFound => e
@@ -57,9 +50,7 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def set_user
-    if params[:user_id]
-      @user = User.find(params[:user_id]) 
-    end
+    @user = User.find(params[:user_id]) 
   end
 
   def review_params

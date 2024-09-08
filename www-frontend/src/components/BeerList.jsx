@@ -14,27 +14,21 @@ const BeerList = () => {
   const [error, setError] = useState(null);
 
   const location = useLocation();
-
   const query = new URLSearchParams(location.search).get('q');
 
   useEffect(() => {
     const fetchBeers = async () => {
       setLoading(true);
-      console.log(query)
       try {
-        let response;
-        if (query != null) {
+        const response = query 
+          ? await axios.get(`http://localhost:3001/api/v1/beers/search?q=${query}`)
+          : await axios.get('http://localhost:3001/api/v1/beers');
 
-          response = await axios.get(`http://localhost:3001/api/v1/beers/search?q=${query}`);
-        } else {
-
-          response = await axios.get('http://localhost:3001/api/v1/beers');
-        }
         setBeers(response.data.beers);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching beers:', error);
         setError('Error fetching beers');
+      } finally {
         setLoading(false);
       }
     };
@@ -56,11 +50,11 @@ const BeerList = () => {
   return (
     <div className="beer-list-content">
       {Object.keys(beersByType).map(style => (
-        <div key={style} className="type-section" sx={{ minWidth: 200}}>
+        <div key={style} className="type-section" sx={{ minWidth: 200 }}>
           <h6 className="type-title">{style}</h6>
           <div className="beer-list">
             {beersByType[style].map(beer => (
-              <Link to={`/beers/${beer.id}`} key={beer.name} className="beer-card-link">
+              <Link to={`/beers/${beer.id}`} key={beer.id} className="beer-card-link">
                 <Card sx={{ maxWidth: 400, minWidth: 200 }} className="beer-card">
                   <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <CardContent sx={{ flex: 1 }} id="card">
@@ -89,6 +83,7 @@ const BeerList = () => {
 };
 
 export default BeerList;
+
 
 
 
