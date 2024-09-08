@@ -24,6 +24,11 @@ Rails.application.routes.draw do
           get 'search'
         end
       end
+      resources :beers, only: [:show, :create, :update, :destroy] do
+        member do
+          get :bars
+        end
+      end
       resources :beers, only: [:show, :create, :update, :destroy]
       resources :brands, only: [:show]
       resources :events, only: [:index, :show, :create, :update, :destroy]
