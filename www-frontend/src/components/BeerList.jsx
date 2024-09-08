@@ -6,29 +6,46 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import './BeerList.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const BeerList = () => {
   const [beers, setBeers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const location = useLocation();
+
+  const query = new URLSearchParams(location.search).get('q');
 
   useEffect(() => {
     const fetchBeers = async () => {
+      setLoading(true);
+      console.log(query)
       try {
-        const response = await axios.get('http://localhost:3001/api/v1/beers');
+        let response;
+        if (query != null) {
+
+          response = await axios.get(`http://localhost:3001/api/v1/beers/search?q=${query}`);
+        } else {
+
+          response = await axios.get('http://localhost:3001/api/v1/beers');
+        }
         setBeers(response.data.beers);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching beers:', error);
+        setError('Error fetching beers');
+        setLoading(false);
       }
     };
+
     fetchBeers();
-  }, []);
+  }, [query]);
 
-  const filteredBeers = beers.filter(beer =>
-    beer.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
-  const beersByType = filteredBeers.reduce((acc, beer) => {
+  const beersByType = beers.reduce((acc, beer) => {
     if (!acc[beer.style]) {
       acc[beer.style] = [];
     }
@@ -44,7 +61,7 @@ const BeerList = () => {
           <div className="beer-list">
             {beersByType[style].map(beer => (
               <Link to={`/beers/${beer.id}`} key={beer.name} className="beer-card-link">
-                <Card sx={{ maxWidth: 400, minWidth: 200}} className="beer-card">
+                <Card sx={{ maxWidth: 400, minWidth: 200 }} className="beer-card">
                   <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <CardContent sx={{ flex: 1 }} id="card">
                       <Typography gutterBottom variant="h5" component="div">

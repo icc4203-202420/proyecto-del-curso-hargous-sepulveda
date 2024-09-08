@@ -20,10 +20,13 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :bars
       resources :beers do
-        resources :reviews, only: [:index] 
+        collection do
+          get 'search'  # This defines the search route for beers
+        end
+        resources :reviews, only: [:index]
       end
       resources :brands, only: [:show]
-      resources :events, only: [:index, :show, :create, :update, :destroy]   
+      resources :events, only: [:index, :show, :create, :update, :destroy]
       resources :users do
         resources :reviews, only: [:index]
         member do
