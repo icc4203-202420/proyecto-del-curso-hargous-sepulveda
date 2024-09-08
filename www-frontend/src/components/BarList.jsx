@@ -44,11 +44,11 @@ const BarList = () => {
                   </Typography>
                 </CardContent>
                 <CardMedia
-                  component="img"
-                  sx={{ width: 140, maxWidth: '100%' }}
-                  image={bar.image || 'default-image.jpg'}
-                  alt='no photo yet'
-                />
+                      component="img"
+                      sx={{ width: 140, maxWidth: '100%' }}
+                      image={ 'default-image.jpg'}
+                      alt='no photo yet'
+                    />
               </Box>
             </Card>
           </div>
