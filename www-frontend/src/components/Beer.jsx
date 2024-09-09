@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Card from '@mui/material/Card';
@@ -7,8 +7,28 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button'; // Import the Button component
 import CloseIcon from '@mui/icons-material/Close';
 import './Beer.css';
+
+const initialReviewState = {
+  loading: false,
+  error: null,
+  reviews: [],
+};
+
+const reviewReducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_INIT':
+      return { ...state, loading: true, error: null };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, reviews: action.payload };
+    case 'FETCH_FAILURE':
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 
 const Beer = () => {
   const { id } = useParams();
@@ -18,6 +38,7 @@ const Beer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bars, setBars] = useState([]);
+  const [reviewState, dispatch] = useReducer(reviewReducer, initialReviewState);
 
   useEffect(() => {
     const fetchBeerAndDetails = async () => {
@@ -36,11 +57,17 @@ const Beer = () => {
           setBrand(brandResponse.data.name);
         }
 
+        // Fetch reviews
+        dispatch({ type: 'FETCH_INIT' });
+        const reviewResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
+        dispatch({ type: 'FETCH_SUCCESS', payload: reviewResponse.data.reviews });
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching beer details or bars:', error);
         setError('Error fetching beer details or bars');
         setLoading(false);
+        dispatch({ type: 'FETCH_FAILURE', payload: 'Error fetching reviews' });
       }
     };
 
@@ -49,6 +76,8 @@ const Beer = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
+
+  const { loading: reviewLoading, error: reviewError, reviews } = reviewState;
 
   return (
     beer && (
@@ -74,8 +103,8 @@ const Beer = () => {
             )}
           </Box>
           <Box className="average-rating-bubble">
-              Rating: {beer.avg_rating ? `${beer.avg_rating}/5` : 'N/A'}
-            </Box>
+            Rating: {beer.avg_rating ? `${beer.avg_rating}/5` : 'N/A'}
+          </Box>
           <CardContent className="beer-card-content">
             <Typography className="beer-card-title" variant="h4" component="div">
               {beer.name || 'N/A'}
@@ -120,6 +149,36 @@ const Beer = () => {
               <Typography variant="body2">No bars serving this beer.</Typography>
             )}
           </Box>
+
+          {/* Render reviews */}
+          <Box className="reviews-section">
+            <Typography variant="h5">Reviews</Typography>
+            {reviewLoading ? (
+              <Typography variant="body2">Cargando evaluaciones...</Typography>
+            ) : reviewError ? (
+              <Typography variant="body2">{reviewError}</Typography>
+            ) : reviews.length > 0 ? (
+              reviews.map(review => (
+                <Box key={review.id} className="review-card">
+                  <Typography variant="body2">{review.text}</Typography>
+                  <Typography variant="body2">Rating: {review.rating}/5</Typography>
+                  <Typography variant="body2">Reviewer: {review.reviewer}</Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2">No Reviews available.</Typography>
+            )}
+          </Box>
+
+          {/* Button to navigate to the review form */}
+          <Typography variant="body2">Did you try it?</Typography>
+          <Button 
+            variant="contained" 
+            color="primary"
+            onClick={() => navigate(`/beers/${id}/review`)}
+          >
+            Leave a Review
+          </Button>
         </Box>
       </Card>
     )
@@ -127,6 +186,7 @@ const Beer = () => {
 };
 
 export default Beer;
+
 
 
 
