@@ -50,5 +50,12 @@ if Rails.env.development?
       FactoryBot.create(:attendance, user: user, event: event, checked_in: [true, false].sample)
     end
   end
+  # Create reviews
+  users.each do |user|
+    beers = Beer.all.sample(rand(1..3))
+    beers.each do |beer|
+      FactoryBot.create(:review, user: user, beer: beer)
+    end
+  end
 
 end
