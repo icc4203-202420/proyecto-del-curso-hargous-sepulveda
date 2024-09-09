@@ -2,60 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Account() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [hasToken, setHasToken] = useState(false); // Estado para saber si hay token o no
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('jwtToken');
 
-      if (!token) {
-        // Redirige a la página de inicio de sesión si no hay token
-        navigate('/login');
-        return;
-      }
-
-      try {
-        const response = await fetch('http://localhost:3001/api/v1/current_user', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Asegúrate de que el token esté incluido
-          },
-        });
-        
-
-        if (response.ok) {
-          const result = await response.json();
-          setUser(result.user);
-        } else {
-          // Si la respuesta no es ok, borra el token y redirige al login
-          localStorage.removeItem('token');
-          navigate('/login');
-        }
-      } catch (err) {
-        setError('An error occurred while fetching user data.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
+    if (token) {
+      setHasToken(true); // Si hay token, actualizar el estado a true
+    } else {
+      setHasToken(false); // Si no hay token, actualizar el estado a false
+      navigate('/login'); // Redirigir al login si no hay token
+    }
   }, [navigate]);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
+  const handleLogout = () => {
+    sessionStorage.removeItem('jwtToken'); // Eliminar el token de sessionStorage
+    setHasToken(false); // Actualizar el estado para reflejar que el usuario ha cerrado sesión
+    navigate('/login'); // Redirigir al login
+  };
 
   return (
-    <div className="container">
-      <p>Welcome, {user ? user.first_name : 'User'}!</p>
+    <div>
+      <h2>Cuenta</h2>
+      {hasToken ? (
+        <>
+          <p>Tienes un token válido en sessionStorage.</p>
+          <button onClick={handleLogout}>Cerrar sesión</button>
+        </>
+      ) : (
+        <p>No tienes un token válido. Por favor, inicia sesión.</p>
+      )}
     </div>
   );
 }

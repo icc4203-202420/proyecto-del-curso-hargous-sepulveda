@@ -10,7 +10,7 @@ const Signup = () => {
     handle: '',
     password: '',
     passwordConfirmation: '',
-    age: '' // Campo opcional
+    // age: '' // Campo opcional
   });
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState(''); // Nuevo estado para el mensaje de éxito
@@ -66,10 +66,10 @@ const Signup = () => {
       return newErrors;
     }
 
-    if (formData.age && (formData.age < 18 || formData.age > 99)) {
-      newErrors.age = 'La edad debe estar entre 18 y 99 años.';
-      return newErrors;
-    }
+    // if (formData.age && (formData.age < 18 || formData.age > 99)) {
+    //   newErrors.age = 'La edad debe estar entre 18 y 99 años.';
+    //   return newErrors;
+    // }
     
     return newErrors;
   };
@@ -95,7 +95,7 @@ const Signup = () => {
             handle: formData.handle,
             password: formData.password,
             password_confirmation: formData.passwordConfirmation,
-            age: formData.age
+            // age: formData.age
           }
         }),
       });
@@ -185,7 +185,7 @@ const Signup = () => {
       />
       {errors.passwordConfirmation && <span className="error">{errors.passwordConfirmation}</span>}
       
-      <input
+      {/* <input
         type="number"
         name="age"
         placeholder="Edad (opcional)"
@@ -194,7 +194,7 @@ const Signup = () => {
         className="signup-input"
         min="18" max="99"
       />
-      {errors.age && <span className="error">{errors.age}</span>}
+      {errors.age && <span className="error">{errors.age}</span>} */}
       
       <button type="submit" className="signup-button">Registrarse</button>
       {errors.submit && <span className="error">{errors.submit}</span>}

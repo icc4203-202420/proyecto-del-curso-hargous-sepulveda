@@ -1,99 +1,118 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate, Link } from 'react-router-dom';
+import qs from 'qs';
+import useAxios from 'axios-hooks';
+import axios from 'axios';
 import './Login.css';
 
+const validationSchema = Yup.object({
+  email: Yup.string().email('Email no válido').required('El email es requerido'),
+  password: Yup.string().required('La contraseña es requerida').min(6, 'La contraseña debe tener al menos 6 caracteres'),
+});
+
+const initialValues = {
+  email: '',
+  password: '',
+};
+
+// Configuración de axios con axios-hooks
+axios.defaults.baseURL = "http://localhost:3001/api/v1/";
+
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [serverError, setServerError] = useState(''); // Estado para manejar el error del servidor
+  const navigate = useNavigate(); // Hook para manejar la navegación
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  // Definir el hook para la petición POST
+  const [{ data, loading, error }, executePost] = useAxios(
+    {
+      url: '/login',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    },
+    { manual: true } // No ejecutar automáticamente, lo haremos manualmente al enviar el formulario
+  );
 
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch('http://localhost:3001/api/v1/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,  // No envolvemos email y password dentro de session
-          password,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // Verificar que el token JWT esté en la respuesta
-        if (data.status && data.status.data && data.status.data.token) {
-          // Guardar el token JWT en sessionStorage
-          sessionStorage.setItem('token', data.status.data.token);
-
-          // Mostrar mensaje de éxito
-          setSuccessMessage('Inicio de sesión exitoso');
-          setErrorMessage('');
-
-          // Redirigir a la página de cuenta o dashboard después del inicio de sesión
-          setTimeout(() => {
-            window.location.href = '/account'; // Cambia la redirección si es necesario
-          }, 1500); // Espera 1.5 segundos antes de redirigir
-        } else {
-          throw new Error('No se recibió un token válido.');
-        }
-      } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || 'Error en el inicio de sesión');
-        setSuccessMessage('');
+      // Anidar los valores bajo la clave user
+      const response = await executePost({ data: qs.stringify({ user: values }) });
+      
+      // Si el status es 200, significa que el inicio de sesión fue exitoso
+      if (response.status === 200) {
+        const receivedToken = response.data.token;
+        // Guardar el token directamente en sessionStorage o localStorage
+        sessionStorage.setItem('jwtToken', receivedToken);
+        setServerError(''); // Limpia el mensaje de error si el login es exitoso
+        navigate('/account'); // Redirige a la página de cuenta
       }
-    } catch (error) {
-      setErrorMessage(error.message || 'Ocurrió un error. Por favor, intenta de nuevo.');
-      setSuccessMessage('');
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setServerError('Correo electrónico o contraseña incorrectos.');
+      } else {
+        setServerError('Error en el servidor. Intenta nuevamente más tarde.');
+      }
+      console.error('Error en el envío del formulario:', err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="login-container">
-      <form className="login-form" onSubmit={handleLogin}>
-        <h2>Iniciar sesión</h2>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, errors, touched }) => (
+          <Form className="login-form">
+            <h2>Iniciar sesión</h2>
 
-        <input
-          type="email"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Correo electrónico"
-          className="login-input"
-          required
-        />
+            <Field
+              as="input"
+              type="email"
+              name="email"
+              placeholder="Correo electrónico"
+              className={`login-input ${touched.email && errors.email ? 'input-error' : ''}`}
+              required
+            />
+            {touched.email && errors.email && (
+              <div className="error-message">{errors.email}</div>
+            )}
 
-        <input
-          type="password"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          className="login-input"
-          required
-        />
+            <Field
+              as="input"
+              type="password"
+              name="password"
+              placeholder="Contraseña"
+              className={`login-input ${touched.password && errors.password ? 'input-error' : ''}`}
+              required
+            />
+            {touched.password && errors.password && (
+              <div className="error-message">{errors.password}</div>
+            )}
 
-        <button type="submit" className="login-button">Iniciar sesión</button>
+            <button type="submit" className="login-button" disabled={isSubmitting || loading}>
+              {loading ? 'Enviando...' : 'Iniciar sesión'}
+            </button>
 
-        {successMessage && <p className="success-message">{successMessage}</p>}
-        {errorMessage && (
-          <ul className="error-list">
-            <li className="error-item">{errorMessage}</li>
-          </ul>
+            {serverError && (
+              <ul className="error-list">
+                <li className="error-item">{serverError}</li>
+              </ul>
+            )}
+
+            <p>
+              ¿No tienes una cuenta?
+              <span className="redirect">
+                <Link to="/signup">Regístrate aquí</Link>
+              </span>
+            </p>
+          </Form>
         )}
-
-        <p>
-          ¿No tienes una cuenta?          
-          <span className="redirect">
-            <Link to="/signup">Regístrate aquí</Link>
-          </span>
-        </p>
-      </form>
+      </Formik>
     </div>
   );
 };
