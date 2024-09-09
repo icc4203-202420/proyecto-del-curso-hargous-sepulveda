@@ -1,11 +1,13 @@
 class API::V1::ReviewsController < ApplicationController
   respond_to :json
-  before_action :set_user, only: [:index, :create]
+  before_action :set_beer, only: [:index, :create]
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    @reviews = Review.where(user: @user)
+    @reviews = Review.where(beer: @beer)
     render json: { reviews: @reviews }, status: :ok
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: e.message }, status: :not_found
   end
 
   def show
@@ -17,7 +19,7 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def create
-    @review = @user.reviews.build(review_params)
+    @review = @beer.reviews.build(review_params)
     if @review.save
       render json: @review, status: :created, location: api_v1_review_url(@review)
     else
@@ -45,11 +47,12 @@ class API::V1::ReviewsController < ApplicationController
     render json: { error: "Review not found" }, status: :not_found unless @review
   end
 
-  def set_user
-    @user = User.find(params[:user_id]) 
+  def set_beer
+    @beer = Beer.find(params[:beer_id]) 
   end
 
   def review_params
     params.require(:review).permit(:id, :text, :rating, :beer_id)
   end
 end
+

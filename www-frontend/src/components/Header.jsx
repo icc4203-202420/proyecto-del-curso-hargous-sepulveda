@@ -1,15 +1,13 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import './Header.css';
-
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -52,9 +50,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function SearchAppBar() {
+export default function Header() {
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we are on the '/beers' page
+    if (location.pathname === '/beers') {
+      if (query.trim()) {
+        navigate(`/beers?q=${query}`);
+      } else {
+        navigate('/beers');
+      }
+    }
+  }, [query, navigate, location.pathname]);
+
   return (
-    
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" id='barra_fondo'>
         <Toolbar>
@@ -64,15 +76,18 @@ export default function SearchAppBar() {
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
-             
+            {/* Your app title/logo */}
           </Typography>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase id='barra'
+            <StyledInputBase
+              id='barra'
               placeholder="Search for Beers, Bars, Events or Users"
               inputProps={{ 'aria-label': 'search' }}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
           </Search>
         </Toolbar>
@@ -80,3 +95,5 @@ export default function SearchAppBar() {
     </Box>
   );
 }
+
+

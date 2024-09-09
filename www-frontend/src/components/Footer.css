@@ -8,9 +8,9 @@
 }
 
 #bottom-navigation-action.selected {
-  color: #ffeb3b; /* Color for selected item */
-  background-color: #333; /* Background color for selected item (optional) */
-  border-radius: 4px; /* Optional rounded corners for selected item */
+  color: #ffeb3b;  
+  background-color: #333;  
+  border-radius: 4px;  
 }
 
 

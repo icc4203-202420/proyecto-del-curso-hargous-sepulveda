@@ -3,7 +3,6 @@ class API::V1::UsersController < ApplicationController
   # autenticación
   before_action :verify_jwt_token, only: [:update, :friendships, :create_friendship]
   before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
-
   def show
   end
 

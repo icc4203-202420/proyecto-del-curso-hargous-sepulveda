@@ -19,8 +19,21 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :bars
-      resources :beers
-      resources :events, only: [:show, :create, :update, :destroy]
+      
+      resources :beers, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get 'search'
+        end
+        
+        member do
+          get :bars
+        end
+  
+        resources :reviews, only: [:index, :show, :create, :update, :destroy]
+      end
+  
+      resources :brands, only: [:show]
+      resources :events, only: [:index, :show, :create, :update, :destroy]
       
       resources :users do
         resources :reviews, only: [:index]
@@ -29,7 +42,7 @@ Rails.application.routes.draw do
           post :friendships, to: 'users#create_friendship'
         end
       end
-
+  
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
     end
   end

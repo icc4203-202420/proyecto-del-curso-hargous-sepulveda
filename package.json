@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "@mui/material": "^6.0.1",
-    "react-router-dom": "^6.26.1"
+    "axios": "^1.7.6",
+    "jwt-decode": "^4.0.0",
+    "react-router-dom": "^6.26.1",
+    "use-local-storage-state": "^19.4.0"
   }
 }
