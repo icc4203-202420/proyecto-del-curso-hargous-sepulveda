@@ -18,13 +18,17 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :bars
-      
+      resources :bars do
+        member do
+          get :beers  # This will map to `GET /api/v1/bars/:id/beers`
+        end
+      end
+  
       resources :beers, only: [:index, :show, :create, :update, :destroy] do
         collection do
           get 'search'
         end
-        
+  
         member do
           get :bars
         end
@@ -34,7 +38,7 @@ Rails.application.routes.draw do
   
       resources :brands, only: [:show]
       resources :events, only: [:index, :show, :create, :update, :destroy]
-      
+  
       resources :users do
         resources :reviews, only: [:index]
         member do
@@ -46,4 +50,5 @@ Rails.application.routes.draw do
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
     end
   end
+  
 end

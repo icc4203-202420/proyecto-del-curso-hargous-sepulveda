@@ -7,7 +7,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button'; // Import the Button component
+import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import './Beer.css';
 
@@ -35,6 +35,7 @@ const Beer = () => {
   const navigate = useNavigate(); // Hook for programmatic navigation
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
+  const [brewery, setBrewery] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bars, setBars] = useState([]);
@@ -56,7 +57,10 @@ const Beer = () => {
           const brandResponse = await axios.get(`http://localhost:3001/api/v1/brands/${beerResponse.data.beer.brand_id}`);
           setBrand(brandResponse.data.name);
         }
-
+        if (beerResponse.data.beer.brewery_id) {
+          const brandResponse = await axios.get(`http://localhost:3001/api/v1/brewery/${beerResponse.data.beer.brewery_id}`);
+          setBrewery(breweryResponse.data.name);
+        }
         // Fetch reviews
         dispatch({ type: 'FETCH_INIT' });
         const reviewResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
@@ -110,7 +114,10 @@ const Beer = () => {
               {beer.name || 'N/A'}
             </Typography>
             <Typography className="beer-card-text">
-              <span className="beer-card-strong">Brand Name:</span> {brand || 'N/A'}
+              <span className="beer-card-strong">Brand:</span> {brand || 'N/A'}
+            </Typography>
+            <Typography className="beer-card-text">
+              <span className="beer-card-strong">Brewery:</span> {brewery || 'N/A'}
             </Typography>
             <Typography className="beer-card-text">
               <span className="beer-card-strong">Style:</span> {beer.style || 'N/A'}
@@ -160,10 +167,13 @@ const Beer = () => {
             ) : reviews.length > 0 ? (
               reviews.map(review => (
                 <Box key={review.id} className="review-card">
-                  <Typography variant="body2">{review.text}</Typography>
-                  <Typography variant="body2">Rating: {review.rating}/5</Typography>
-                  <Typography variant="body2">Reviewer: {review.reviewer}</Typography>
-                </Box>
+                <div className='rating'>
+                <Typography className="rating" variant="body2">Rating: {review.rating}/5</Typography>
+                </div>
+                <Typography variant="body2">Reviewer: {review.user_id}</Typography>
+                <Typography variant="body2">{review.text}</Typography>
+
+              </Box>
               ))
             ) : (
               <Typography variant="body2">No Reviews available.</Typography>

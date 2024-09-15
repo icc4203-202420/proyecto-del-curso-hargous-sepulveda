@@ -12,6 +12,7 @@ import BeerList from './BeerList.jsx';
 import BarList from './BarList.jsx';
 import Events from './Events.jsx';
 import Beer from './Beer.jsx';
+import Bar from './Bar.jsx';
 import Signup from './Signup'; // Usando ruta relativa
 import Login from './Login.jsx';
 import CreateReview from './CreateReview.jsx';
@@ -24,6 +25,7 @@ const Footer = ({ value, onChange }) => {
           <Route path="/account" element={<Account />} />
           <Route path="/beers" element={<BeerList />} />
           <Route path="/bars" element={<BarList />} />
+          <Route path="/bars/:id" element={<Bar />} />
           <Route path="/events" element={<Events />} />
           <Route path="/beers/:id" element={<Beer />} />
           <Route path="/signup" element={<Signup />} />

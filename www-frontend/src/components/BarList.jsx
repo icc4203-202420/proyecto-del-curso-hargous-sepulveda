@@ -6,7 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import './BarList.css';
-
+import { Link, useLocation } from 'react-router-dom';
 const BarList = () => {
   const [bars, setBars] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,6 +33,7 @@ const BarList = () => {
       <div className="bar-list">
         {filteredBars.map(bar => (
           <div key={bar.name} className="bar-card">
+            <Link to={`/bars/${bar.id}`} key={bar.id} className="bar-card-link">
             <Card sx={{ maxWidth: 345 }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <CardContent sx={{ flex: 1 }}id = "card">
@@ -51,6 +52,7 @@ const BarList = () => {
                     />
               </Box>
             </Card>
+            </Link>
           </div>
         ))}
         </div>

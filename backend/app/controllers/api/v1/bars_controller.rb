@@ -10,7 +10,11 @@ class API::V1::BarsController < ApplicationController
     @bars = Bar.all
     render json: { bars: @bars }, status: :ok
   end
-
+  def beers
+    @bar = Bar.find(params[:id])
+    @beers = @bar.beers 
+    render json: @beers
+  end
   def show
     if @bar.image.attached?
       render json: @bar.as_json.merge({ 
