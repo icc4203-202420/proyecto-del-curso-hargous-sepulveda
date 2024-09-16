@@ -16,20 +16,25 @@ const Bar = () => {
   const navigate = useNavigate();
   const [bar, setBar] = useState(null);
   const [beers, setBeers] = useState([]);
+  const [country, setCountry] = useState(null);
+  const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     const fetchBarAndBeers = async () => {
       try {
         const barResponse = await axios.get(`http://localhost:3001/api/v1/bars/${id}`);
-        console.log('Bar Response:', barResponse.data); 
         setBar(barResponse.data.bar);
 
         const beersResponse = await axios.get(`http://localhost:3001/api/v1/bars/${id}/beers`);
-        console.log('Beers Response:', beersResponse.data); 
         setBeers(beersResponse.data);
 
+        const addressResponse = await axios.get(`http://localhost:3001/api/v1/bars/${id}/addresses`);
+        setAddress(addressResponse.data);
+
+        const countryResponse = await axios.get(`http://localhost:3001/api/v1/bars/${id}/countrys`);
+        setCountry(countryResponse.data.country);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching bar details or beers:', error);
@@ -72,13 +77,13 @@ const Bar = () => {
               {bar.name || 'N/A'}
             </Typography>
             <Typography className="bar-card-text">
-              <span className="bar-card-strong">Location:</span> {bar.location || 'N/A'}
+              <span className="bar-card-strong">Country:</span> {country.name || 'N/A'}
             </Typography>
             <Typography className="bar-card-text">
-              <span className="bar-card-strong">Address:</span> {bar.address || 'N/A'}
+              <span className="bar-card-strong">City:</span> {address.city || 'N/A'}
             </Typography>
             <Typography className="bar-card-text">
-              <span className="bar-card-strong">Phone:</span> {bar.phone || 'N/A'}
+              <span className="bar-card-strong">Address:</span> {address.line1 || 'N/A'}
             </Typography>
           </CardContent>
 

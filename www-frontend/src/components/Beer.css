@@ -5,7 +5,6 @@
   padding-right: 2% !important;
   background-color: #2E2E42;
   margin-top: 0% !important;
-  
 }
 
 .css-1iqhh05-MuiPaper-root {    
@@ -13,20 +12,26 @@
   box-shadow: none !important;
 }
 
+#content {
+  position: relative;
+}
+
 #content img {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 0;
+  right: 0;
 }
 
 .beer-card-container {
   display: flex;
+  align-items: center;
   justify-content: flex-start;
+  margin-top: 20%; 
   max-width: 600px;
   margin: 20px auto;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
+  max-height: 90vh; 
+  overflow-y: auto; 
+  overflow-x: hidden; 
 }
 
 .close-button {
@@ -41,7 +46,6 @@
   width: 100%;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  overflow-y: auto;
 }
 
 .beer-card img {
@@ -117,8 +121,9 @@
   background-color: #9E9CB2;
   border-radius: 16px;
   padding: 1rem;
-  width: 100%;
-  overflow-y: auto; 
+  width: 500px;
+  max-height: 60vh; /* Ensure section can be scrolled if content overflows */
+  overflow-y: auto; /* Add vertical scrollbar if needed */
 }
 
 .reviews-section_sub {
@@ -128,9 +133,9 @@
   padding: 1rem;
   background-color: #9E9CB2;
   border-radius: 16px;
-  white-space: nowrap; 
-  max-width: 100%; 
-  scroll-behavior: smooth; 
+  white-space: nowrap;
+  max-width: 100%;
+  scroll-behavior: smooth;
 }
 
 .review-card {
@@ -139,6 +144,7 @@
   border-radius: 8px;
   background-color: #CCCBCE !important;
   display: flex;
+  min-width: 300px;
   flex-direction: column; /* Stack content vertically */
   width: 100%; /* Make sure the card takes up full width */
   box-sizing: border-box; /* Ensure padding and border are included in width */
@@ -171,8 +177,6 @@
   white-space: pre-wrap; /* Preserve whitespace and new lines */
 }
 
-
-
 .review-rating,
 .review-reviewer {
   color: #2E2E42;
@@ -185,11 +189,9 @@
 /* Media Queries for Responsiveness */
 
 /* Mobile Devices */
-
 @media (max-width: 600px) {
   .beer-card-container {
     max-width: 100%;
-    padding: 0 10px;
   }
 
   .beer-card {
@@ -255,4 +257,5 @@
     padding: 1rem;
   }
 }
+
 
