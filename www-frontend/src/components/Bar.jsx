@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import './Bar.css';
-
+import { Link, useLocation } from 'react-router-dom';
 const Bar = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -90,6 +90,7 @@ const Bar = () => {
           <Box className="reviews-section-sub">
           {Array.isArray(beers) && beers.length > 0 ? (
             beers.map(beer => (
+                <Link to={`/beers/${beer.id}`} key={beer.id} className=".review-card">
               <Box key={beer.id} className="review-card">
                 <Typography variant="h6">{beer.name}</Typography>
                 {beer.image_url && (
@@ -102,6 +103,7 @@ const Bar = () => {
                 )}
                 <Typography variant="body2">Rating: {beer.avg_rating || 'N/A'}</Typography>
               </Box>
+              </Link>
             ))
           ) : (
             <Typography variant="body2">No beers available at this bar.</Typography>

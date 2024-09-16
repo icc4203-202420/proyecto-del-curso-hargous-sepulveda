@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -143,43 +143,56 @@ const Beer = () => {
           </CardContent>
 
           {/* Render bars where the beer is served */}
-          <Box className="bars-section">
-            <Typography variant="h5">Available At</Typography>
-            <Typography variant="body2">*This will normally be a button to show bars on a map, but the map is not available yet*</Typography>
-            {bars.length > 0 ? (
-              bars.map(bar => (
-                <Box key={bar.id} className="bar-card">
-                  <Typography variant="h6">{bar.name}</Typography>
-                </Box>
-              ))
-            ) : (
-              <Typography variant="body2">No bars serving this beer.</Typography>
-            )}
-          </Box>
+          <Box className="reviews-section">
+          <Typography variant="h5">Available At</Typography>
+          <Box className="reviews-section-sub">
+          {Array.isArray(bars) && bars.length > 0 ? (
+            bars.map(bar => (
+                <Link to={`/bars/${bar.id}`} key={bar.id} className=".review-card">
+              <Box key={bar.id} className="review-card">
+                <Typography variant="h6">{bar.name}</Typography>
+                {bar.image_url && (
+                  <CardMedia
+                    component="img"
+                    className="bar-card-img"
+                    image={bar.image_url}
+                    alt={`${bar.name} image`}
+                  />
+                )}
+                <Typography variant="body2">Address: {bar.address || 'N/A'}</Typography>
+              </Box>
+              </Link>
+            ))
+          ) : (
+            <Typography variant="body2">No bars serving this beer.</Typography>
+          )}
+        </Box>
+        </Box>
 
           {/* Render reviews */}
           <Box className="reviews-section">
             <Typography variant="h5">Reviews</Typography>
+            <Box className="reviews-section_sub"> 
             {reviewLoading ? (
               <Typography variant="body2">Cargando evaluaciones...</Typography>
             ) : reviewError ? (
               <Typography variant="body2">{reviewError}</Typography>
             ) : reviews.length > 0 ? (
               reviews.map(review => (
-                <Box key={review.id} className="review-card">
+              <Card key={review.id} className="review-card">
                 <div className='rating'>
-                <Typography className="rating" variant="body2">Rating: {review.rating}/5</Typography>
+                  <Typography className="rating-text" variant="body2">Rating: {review.rating}/5</Typography>
                 </div>
-                <Typography variant="body2">Reviewer: {review.user_id}</Typography>
-                <Typography variant="body2">{review.text}</Typography>
+                <Typography className="reviewer-text" variant="body2">Reviewer: {review.user_id}</Typography>
+                <Typography className="review-text" variant="body2">{review.text}</Typography>
+              </Card>
 
-              </Box>
               ))
             ) : (
               <Typography variant="body2">No Reviews available.</Typography>
             )}
           </Box>
-
+          </Box>
           {/* Button to navigate to the review form */}
           <Typography variant="body2">Did you try it?</Typography>
           <Button 
@@ -197,20 +210,4 @@ const Beer = () => {
 
 export default Beer;
 
-
-
-
-
-//<Card className="beer-review-card">
-//<Box className="beer-review-card-container">
-//  <CardContent className="beer-review-card-content">
-//    <Typography className="beer-review-card-title" variant="h4" component="div">
-//      {review.rating}
-//    </Typography>
-//    <Typography className="beer-review-card-text">
-//      {review.text}
-//    </Typography>
-//  </CardContent>
-//</Box>
-//</Card>    
 
