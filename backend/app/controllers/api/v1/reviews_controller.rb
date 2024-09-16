@@ -1,6 +1,6 @@
 class API::V1::ReviewsController < ApplicationController
   respond_to :json
-  before_action :set_beer, only: [:index, :create]
+  before_action :set_beer, only: [:index]
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
@@ -19,7 +19,7 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def create
-    @review = @beer.reviews.build(review_params)
+    @review = Review.new(review_params)  # Ahora permite todos los parámetros
     if @review.save
       render json: @review, status: :created, location: api_v1_review_url(@review)
     else
@@ -48,11 +48,10 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def set_beer
-    @beer = Beer.find(params[:beer_id]) 
+    @beer = Beer.find(params[:beer_id])
   end
 
   def review_params
-    params.require(:review).permit(:id, :text, :rating, :beer_id)
+    params.require(:review).permit(:text, :rating, :beer_id, :user_id) # Permitir beer_id y user_id desde el frontend
   end
 end
-

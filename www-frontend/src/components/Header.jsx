@@ -68,7 +68,6 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    // Navegar solo si estamos en la página de 'beers' y hay un query
     if (location.pathname === '/beers') {
       if (query.trim()) {
         navigate(`/beers?q=${query}`);
@@ -76,7 +75,14 @@ export default function Header() {
         navigate('/beers');
       }
     }
-  }, [query, navigate, location.pathname]);
+    if (location.pathname === '/bars') {
+      if (query.trim()) {
+        navigate(`/bars?q=${query}`);
+      } else {
+        navigate('/bars');
+      }
+    }
+  }, [query, navigate, location.pathname])
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -91,7 +97,7 @@ export default function Header() {
           
           {/* Mostrar la barra de búsqueda solo si el usuario está autenticado */}
           {isAuthenticated && (
-            <Search style={{ position: 'absolute', right: '10px' }}> {/* Barra de búsqueda en la derecha */}
+            <Search style={{alignSelf:"flex-end", transform: 'translateY(-20%)'}}> {/* Barra de búsqueda en la derecha */}
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
