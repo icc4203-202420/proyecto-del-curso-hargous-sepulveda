@@ -19,9 +19,15 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :bars do
-        member do
-          get :beers  # This will map to `GET /api/v1/bars/:id/beers`
+        collection do
+          get 'search'
         end
+        member do
+          get :beers
+          get :addresses
+          get :countrys 
+        end
+        
       end
   
       resources :beers, only: [:index, :show, :create, :update, :destroy] do

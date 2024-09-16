@@ -10,10 +10,32 @@ class API::V1::BarsController < ApplicationController
     @bars = Bar.all
     render json: { bars: @bars }, status: :ok
   end
+  def search
+    query = "%#{params[:q]}%"
+    if params[:q]
+      @bars = Bar.where("name LIKE ?", query)
+    else
+      @bars = Bar.all
+    end
+
+    render json: { bars: @bars }, status: :ok
+  end
   def beers
     @bar = Bar.find(params[:id])
     @beers = @bar.beers 
     render json: @beers
+  end
+  def addresses
+    @bar = Bar.find(params[:id])
+    @address = @bar.address
+    render json: @address
+  end
+  def countrys
+    @bar = Bar.find(params[:id])
+    @address = @bar.address
+    @country = @address.country 
+
+    render json: { country: @country }, status: :ok
   end
   def show
     if @bar.image.attached?
