@@ -14,48 +14,83 @@ require 'factory_bot_rails'
 ReviewCounter.create(count: 0)
 
 if Rails.env.development?
+  # Create custom countries
+  countries = [
+    FactoryBot.create(:country, name: "Chile"),
+  ]
 
-  # Crear países
-  countries = FactoryBot.create_list(:country, 5)
+  # Create custom addresses
+  addresses = [
+    FactoryBot.create(:address, line1: "Francisco Bulnes Correa 1156", line2: "7610588 Las Condes", city: "Santiago", country: countries.first),
+    FactoryBot.create(:address, line1: "Av. Pdte. Kennedy Lateral", line2: "7560009 Las Condes", city: "Santiago", country: countries.first),
+    FactoryBot.create(:address, line1: "Camino de la Huerta 3848", line2: "7700944 Lo Barnechea", city: "Santiago", country: countries.first)
+  ]
+  
+  # Create custom bars with predefined coordinates
+  bars = [
+    FactoryBot.create(:bar, name: "Sturmtiger's Bar", address: addresses.first, latitude: "-33.39132546864838", longitude: "-70.51527317976134"),
+    FactoryBot.create(:bar, name: "Checho's Bar", address: addresses.second, latitude: "-33.39081201541005", longitude: "-70.5496134876965"),
+    FactoryBot.create(:bar, name: "El Sacacorcho's Bar", address: addresses.third, latitude: "-33.346435892829774", longitude: "-70.55061262015269")
+  ]
 
-  # Crear cervecerías (breweries) con marcas (brands) y cervezas (beers)
-  countries.map do |country|
-    FactoryBot.create(:brewery_with_brands_with_beers, countries: [country])
+  # Create additional bars with random coordinates
+  additional_bars_count = 5
+  additional_bars = additional_bars_count.times.map do
+    address = FactoryBot.create(:address, city: "Santiago", country: countries.first)
+    FactoryBot.create(:bar, 
+      name: "Additional Bar #{Faker::Address.unique.street_name}", 
+      address: address,
+      latitude: Faker::Address.latitude.to_s,
+      longitude: Faker::Address.longitude.to_s
+    )
   end
 
-  # Crear usuarios con direcciones asociadas
-  users = FactoryBot.create_list(:user, 10) do |user, i|
+  # Combine custom and additional bars
+  all_bars = bars + additional_bars
+
+  # Create a set of beers
+  beers = FactoryBot.create_list(:beer, 10)
+
+  # Associate beers with bars and add reviews
+  all_bars.each do |bar|
+    # Add random beers to each bar
+    bar.beers << beers.sample(rand(1..5))
+
+    # Add reviews for each beer in this bar
+    bar.beers.each do |beer|
+      FactoryBot.create(:review, user: User.all.sample, beer: beer)
+    end
+  end
+
+  # Create users with random addresses
+  users = FactoryBot.create_list(:user, 10) do |user|
     user.address.update(country: countries.sample)
   end
 
-  # Crear bares con direcciones y cervezas asociadas
-  bars = FactoryBot.create_list(:bar, 5) do |bar|
-    bar.address.update(country: countries.sample)
-    bar.beers << Beer.all.sample(rand(1..3))
+  # Create breweries with custom countries
+  countries.each do |country|
+    FactoryBot.create(:brewery_with_brands_with_beers, countries: [country])
   end
 
-  # Crear eventos asociados a los bares
-  events = bars.map do |bar|
+  # Create events and friendships
+  events = all_bars.map do |bar|
     FactoryBot.create(:event, bar: bar)
   end
 
-  # Crear relaciones de amistad entre usuarios
   users.combination(2).to_a.sample(5).each do |user_pair|
-    FactoryBot.create(:friendship, user: user_pair[0], friend: user_pair[1], bar: bars.sample)
+    FactoryBot.create(:friendship, user: user_pair[0], friend: user_pair[1], bar: all_bars.sample)
   end
 
-  # Crear attendances (asistencia) de usuarios a eventos
   users.each do |user|
     events.sample(rand(1..3)).each do |event|
       FactoryBot.create(:attendance, user: user, event: event, checked_in: [true, false].sample)
     end
   end
-  # Create reviews
+
   users.each do |user|
     beers = Beer.all.sample(rand(1..3))
     beers.each do |beer|
       FactoryBot.create(:review, user: user, beer: beer)
     end
   end
-
 end
