@@ -11,15 +11,10 @@ class API::V1::BarsController < ApplicationController
     render json: { bars: @bars }, status: :ok
   end
   def search
-    query = "%#{params[:q]}%"
-    if params[:q]
-      @bars = Bar.where("name LIKE ?", query)
-    else
-      @bars = Bar.all
-    end
-
-    render json: { bars: @bars }, status: :ok
+    @bars = Bar.all
+    render json: @bars.to_json(include: { address: { include: :country } })
   end
+
   def beers
     @bar = Bar.find(params[:id])
     @beers = @bar.beers 
