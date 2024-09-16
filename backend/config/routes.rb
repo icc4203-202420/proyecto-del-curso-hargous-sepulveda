@@ -48,7 +48,7 @@ Rails.application.routes.draw do
       end
 
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
-      
+      resources :attendances
       # Nueva ruta para listar las asistencias de un evento (sin usar collection)
       get 'attendances/event/:event_id', to: 'attendances#index_by_event'
     end

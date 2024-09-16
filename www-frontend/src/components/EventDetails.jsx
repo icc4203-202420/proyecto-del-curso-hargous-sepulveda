@@ -6,6 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button'; // Importa el componente de botón
 
 const EventDetails = () => {
   const { id } = useParams(); // Obtener el ID del evento desde la URL
@@ -15,60 +16,65 @@ const EventDetails = () => {
   const [attendees, setAttendees] = useState([]); // Lista de asistentes (nombres)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hasConfirmed, setHasConfirmed] = useState(false); // Nuevo estado para asistencia confirmada
+
+  const currentUserId = sessionStorage.getItem('userId'); // ID del usuario autenticado
+
+  const fetchEventDetails = async () => {
+    try {
+      const eventResponse = await axios.get('http://localhost:3001/api/v1/events');
+      const selectedEvent = eventResponse.data.events.find((e) => e.id.toString() === id);
+
+      if (selectedEvent) {
+        setEvent(selectedEvent);
+
+        if (selectedEvent.bar_id) {
+          const barResponse = await axios.get(`http://localhost:3001/api/v1/bars/${selectedEvent.bar_id}`);
+          setBarName(barResponse.data.bar.name);
+          setBarId(selectedEvent.bar_id);
+        }
+
+        const attendanceResponse = await axios.get(`http://localhost:3001/api/v1/attendances/event/${id}`);
+        const attendeesData = attendanceResponse.data.attendees;
+
+        const attendeesNamesPromises = attendeesData.map(async (userId) => {
+          const userResponse = await axios.get(`http://localhost:3001/api/v1/users/${userId}`);
+          return { userId, name: userResponse.data.user.name };
+        });
+
+        const attendeesNames = await Promise.all(attendeesNamesPromises);
+        setAttendees(attendeesNames);
+
+        // Verificar si el usuario actual ya confirmó asistencia
+        if (attendeesData.includes(parseInt(currentUserId))) {
+          setHasConfirmed(true);
+        }
+      } else {
+        setEvent(null);
+      }
+      setLoading(false);
+    } catch (error) {
+      setError('Error fetching event details or attendees');
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        // Llamada para obtener los detalles del evento
-        const eventResponse = await axios.get('http://localhost:3001/api/v1/events');
-        const selectedEvent = eventResponse.data.events.find((e) => e.id.toString() === id);
-
-        // Si se encuentra el evento, obtenemos los detalles del bar y los asistentes
-        if (selectedEvent) {
-          setEvent(selectedEvent);
-
-          // Obtener el nombre del bar si existe un bar asociado
-          if (selectedEvent.bar_id) {
-            try {
-              const barResponse = await axios.get(`http://localhost:3001/api/v1/bars/${selectedEvent.bar_id}`);
-              setBarName(barResponse.data.bar.name);
-              setBarId(selectedEvent.bar_id);
-            } catch (barError) {
-              console.error('Error fetching bar details:', barError);
-              setBarName('Unknown Bar');
-            }
-          }
-
-          // Llamada para obtener la lista de asistentes del evento
-          const attendanceResponse = await axios.get(`http://localhost:3001/api/v1/attendances/event/${id}`);
-          const attendeesData = attendanceResponse.data.attendees;
-
-          // Para cada asistente (user ID), obtener su nombre
-          const attendeesNamesPromises = attendeesData.map(async (userId) => {
-            try {
-              const userResponse = await axios.get(`http://localhost:3001/api/v1/users/${userId}`);
-              return userResponse.data.user.name; // Obtener el nombre del usuario
-            } catch (userError) {
-              console.error(`Error fetching user ${userId} details:`, userError);
-              return 'Unknown User'; // Si falla la petición
-            }
-          });
-
-          const attendeesNames = await Promise.all(attendeesNamesPromises); // Espera a que todas las promesas se resuelvan
-          setAttendees(attendeesNames); // Actualizar con los nombres
-        } else {
-          setEvent(null);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching event details or attendees:', error);
-        setError('Error fetching event details or attendees');
-        setLoading(false);
-      }
-    };
-
-    fetchEventDetails();
+    fetchEventDetails(); // Llamar cuando se monta el componente
   }, [id]);
+
+  const confirmAttendance = async () => {
+    try {
+      await axios.post(`http://localhost:3001/api/v1/attendances`, {
+        event_id: id,
+        user_id: currentUserId,
+      });
+      setHasConfirmed(true);
+      fetchEventDetails(); // Volver a cargar los detalles después de confirmar
+    } catch (error) {
+      console.error('Error confirming attendance:', error);
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -100,14 +106,24 @@ const EventDetails = () => {
               <strong>Fecha de fin:</strong> {new Date(event.end_date).toLocaleString() || 'No disponible'}
             </Typography>
 
-            {/* Mostrar la lista de nombres de los asistentes */}
+            {/* Mostrar el botón o mensaje según la asistencia confirmada */}
+            {hasConfirmed ? (
+              <Typography variant="h6" color="green" sx={{ mt: 3 }}>
+                Has confirmado tu asistencia
+              </Typography>
+            ) : (
+              <Button variant="contained" color="primary" sx={{ mt: 3 }} onClick={confirmAttendance}>
+                Confirmar Asistencia
+              </Button>
+            )}
+
             <Typography variant="h6" sx={{ mt: 3 }}>
               Asistentes:
             </Typography>
             {attendees.length > 0 ? (
-              attendees.map((userName, index) => (
+              attendees.map((attendee, index) => (
                 <Typography key={index} variant="body2">
-                  {userName}
+                  {attendee.name}  
                 </Typography>
               ))
             ) : (
