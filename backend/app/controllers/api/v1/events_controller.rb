@@ -18,6 +18,7 @@ class API::V1::EventsController < ApplicationController
   end
   # GET /api/v1/events/:id
   def show
+    
     event_data = @event.as_json.tap do |data|
       data[:flyer_url] = url_for(@event.flyer) if @event.flyer.attached?
       data[:thumbnail_url] = url_for(@event.thumbnail) if @event.thumbnail.attached?

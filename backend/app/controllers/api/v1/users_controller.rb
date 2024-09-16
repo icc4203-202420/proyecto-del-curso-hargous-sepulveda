@@ -3,7 +3,16 @@ class API::V1::UsersController < ApplicationController
   # autenticación
   before_action :verify_jwt_token, only: [:update, :friendships, :create_friendship]
   before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
+
   def show
+    user = User.find_by(id: params[:id])
+    
+    if user
+ 
+      render json: { user: { id: user.id, name: "#{user.first_name} #{user.last_name}", email: user.email } }, status: :ok
+    else
+      render json: { error: "User not found" }, status: :not_found
+    end
   end
 
   def create
