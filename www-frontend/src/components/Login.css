@@ -6,7 +6,7 @@ html, body {
 .css-13p3xcz-MuiContainer-root {  
   background-color: #2E2E42;
   margin-top: 0% !important;
-  display:block !important;
+  display:block;
   align-items: center;
 }
 .login-container {

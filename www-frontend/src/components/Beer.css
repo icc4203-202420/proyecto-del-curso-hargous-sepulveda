@@ -24,14 +24,14 @@
 
 .beer-card-container {
   display: flex;
+  flex-direction: column; 
   align-items: center;
   justify-content: flex-start;
   margin-top: 20%; 
-  max-width: 600px;
+  max-width: 600px !important;
   margin: 20px auto;
   max-height: 90vh; 
-  overflow-y: auto; 
-  overflow-x: hidden; 
+
 }
 
 .close-button {
@@ -113,17 +113,14 @@
   align-self: flex-start;
 }
 
-/* Reviews Section */
 .reviews-section {
   margin-bottom: 1rem !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
   background-color: #9E9CB2;
-  border-radius: 16px;
+  border-radius: 16px !important;
   padding: 1rem;
   width: 500px;
-  max-height: 60vh; /* Ensure section can be scrolled if content overflows */
-  overflow-y: auto; /* Add vertical scrollbar if needed */
 }
 
 .reviews-section_sub {
@@ -132,16 +129,19 @@
   gap: 1rem;
   padding: 1rem;
   background-color: #9E9CB2;
-  border-radius: 16px;
+  border-radius: 16px!important;
   white-space: nowrap;
   max-width: 100%;
+  height: fit-content;
   scroll-behavior: smooth;
+  
 }
 
 .review-card {
   margin-bottom: 1rem;
   padding: 1rem;
-  border-radius: 8px;
+  height:fit-content;
+  border-radius: 8px!important;
   background-color: #CCCBCE !important;
   display: flex;
   min-width: 300px;

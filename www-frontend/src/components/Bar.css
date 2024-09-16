@@ -64,7 +64,7 @@
 
 .bar-card-text {
   font-size: 1rem;
-  color: #333;
+  color: #eeeaea;
   margin-bottom: 0.5rem;
 }
 
@@ -241,5 +241,45 @@
   .review-card {
     padding: 1rem;
   }
+}
+
+.event-modal {
+  max-width: 800px;
+  margin: auto;
+}
+
+.event-card {
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.event-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-description {
+  margin-bottom: 5px;
+}
+
+.event-dates {
+  margin-bottom: 5px;
+}
+
+.dialog-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 

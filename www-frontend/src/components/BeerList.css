@@ -84,23 +84,7 @@
   }
 }
 
-/* Large Screens */
-@media (min-width: 1200px) {
-  .css-13p3xcz-MuiContainer-root {
-    background-color: #2E2E42;
-    margin-top: 0% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
 
-  .beer-card {
-    min-width: 400px; /* Increase min-width for larger screens */
-  }
-
-  .type-title {
-    font-size: 1.8rem; /* Larger font size for better visibility on larger screens */
-  }
-}
 
 @media (max-width: 430px) {
   .beer-card {

@@ -82,6 +82,13 @@ export default function Header() {
         navigate('/bars');
       }
     }
+    if (location.pathname === '/') {
+      if (query.trim()) {
+        navigate(`/?q=${query}`);
+      } else {
+        navigate('/');
+      }
+    }
   }, [query, navigate, location.pathname])
 
   return (

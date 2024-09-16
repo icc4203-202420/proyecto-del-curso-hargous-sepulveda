@@ -10,6 +10,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 const BarList = () => {
   const [bars, setBars] = useState([]);
+  const [filteredBars, setFilteredBars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,33 +21,18 @@ const BarList = () => {
     const fetchBars = async () => {
       setLoading(true);
       try {
-        const response = query
-          ? await axios.get(`http://localhost:3001/api/v1/bars/search?q=${query}`)
-          : await axios.get('http://localhost:3001/api/v1/bars');
-
-        const barsWithDetails = await Promise.all(
-          response.data.bars.map(async (bar) => {
-            try {
-              const addressResponse = await axios.get(`http://localhost:3001/api/v1/bars/${bar.id}/addresses`);
-              const countryResponse = await axios.get(`http://localhost:3001/api/v1/bars/${bar.id}/countrys`);
-              
-              return {
-                ...bar,
-                address: addressResponse.data,
-                country: countryResponse.data.country,
-              };
-            } catch (detailsError) {
-              console.error(`Error fetching details for bar ${bar.id}:`, detailsError);
-              return {
-                ...bar,
-                address: null,
-                country: null,
-              };
-            }
-          })
-        );
-
+        const response = await axios.get('http://localhost:3001/api/v1/bars/search');
+        const barsWithDetails = response.data.map((bar) => ({
+          ...bar,
+          line1: bar.address.line1,
+          line2: bar.address.line2,
+          country: bar.address?.country.name || 'Unknown',
+          city: bar.address.city
+        }));
+        
+        console.log('Fetched bars with details:', barsWithDetails);
         setBars(barsWithDetails);
+        setFilteredBars(barsWithDetails); // Set all bars initially
       } catch (fetchError) {
         console.error('Error fetching bars:', fetchError);
         setError('Error fetching bars');
@@ -56,7 +42,28 @@ const BarList = () => {
     };
 
     fetchBars();
-  }, [query]);
+  }, []);
+
+  // Filter bars based on query
+  useEffect(() => {
+    if (!bars.length) return;
+
+    if (query && query.trim() !== '') {
+      const lowerCaseQuery = query.toLowerCase();
+      const filtered = bars.filter((bar) =>
+        bar.country.toLowerCase().includes(lowerCaseQuery) ||
+        bar.city.toLowerCase().includes(lowerCaseQuery) ||
+        bar.line1.toLowerCase().includes(lowerCaseQuery) ||
+        bar.name.toLowerCase().includes(lowerCaseQuery) ||
+        bar.line2.toLowerCase().includes(lowerCaseQuery)
+      );
+
+      console.log('Filtered bars:', filtered);
+      setFilteredBars(filtered);
+    } else {
+      setFilteredBars(bars); // Show all bars if query is empty
+    }
+  }, [query, bars]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -64,7 +71,7 @@ const BarList = () => {
   return (
     <div className="bar-list-content">
       <div className="bar-list">
-        {bars.map(bar => (
+        {filteredBars.map(bar => (
           <div key={bar.id} className="bar-card">
             <Link to={`/bars/${bar.id}`} className="bar-card-link">
               <Card sx={{ maxWidth: 345 }}>
@@ -75,7 +82,7 @@ const BarList = () => {
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       {bar.address 
-                        ? `Address: ${bar.address.line1}, ${bar.address.city}, ${bar.country?.name}` 
+                        ? `Address: ${bar.line1}, ${bar.city}, ${bar.country}` 
                         : 'No Address'}
                     </Typography>
                   </CardContent>
@@ -96,6 +103,7 @@ const BarList = () => {
 };
 
 export default BarList;
+
 
 
 
