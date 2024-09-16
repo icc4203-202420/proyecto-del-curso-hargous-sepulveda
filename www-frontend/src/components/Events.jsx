@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Importa Link para redirigir
 import axios from 'axios';  
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import './Events.css';
@@ -16,13 +15,30 @@ const Events = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        
         const response = await axios.get('http://localhost:3001/api/v1/events');  
-        setEvents(response.data.events);  
+        const eventData = response.data.events;
+
+        // Mapeamos los eventos con las llamadas para obtener el nombre del bar basado en `bar_id`
+        const eventsWithBarNames = await Promise.all(eventData.map(async (event) => {
+          if (event.bar_id) {
+            try {
+              const barResponse = await axios.get(`http://localhost:3001/api/v1/bars/${event.bar_id}`);
+              return { ...event, bar_name: barResponse.data.bar.name };
+            } catch (barError) {
+              console.error(`Error fetching bar data for bar_id: ${event.bar_id}`, barError);
+              return { ...event, bar_name: 'Unknown Bar' }; // En caso de error, muestra "Unknown Bar"
+            }
+          } else {
+            return { ...event, bar_name: 'No Bar' };
+          }
+        }));
+
+        setEvents(eventsWithBarNames); // Guardamos los eventos con el nombre del bar
       } catch (error) {
         console.error('Error fetching events:', error);
       }
     };
+
     fetchEvents();
   }, []);
  
@@ -34,15 +50,15 @@ const Events = () => {
     <div className="event-list-content">  
       <div className="event-list">
         {filteredEvents.map(event => (
-          <div key={event.name} className="event-card">
+          <Link to={`/events/${event.id}`} key={event.id} className="event-link">
             <Card sx={{ maxWidth: 345 }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <CardContent sx={{ flex: 1 }}id = "card">
+                <CardContent sx={{ flex: 1 }} id="card">
                   <Typography gutterBottom variant="h5" component="div">
                     {event.name}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {event.bar_id ? `Bar id: ${event.bar_id}` : 'No Bar'}
+                    {event.bar_name ? `Bar: ${event.bar_name}` : 'No Bar'} {/* Mostramos el nombre del bar */}
                   </Typography>
                 </CardContent>
                 <CardMedia
@@ -53,7 +69,7 @@ const Events = () => {
                 />
               </Box>
             </Card>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

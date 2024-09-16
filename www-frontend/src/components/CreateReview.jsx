@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './CreateReview.css'; 
 import Typography from '@mui/material/Typography';
@@ -18,7 +18,14 @@ const CreateReview = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false); // Control del envío
 
-  const storedUserId = sessionStorage.getItem('userId'); // Asumes que user_id está almacenado en sessionStorage
+  const storedUserId = sessionStorage.getItem('userId');
+
+  // Redirige si no hay userId
+  useEffect(() => {
+    if (!storedUserId) {
+      navigate('/login'); // Redirige al login si no hay userId
+    }
+  }, [storedUserId, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,8 +81,8 @@ const CreateReview = () => {
           review: {
             text: formData.text,
             rating: formData.rating,
-            beer_id: id,        // Pasas el beer_id directamente desde el frontend
-            user_id: storedUserId, // Pasas el user_id directamente desde sessionStorage
+            beer_id: id,
+            user_id: storedUserId,
           }
         }),
       });

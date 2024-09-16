@@ -8,10 +8,14 @@ class API::V1::EventsController < ApplicationController
 
   # GET /api/v1/events
   def index
-    @events = Event.all
-    render json: { events: @events }, status: :ok
-  end
+    if params[:bar_id].present?
+      events = Event.where(bar_id: params[:bar_id])  # Filtra eventos por bar_id
+    else
+      events = Event.all   
+    end
 
+    render json: { events: events }, status: :ok
+  end
   # GET /api/v1/events/:id
   def show
     event_data = @event.as_json.tap do |data|
