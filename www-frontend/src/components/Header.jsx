@@ -52,11 +52,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function Header() {
   const [query, setQuery] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(sessionStorage.getItem('jwtToken')));
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // Check if we are on the '/beers' page
+    // Verificar constantemente si el usuario está autenticado
+    const interval = setInterval(() => {
+      const token = Boolean(sessionStorage.getItem('jwtToken'));
+      setIsAuthenticated(token);
+    }, 1000); // Verificar cada segundo
+
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Navegar solo si estamos en la página de 'beers' y hay un query
     if (location.pathname === '/beers') {
       if (query.trim()) {
         navigate(`/beers?q=${query}`);
@@ -69,31 +81,31 @@ export default function Header() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" id='barra_fondo'>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-          >
-            {/* Your app title/logo */}
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              id='barra'
-              placeholder="Search for Beers, Bars, Events or Users"
-              inputProps={{ 'aria-label': 'search' }}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </Search>
+        <Toolbar sx={{ justifyContent: 'center', position: 'relative' }}>
+          {/* Logo en el centro de la barra */}
+          <img
+            src="/BeerHub_logo.png"  // Cambia esto a la ruta correcta de la imagen, dependiendo de dónde se encuentre
+            alt="BeerHub Logo"
+            style={{ height: '50px' }} // Ajusta el tamaño del logo según sea necesario
+          />
+          
+          {/* Mostrar la barra de búsqueda solo si el usuario está autenticado */}
+          {isAuthenticated && (
+            <Search style={{ position: 'absolute', right: '10px' }}> {/* Barra de búsqueda en la derecha */}
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                id='barra'
+                placeholder="Search for Beers, Bars, Events or Users"
+                inputProps={{ 'aria-label': 'search' }}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </Search>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
   );
 }
-
-

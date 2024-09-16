@@ -1,38 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Account.css'; 
 
 function Account() {
-  const [hasToken, setHasToken] = useState(false); // Estado para saber si hay token o no
+  const [hasToken, setHasToken] = useState(false); 
+  const [userId, setUserId] = useState(''); 
+  const [userName, setUserName] = useState(''); 
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = sessionStorage.getItem('jwtToken');
+    const storedUserId = sessionStorage.getItem('userId'); 
+    const storedUserName = sessionStorage.getItem('userName'); 
 
     if (token) {
-      setHasToken(true); // Si hay token, actualizar el estado a true
+      setHasToken(true);
+      setUserId(storedUserId); 
+      setUserName(storedUserName); 
     } else {
-      setHasToken(false); // Si no hay token, actualizar el estado a false
-      navigate('/login'); // Redirigir al login si no hay token
+      setHasToken(false); 
+      navigate('/login'); 
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('jwtToken'); // Eliminar el token de sessionStorage
-    setHasToken(false); // Actualizar el estado para reflejar que el usuario ha cerrado sesión
-    navigate('/login'); // Redirigir al login
+    sessionStorage.removeItem('jwtToken');
+    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('userName');
+    setHasToken(false); 
+    navigate('/login');
   };
 
   return (
-    <div>
-      <h2>Cuenta</h2>
-      {hasToken ? (
-        <>
-          <p>Tienes un token válido en sessionStorage.</p>
-          <button onClick={handleLogout}>Cerrar sesión</button>
-        </>
-      ) : (
-        <p>No tienes un token válido. Por favor, inicia sesión.</p>
-      )}
+    <div className="account-container">
+      <div className="account-card">
+        <h2>Cuenta</h2>
+        {hasToken ? (
+          <>
+            <p>Bienvenido, {userName}.</p> 
+            <button className="logout-button" onClick={handleLogout}>Cerrar sesión</button>
+          </>
+        ) : (
+          <p>Contraseña o Email no válidos. Por favor, inicia sesión.</p>
+        )}
+      </div>
     </div>
   );
 }

@@ -41,3 +41,17 @@
     padding: 12px 2px;
   }
 }
+
+
+.invisible-button {
+  opacity: 0;          
+  pointer-events: none; 
+  transition: opacity 0.5s ease; 
+}
+
+
+.visible-button {
+  opacity: 1;     
+  pointer-events: auto;
+  transition: opacity 0.5s ease;
+}

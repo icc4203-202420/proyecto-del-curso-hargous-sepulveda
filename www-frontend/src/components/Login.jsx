@@ -17,35 +17,50 @@ const initialValues = {
   password: '',
 };
 
-// Configuración de axios con axios-hooks
 axios.defaults.baseURL = "http://localhost:3001/api/v1/";
 
 const Login = () => {
-  const [serverError, setServerError] = useState(''); // Estado para manejar el error del servidor
-  const navigate = useNavigate(); // Hook para manejar la navegación
+  const [serverError, setServerError] = useState(''); 
+  const [successMessage, setSuccessMessage] = useState(''); 
+  const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
 
-  // Definir el hook para la petición POST
+
   const [{ data, loading, error }, executePost] = useAxios(
     {
       url: '/login',
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     },
-    { manual: true } // No ejecutar automáticamente, lo haremos manualmente al enviar el formulario
+    { manual: true } 
   );
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      // Anidar los valores bajo la clave user
+
       const response = await executePost({ data: qs.stringify({ user: values }) });
-      
-      // Si el status es 200, significa que el inicio de sesión fue exitoso
+  
+
+      const user = response.data.status.data.user;
+      console.log('Datos del usuario:', user);
+      console.log('Mensaje del servidor:', response.data.status.message);
+  
       if (response.status === 200) {
-        const receivedToken = response.data.token;
-        // Guardar el token directamente en sessionStorage o localStorage
-        sessionStorage.setItem('jwtToken', receivedToken);
-        setServerError(''); // Limpia el mensaje de error si el login es exitoso
-        navigate('/account'); // Redirige a la página de cuenta
+        setServerError('');
+        setUserName(user.id); 
+  
+      
+        const receivedToken = response.headers.authorization;
+        sessionStorage.setItem('jwtToken', receivedToken); 
+        sessionStorage.setItem('userId', user.id); 
+        sessionStorage.setItem('userName', `${user.first_name} ${user.last_name}`); 
+  
+ 
+        setSuccessMessage('Has sido logueado exitosamente.');
+  
+        setTimeout(() => {
+          navigate('/account'); 
+        }, 800);
       }
     } catch (err) {
       if (err.response && err.response.status === 401) {
@@ -58,7 +73,7 @@ const Login = () => {
       setSubmitting(false);
     }
   };
-
+  
   return (
     <div className="login-container">
       <Formik
@@ -98,6 +113,16 @@ const Login = () => {
               {loading ? 'Enviando...' : 'Iniciar sesión'}
             </button>
 
+      
+            {successMessage && (
+              <div className="success-message">{successMessage}</div>
+            )}
+
+       
+            {!successMessage && userName && (
+              <div className="user-message">Bienvenido, {userName}!</div>
+            )}
+
             {serverError && (
               <ul className="error-list">
                 <li className="error-item">{serverError}</li>
@@ -107,7 +132,7 @@ const Login = () => {
             <p>
               ¿No tienes una cuenta?
               <span className="redirect">
-                <Link to="/signup">Regístrate aquí</Link>
+                <Link to="/signup"> Regístrate aquí</Link>
               </span>
             </p>
           </Form>
