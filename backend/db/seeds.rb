@@ -72,21 +72,27 @@ if Rails.env.development?
     FactoryBot.create(:brewery_with_brands_with_beers, countries: [country])
   end
 
-  # Create events and friendships
+  # Create events
   events = all_bars.map do |bar|
     FactoryBot.create(:event, bar: bar)
   end
 
-  users.combination(2).to_a.sample(5).each do |user_pair|
-    FactoryBot.create(:friendship, user: user_pair[0], friend: user_pair[1], bar: all_bars.sample)
+  # Create friendships for all users
+  users.each do |user|
+    other_users = users - [user] # Exclude the current user
+    other_users.each do |other_user|
+      FactoryBot.create(:friendship, user: user, friend: other_user, bar: all_bars.sample)
+    end
   end
 
+  # Create attendances for users and events
   users.each do |user|
     events.sample(rand(1..3)).each do |event|
       FactoryBot.create(:attendance, user: user, event: event, checked_in: [true, false].sample)
     end
   end
 
+  # Create reviews for users and beers
   users.each do |user|
     beers = Beer.all.sample(rand(1..3))
     beers.each do |beer|

@@ -14,6 +14,7 @@ const EventDetails = () => {
   const [barName, setBarName] = useState(''); // Estado para guardar el nombre del bar
   const [barId, setBarId] = useState(null); // Estado para guardar el ID del bar
   const [attendees, setAttendees] = useState([]); // Lista de asistentes (nombres)
+  const [friends, setFriends] = useState([]); // Lista de amigos del usuario autenticado
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasConfirmed, setHasConfirmed] = useState(false); // Nuevo estado para asistencia confirmada
@@ -49,6 +50,10 @@ const EventDetails = () => {
         if (attendeesData.includes(parseInt(currentUserId))) {
           setHasConfirmed(true);
         }
+
+        // Obtener las amistades del usuario
+        const friendsResponse = await axios.get(`http://localhost:3001/api/v1/users/${currentUserId}/friendships`);
+        setFriends(friendsResponse.data);
       } else {
         setEvent(null);
       }
@@ -75,6 +80,15 @@ const EventDetails = () => {
       console.error('Error confirming attendance:', error);
     }
   };
+
+  // Filtrar amigos que también están asistiendo
+  const friendsAttending = attendees.filter((attendee) =>
+    friends.some((friend) => friend.id === attendee.userId)
+  );
+
+  const otherAttendees = attendees.filter(
+    (attendee) => !friendsAttending.some((friend) => friend.userId === attendee.userId)
+  );
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -118,16 +132,33 @@ const EventDetails = () => {
             )}
 
             <Typography variant="h6" sx={{ mt: 3 }}>
-              Asistentes:
+              Amigos que asisten:
             </Typography>
-            {attendees.length > 0 ? (
-              attendees.map((attendee, index) => (
-                <Typography key={index} variant="body2">
-                  {attendee.name}  
+
+            {/* Mostrar amigos que están asistiendo */}
+            {friendsAttending.length > 0 ? (
+              friendsAttending.map((friend, index) => (
+                <Typography key={index} variant="body2" color="primary">
+                  {friend.name} (Amigo)
                 </Typography>
               ))
             ) : (
-              <Typography variant="body2">No hay asistentes confirmados.</Typography>
+              <Typography variant="body2">No tienes amigos asistiendo.</Typography>
+            )}
+
+            <Typography variant="h6" sx={{ mt: 3 }}>
+              Otros asistentes:
+            </Typography>
+
+            {/* Mostrar otros asistentes */}
+            {otherAttendees.length > 0 ? (
+              otherAttendees.map((attendee, index) => (
+                <Typography key={index} variant="body2">
+                  {attendee.name}
+                </Typography>
+              ))
+            ) : (
+              <Typography variant="body2">No hay otros asistentes confirmados.</Typography>
             )}
           </CardContent>
           {event.thumbnail_url && (
