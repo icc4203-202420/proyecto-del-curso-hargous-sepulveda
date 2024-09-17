@@ -1,45 +1,110 @@
-#fondo {                                   /* No Borrar*/    
-    background-color: #2E2E42; /* No Borrar*/
-    width: 100%;/* No Borrar*/
-}/* No Borrar*/
-.css-13p3xcz-MuiContainer-root {/* No Borrar*/
-    padding-left: 0px !important;/* No Borrar*/
-    padding-right: 0px !important;/* No Borrar*/
-}/* No Borrar*/
-@media (min-width: 1200px) {/* No Borrar*/
-    .css-13p3xcz-MuiContainer-root {/* No Borrar*/
-        max-width: 100% !important;/* No Borrar*/
-    }                                      /* No Borrar*/  
-}                                          /* No Borrar*/
+#fondo {    
+  background-color: #2E2E42; 
+  width: 100%;
+}
+
+.css-13p3xcz-MuiContainer-root {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  background-color: #2E2E42;
+  margin-top: 0% !important;
+}
+
+.MuiCardContent-root {
+  min-width: 200px !important; 
+}
+
+.bar-list-content {
+  max-width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center !important;
+  overflow-y: auto;
+  width: 100%;
+  max-height: 85vh; 
+  min-width: 200px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-items: center;
+}
+
+/* Default Bar List Styling */
+.bar-list {
+  margin-bottom: 1rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 200px;
+  max-width: 400px;
+  align-items: center;
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 1rem;
+  width: 100%; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.bar-card-link{
+  max-width: 400px !important;
+}
 .bar-card {
-  border-radius: 8px;       
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-  transition: box-shadow 0.3s ease-in-out; 
-}
-
-.bar-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); 
-}
-
-
-.test-bar-card {
-  background-color: #1d192b; 
+  padding: 0 !important;
+  display: flex;
+  max-width: 400px !important;
+  align-items: center;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: box-shadow 0.3s ease-in-out;
+  margin-bottom: 0.5rem;
+  min-width: 200px;
+  background-color: #BDBBC1;
+  width: 100%; /* Full width on smaller screens */
 }
 
-.test-bar-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+/* Responsive Media Queries */
+
+/* Small screens (mobile) */
+@media (max-width: 600px) {
+  .bar-list {
+    max-width: 90% !important;
+    padding: 0.3rem;
+  }
+  .bar-card-link
+  .bar-card {
+    min-width: 90%;
+    padding: 8px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .MuiCardContent-root {
+    min-width: 100px !important;
+  }
 }
 
-.bar-card-content {
-  padding: 16px;
-  background-color: #CCCBCE; 
-  
-  color: #1D1B20;
+/* Medium screens (tablets) */
+@media (min-width: 600px) and (max-width: 960px) {
+  .bar-list {
+    
+    padding: 1rem;
+    max-width: 400px !important;
+  }
+  .bar-card-link
+  .bar-card {
+    min-width: 300px;
+    max-width: 400px !important;
+  }
 }
 
-.bar-card-media {
-  width: 140px;
+/* Large screens (desktops) */
+@media (min-width: 960px) {
+  .bar-list {
+    max-width: 400px!important;
+  }
+  .bar-card-link
+  .bar-card {
+    min-width: 400px;
+    max-width: 500px!important;
+  }
 }
+
+

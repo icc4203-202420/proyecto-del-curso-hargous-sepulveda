@@ -1,15 +1,13 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import './Header.css';
-
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -52,29 +50,73 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function SearchAppBar() {
+export default function Header() {
+  const [query, setQuery] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(sessionStorage.getItem('jwtToken')));
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Verificar constantemente si el usuario está autenticado
+    const interval = setInterval(() => {
+      const token = Boolean(sessionStorage.getItem('jwtToken'));
+      setIsAuthenticated(token);
+    }, 1000); // Verificar cada segundo
+
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (location.pathname === '/beers') {
+      if (query.trim()) {
+        navigate(`/beers?q=${query}`);
+      } else {
+        navigate('/beers');
+      }
+    }
+    if (location.pathname === '/bars') {
+      if (query.trim()) {
+        navigate(`/bars?q=${query}`);
+      } else {
+        navigate('/bars');
+      }
+    }
+    if (location.pathname === '/') {
+      if (query.trim()) {
+        navigate(`/?q=${query}`);
+      } else {
+        navigate('/');
+      }
+    }
+  }, [query, navigate, location.pathname])
+
   return (
-    
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" id='barra_fondo'>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-          >
-             
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase id='barra'
-              placeholder="Search for Beers, Bars, Events or Users"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
+        <Toolbar sx={{ justifyContent: 'center', position: 'relative' }}>
+          {/* Logo en el centro de la barra */}
+          <img
+            src="/BeerHub_logo.png"  // Cambia esto a la ruta correcta de la imagen, dependiendo de dónde se encuentre
+            alt="BeerHub Logo"
+            style={{ height: '50px' }} // Ajusta el tamaño del logo según sea necesario
+          />
+          
+          {/* Mostrar la barra de búsqueda solo si el usuario está autenticado */}
+          {isAuthenticated && (
+            <Search style={{alignSelf:"flex-end", transform: 'translateY(-20%)'}}> {/* Barra de búsqueda en la derecha */}
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                id='barra'
+                placeholder="Search for Beers, Bars, Events or Users"
+                inputProps={{ 'aria-label': 'search' }}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </Search>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
