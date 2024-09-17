@@ -41,35 +41,56 @@ const Events = () => {
 
     fetchEvents();
   }, []);
- 
+
+  // Group events by bar name
+  const groupByBar = (events) => {
+    return events.reduce((acc, event) => {
+      const barName = event.bar_name || 'No Bar';
+      if (!acc[barName]) {
+        acc[barName] = [];
+      }
+      acc[barName].push(event);
+      return acc;
+    }, {});
+  };
+
+  // Filter events based on search term
   const filteredEvents = events.filter(event =>
     event.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Group filtered events by bar name
+  const groupedEvents = groupByBar(filteredEvents);
+
   return (
-    <div className="event-list-content">  
+    <div className="event-list-content">
       <div className="event-list">
-        {filteredEvents.map(event => (
-          <Link to={`/events/${event.id}`} key={event.id} className="event-link">
-            <Card sx={{ maxWidth: 345 }}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <CardContent sx={{ flex: 1 }} id="card">
-                  <Typography gutterBottom variant="h5" component="div">
-                    {event.name}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {event.bar_name ? `Bar: ${event.bar_name}` : 'No Bar'} {/* Mostramos el nombre del bar */}
-                  </Typography>
-                </CardContent>
-                <CardMedia
-                  component="img"
-                  sx={{ width: 140, maxWidth: '100%' }}
-                  image={event.image || 'default-image.jpg'}
-                  alt='no photo yet'
-                />
-              </Box>
-            </Card>
-          </Link>
+        {Object.keys(groupedEvents).map(barName => (
+          <div key={barName} className="event-group">
+            <h2>{barName}</h2>
+            {groupedEvents[barName].map(event => (
+              <Link to={`/events/${event.id}`} key={event.id} className="event-link">
+                <Card sx={{ maxWidth: 345 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                    <CardContent sx={{ flex: 1 }} id="card">
+                      <Typography gutterBottom variant="h5" component="div">
+                        {event.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        {event.bar_name ? `Bar: ${event.bar_name}` : 'No Bar'}
+                      </Typography>
+                    </CardContent>
+                    <CardMedia
+                      component="img"
+                      sx={{ width: 140, maxWidth: '100%' }}
+                      image={event.image || 'default-image.jpg'}
+                      alt='no photo yet'
+                    />
+                  </Box>
+                </Card>
+              </Link>
+            ))}
+          </div>
         ))}
       </div>
     </div>

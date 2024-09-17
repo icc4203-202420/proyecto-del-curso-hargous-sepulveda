@@ -28,7 +28,7 @@ const Home = () => {
           country: bar.address?.country.name,
           city: bar.address.city
         }));
-        
+
         console.log('Fetched bars with details:', barsWithDetails);
         setBars(barsWithDetails);
         setFilteredBars(barsWithDetails); // Set all bars initially
@@ -64,6 +64,22 @@ const Home = () => {
     }
   }, [query, bars]);
 
+  // Get user's geolocation
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error("Error getting user's location:", error);
+        }
+      );
+    }
+  }, []);
+
+  // Initialize Google Map
   useEffect(() => {
     if (!mapRef.current || (!filteredBars.length && !userLocation)) return;
 
@@ -77,15 +93,20 @@ const Home = () => {
       .then((lib) => {
         const { Map } = lib;
 
-        // Center map based on available data
+        // Center map based on user location or first bar
         const map = new Map(mapRef.current, {
-          center: filteredBars.length > 0 ? { lat: filteredBars[0].latitude, lng: filteredBars[0].longitude } : userLocation,
-          zoom: 10,
+          center: userLocation || { lat: filteredBars[0].latitude, lng: filteredBars[0].longitude },
+          zoom: 15,
         });
 
-        // Only add markers if filteredBars are available
+        // Add marker for user location if available
+        if (userLocation) {
+          addMarker(userLocation, 'You are here', null, null, null, map, true);
+        }
+
+        // Add markers for filtered bars
         if (filteredBars.length > 0) {
-          filteredBars.forEach(({ name, latitude, longitude, id , country, city}) => {
+          filteredBars.forEach(({ name, latitude, longitude, id, country, city }) => {
             const position = { lat: latitude, lng: longitude };
             addMarker(position, name, id, country, city, map);
           });
@@ -96,34 +117,38 @@ const Home = () => {
       });
   }, [filteredBars, userLocation]);
 
-  const addMarker = (location, name, id, country, city, map) => {
+  const addMarker = (location, name, id, country, city, map, isUserLocation = false) => {
     const marker = new google.maps.Marker({
       position: location,
       map: map,
+      icon: isUserLocation
+        ? { url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' } // User location marker is blue
+        : undefined,
     });
-  
-    marker.addListener('click', () => {
-      if (infoWindowRef.current) {
-        infoWindowRef.current.close();
-      }
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="font-size: 14px; background-color: #fff; border: 2px solid #000; border-radius: 5px; padding: 10px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);">
-            <h4 style="margin: 0; color: #1D1B20;">${name}</h4>
-            <p style="margin: 5px 0; color: #1D1B20;">Country: ${country}, City: ${city}</p>
-            <button style="background-color: #3f51b5; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" onclick="window.location.href='/bars/${id}'">
-              See more
-            </button>
-          </div>`,
-        position: location,
+
+    if (!isUserLocation) {
+      marker.addListener('click', () => {
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div style="font-size: 14px; background-color: #fff; border: 2px solid #000; border-radius: 5px; padding: 10px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);">
+              <h4 style="margin: 0; color: #1D1B20;">${name}</h4>
+              <p style="margin: 5px 0; color: #1D1B20;">Country: ${country}, City: ${city}</p>
+              <button style="background-color: #3f51b5; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" onclick="window.location.href='/bars/${id}'">
+                See more
+              </button>
+            </div>`,
+          position: location,
+        });
+        infoWindow.open(map, marker);
+        infoWindowRef.current = infoWindow;
       });
-      infoWindow.open(map, marker);
-      infoWindowRef.current = infoWindow;
-    });
-  
+    }
+
     return marker;
   };
-  
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -132,6 +157,7 @@ const Home = () => {
 };
 
 export default Home;
+
 
 
 

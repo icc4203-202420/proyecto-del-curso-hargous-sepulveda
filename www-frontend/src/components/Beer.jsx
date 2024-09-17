@@ -85,6 +85,8 @@ const Beer = () => {
 
   return (
     beer && (
+      <div className="show-beer">
+        <div className='mid'>
       <Card className="beer-card">
         <Box className="beer-card-container">
           <IconButton
@@ -143,9 +145,9 @@ const Beer = () => {
           </CardContent>
 
           {/* Render bars where the beer is served */}
-          <Box className="reviews-section">
+          <Box className="bar-section">
           <Typography variant="h5">Available At</Typography>
-          <Box className="reviews-section-sub">
+          <Box className="bar-section-sub">
           {Array.isArray(bars) && bars.length > 0 ? (
             bars.map(bar => (
                 <Link to={`/bars/${bar.id}`} key={bar.id} className=".review-card">
@@ -204,6 +206,8 @@ const Beer = () => {
           </Button>
         </Box>
       </Card>
+      </div>
+      </div>
     )
   );
 };

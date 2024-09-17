@@ -1,16 +1,4 @@
-/* General Styles */
 
-.css-13p3xcz-MuiContainer-root {
-  padding-left: 2% !important;
-  padding-right: 2% !important;
-  background-color: #2E2E42;
-  margin-top: 0% !important;
-}
-
-.css-1iqhh05-MuiPaper-root {    
-  background-color: #2E2E42 !important; 
-  box-shadow: none !important;
-}
 
 #content {
   position: relative;
@@ -31,7 +19,7 @@
   max-width: 600px !important;
   margin: 20px auto;
   max-height: 90vh; 
-
+  overflow-y: auto;
 }
 
 .close-button {
@@ -111,6 +99,34 @@
   color: #FFFFFF;
   font-size: 1.2rem;
   align-self: flex-start;
+}
+
+.bar-section {
+
+  margin-bottom: 1rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  background-color: #9E9CB2;
+  border-radius: 16px !important;
+  padding: 1rem;
+  width: 100%;
+  overflow-x: auto; 
+  white-space: nowrap; 
+}
+
+/* Bar Section Sub */
+.bar-section_sub {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto; 
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #9E9CB2;
+  border-radius: 16px !important;
+  white-space: nowrap;
+  max-width: 100%;
+  height: fit-content;
+  scroll-behavior: smooth;
 }
 
 .reviews-section {
