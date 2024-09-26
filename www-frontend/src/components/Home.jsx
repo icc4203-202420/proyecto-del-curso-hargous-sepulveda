@@ -4,9 +4,9 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { useLocation } from 'react-router-dom';
 
 const Home = () => {
-  const [bars, setBars] = useState([]); // All bars
-  const [filteredBars, setFilteredBars] = useState([]); // Bars filtered by query
-  const [userLocation, setUserLocation] = useState(null); // State for user's geolocation
+  const [bars, setBars] = useState([]);
+  const [filteredBars, setFilteredBars] = useState([]); 
+  const [userLocation, setUserLocation] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const mapRef = useRef(null);
@@ -15,7 +15,6 @@ const Home = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('q');
 
-  // Fetch all bars once when component mounts
   useEffect(() => {
     const fetchBars = async () => {
       setLoading(true);
@@ -31,7 +30,7 @@ const Home = () => {
 
         console.log('Fetched bars with details:', barsWithDetails);
         setBars(barsWithDetails);
-        setFilteredBars(barsWithDetails); // Set all bars initially
+        setFilteredBars(barsWithDetails); 
       } catch (fetchError) {
         console.error('Error fetching bars:', fetchError);
         setError('Error fetching bars');
@@ -43,7 +42,6 @@ const Home = () => {
     fetchBars();
   }, []);
 
-  // Filter bars based on query
   useEffect(() => {
     if (!bars.length) return;
 
@@ -82,29 +80,33 @@ const Home = () => {
   // Initialize Google Map
   useEffect(() => {
     if (!mapRef.current || (!filteredBars.length && !userLocation)) return;
-
+  
     const loader = new Loader({
       apiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY,
       version: 'weekly',
     });
-
+  
     loader
       .importLibrary('maps')
       .then((lib) => {
         const { Map } = lib;
 
-        // Center map based on user location or first bar
+        const center = query && filteredBars.length > 0 
+          ? { lat: filteredBars[0].latitude, lng: filteredBars[0].longitude }
+          : userLocation;
+  
+
         const map = new Map(mapRef.current, {
-          center: userLocation || { lat: filteredBars[0].latitude, lng: filteredBars[0].longitude },
+          center: center,
           zoom: 15,
         });
+  
 
-        // Add marker for user location if available
         if (userLocation) {
           addMarker(userLocation, 'You are here', null, null, null, map, true);
         }
+  
 
-        // Add markers for filtered bars
         if (filteredBars.length > 0) {
           filteredBars.forEach(({ name, latitude, longitude, id, country, city }) => {
             const position = { lat: latitude, lng: longitude };
@@ -115,14 +117,14 @@ const Home = () => {
       .catch((error) => {
         console.error('Error loading Google Maps library:', error);
       });
-  }, [filteredBars, userLocation]);
+  }, [filteredBars, userLocation, query]); 
 
   const addMarker = (location, name, id, country, city, map, isUserLocation = false) => {
     const marker = new google.maps.Marker({
       position: location,
       map: map,
       icon: isUserLocation
-        ? { url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' } // User location marker is blue
+        ? { url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' } 
         : undefined,
     });
 
