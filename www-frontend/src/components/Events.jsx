@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Importa Link para redirigir
-import axios from 'axios';  
+import { Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -10,15 +10,20 @@ import './Events.css';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const location = useLocation();
+  const query = new URLSearchParams(location.search).get('q');
 
   useEffect(() => {
     const fetchEvents = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3001/api/v1/events');  
+        const response = await axios.get('http://localhost:3001/api/v1/events');
         const eventData = response.data.events;
 
-        // Mapeamos los eventos con las llamadas para obtener el nombre del bar basado en `bar_id`
         const eventsWithBarNames = await Promise.all(eventData.map(async (event) => {
           if (event.bar_id) {
             try {
@@ -26,23 +31,43 @@ const Events = () => {
               return { ...event, bar_name: barResponse.data.bar.name };
             } catch (barError) {
               console.error(`Error fetching bar data for bar_id: ${event.bar_id}`, barError);
-              return { ...event, bar_name: 'Unknown Bar' }; // En caso de error, muestra "Unknown Bar"
+              return { ...event, bar_name: 'Unknown Bar' };
             }
           } else {
             return { ...event, bar_name: 'No Bar' };
           }
         }));
 
-        setEvents(eventsWithBarNames); // Guardamos los eventos con el nombre del bar
+        setEvents(eventsWithBarNames);
+        setFilteredEvents(eventsWithBarNames); 
       } catch (error) {
         console.error('Error fetching events:', error);
+        setError('Error fetching events');
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchEvents();
   }, []);
 
-  // Group events by bar name
+
+  useEffect(() => {
+    if (!events.length) return;
+
+    if (query && query.trim() !== '') {
+      const lowerCaseQuery = query.toLowerCase();
+      const filtered = events.filter((event) =>
+        event.name.toLowerCase().includes(lowerCaseQuery) ||
+        (event.bar_name && event.bar_name.toLowerCase().includes(lowerCaseQuery))
+      );
+
+      setFilteredEvents(filtered);
+    } else {
+      setFilteredEvents(events); 
+    }
+  }, [query, events]);
+
   const groupByBar = (events) => {
     return events.reduce((acc, event) => {
       const barName = event.bar_name || 'No Bar';
@@ -54,13 +79,10 @@ const Events = () => {
     }, {});
   };
 
-  // Filter events based on search term
-  const filteredEvents = events.filter(event =>
-    event.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Group filtered events by bar name
   const groupedEvents = groupByBar(filteredEvents);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="event-list-content">
@@ -77,14 +99,14 @@ const Events = () => {
                         {event.name}
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {event.bar_name ? `Bar: ${event.bar_name}` : 'No Bar'}
+                        {event.bar_name ? `Date: ${new Date(event.start_date).toLocaleString() }` : 'No Date'}
                       </Typography>
                     </CardContent>
                     <CardMedia
                       component="img"
                       sx={{ width: 140, maxWidth: '100%' }}
                       image={event.image || 'default-image.jpg'}
-                      alt='no photo yet'
+                      alt="no photo yet"
                     />
                   </Box>
                 </Card>

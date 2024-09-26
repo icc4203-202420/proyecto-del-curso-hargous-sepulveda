@@ -17,6 +17,16 @@ class API::V1::EventsController < ApplicationController
     render json: { events: events }, status: :ok
   end
   # GET /api/v1/events/:id
+  def search
+    query = "%#{params[:q]}%"
+    if params[:q]
+      @events = Event.where("name LIKE ?", query)
+    else
+      @events = Event.all
+    end
+
+    render json: { events: @events }, status: :ok
+  end
   def show
     
     event_data = @event.as_json.tap do |data|

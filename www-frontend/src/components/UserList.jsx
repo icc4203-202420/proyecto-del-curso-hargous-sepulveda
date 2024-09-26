@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import './BeerList.css';
+import './UserList.css';
 import { Link, useLocation } from 'react-router-dom';
 
 const UserList = () => {
@@ -21,7 +21,7 @@ const UserList = () => {
       try {
         const response = query 
           ? await axios.get(`http://localhost:3001/api/v1/users/search?q=${query}`)
-          : await axios.get('http://localhost:3001/api/v1/users');
+          : await axios.get('http://localhost:3001/api/v1/users/search');
           
         setUsers(response.data.users);
       } catch (error) {
@@ -40,18 +40,14 @@ const UserList = () => {
 
   return (
     <div className="user-list-content">
-      <h2>Users</h2>
       <div className="user-list">
         {users.map(user => (
           <Link to={`/users/${user.id}`} key={user.id} className="user-card-link">
             <Card sx={{ maxWidth: 400, minWidth: 200 }} className="user-card">
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <CardContent sx={{ flex: 1 }}>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {user.name}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {user.email}
+                  <Typography gutterBottom variant="h5" sx={{ color: 'text.secondary' }}>
+                    @{user.handle}
                   </Typography>
                 </CardContent>
               </Box>

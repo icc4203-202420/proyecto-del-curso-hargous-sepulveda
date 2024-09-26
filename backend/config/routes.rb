@@ -37,7 +37,11 @@ Rails.application.routes.draw do
       end
 
       resources :brands, only: [:show]
-      resources :events, only: [:index, :show, :create, :update, :destroy]
+      resources :events, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get 'search'
+        end
+      end
 
       resources :users do
         collection do

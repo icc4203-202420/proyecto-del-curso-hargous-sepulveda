@@ -46,7 +46,11 @@ body, html, #root {
     animation: logo-spin infinite 20s linear;
   }
 }
-
+@media (min-width: 1200px) {
+  .css-13p3xcz-MuiContainer-root {
+      max-width: 100% !important;
+  }
+}
 
 .read-the-docs {
   color: #888;

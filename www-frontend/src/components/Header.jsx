@@ -88,6 +88,13 @@ export default function Header() {
         navigate('/users');
       }
     }
+    if (location.pathname === '/events') {
+      if (query.trim()) {
+        navigate(`/events?q=${query}`);
+      } else {
+        navigate('/events');
+      }
+    }
     if (location.pathname === '/') {
       if (query.trim()) {
         navigate(`/?q=${query}`);
@@ -125,7 +132,7 @@ export default function Header() {
         </Toolbar>
       </AppBar>
       <Box id="main-content">
-      {query.length > 0 && (
+      
         <Box id="button-group-container">
           <ButtonGroup variant="outlined" aria-label="Basic button group">
             <Button onClick={() => navigate(`/beers?q=${query}`)}>Beers</Button>
@@ -134,7 +141,7 @@ export default function Header() {
             <Button onClick={() => navigate(`/users?q=${query}`)}>Users</Button>
           </ButtonGroup>
         </Box>
-      )}
+
     </Box>
 
     </Box>

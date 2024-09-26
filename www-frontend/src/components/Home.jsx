@@ -153,7 +153,7 @@ const Home = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
-  return <div ref={mapRef} style={{ width: '100vw', height: '100vh' }} />;
+  return <div ref={mapRef} style={{ width: '100vw', height: '100vh'}} />;
 };
 
 export default Home;
