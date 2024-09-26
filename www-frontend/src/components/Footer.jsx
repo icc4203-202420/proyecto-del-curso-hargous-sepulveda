@@ -14,6 +14,7 @@ import BarList from './BarList.jsx';
 import Events from './Events.jsx';
 import Beer from './Beer.jsx';
 import Bar from './Bar.jsx';
+import UserList from './UserList.jsx';
 import Signup from './Signup';
 import Login from './Login.jsx';
 import CreateReview from './CreateReview.jsx';
@@ -48,7 +49,7 @@ const Footer = ({ value, onChange }) => {
 
           <Route path="/events" element={<PrivateRoute><Events /></PrivateRoute>} />
           <Route path="/events/:id" element={<PrivateRoute><EventDetails /></PrivateRoute>} />
-
+          <Route path="/users" element={<PrivateRoute><UserList /></PrivateRoute>} />
           <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
           <Route path="/beers" element={<PrivateRoute><BeerList /></PrivateRoute>} />
           <Route path="/bars" element={<PrivateRoute><BarList /></PrivateRoute>} />

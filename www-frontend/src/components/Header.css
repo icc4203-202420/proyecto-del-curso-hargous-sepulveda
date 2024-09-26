@@ -1,11 +1,26 @@
-
 #barra {
-    background-color: #DBDBE0;
-}
-#barra{
+  background-color: #DBDBE0;
   color: #49454F;
   font-style: normal;
 }
-#barra_fondo{
-  background-color: #525277; 
+
+#barra_fondo {
+  background-color: #525277;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1100;
+}
+
+#main-content {
+  padding-top: 80px; 
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+#button-group-container {
+  background-color: #A6A7B5;
+  
 }

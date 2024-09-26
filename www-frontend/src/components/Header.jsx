@@ -4,9 +4,10 @@ import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import './Header.css';
 
 const Search = styled('div')(({ theme }) => ({
@@ -57,13 +58,11 @@ export default function Header() {
   const location = useLocation();
 
   useEffect(() => {
-    // Verificar constantemente si el usuario está autenticado
     const interval = setInterval(() => {
       const token = Boolean(sessionStorage.getItem('jwtToken'));
       setIsAuthenticated(token);
-    }, 1000); // Verificar cada segundo
+    }, 1000);
 
-    // Limpiar el intervalo cuando el componente se desmonte
     return () => clearInterval(interval);
   }, []);
 
@@ -82,6 +81,13 @@ export default function Header() {
         navigate('/bars');
       }
     }
+    if (location.pathname === '/users') {
+      if (query.trim()) {
+        navigate(`/users?q=${query}`);
+      } else {
+        navigate('/users');
+      }
+    }
     if (location.pathname === '/') {
       if (query.trim()) {
         navigate(`/?q=${query}`);
@@ -89,22 +95,21 @@ export default function Header() {
         navigate('/');
       }
     }
+    
   }, [query, navigate, location.pathname])
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" id='barra_fondo'>
         <Toolbar sx={{ justifyContent: 'center', position: 'relative' }}>
-          {/* Logo en el centro de la barra */}
           <img
-            src="/BeerHub_logo.png"  // Cambia esto a la ruta correcta de la imagen, dependiendo de dónde se encuentre
+            src="/BeerHub_logo.png" 
             alt="BeerHub Logo"
-            style={{ height: '50px' }} // Ajusta el tamaño del logo según sea necesario
+            style={{ height: '50px' }} 
           />
           
-          {/* Mostrar la barra de búsqueda solo si el usuario está autenticado */}
           {isAuthenticated && (
-            <Search style={{alignSelf:"flex-end", transform: 'translateY(-20%)'}}> {/* Barra de búsqueda en la derecha */}
+            <Search style={{alignSelf:"flex-end", transform: 'translateY(-20%)'}}>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -119,6 +124,20 @@ export default function Header() {
           )}
         </Toolbar>
       </AppBar>
+      <Box id="main-content">
+      {query.length > 0 && (
+        <Box id="button-group-container">
+          <ButtonGroup variant="outlined" aria-label="Basic button group">
+            <Button onClick={() => navigate(`/beers?q=${query}`)}>Beers</Button>
+            <Button onClick={() => navigate(`/bars?q=${query}`)}>Bars</Button>
+            <Button onClick={() => navigate(`/events?q=${query}`)}>Events</Button>
+            <Button onClick={() => navigate(`/users?q=${query}`)}>Users</Button>
+          </ButtonGroup>
+        </Box>
+      )}
+    </Box>
+
     </Box>
   );
 }
+

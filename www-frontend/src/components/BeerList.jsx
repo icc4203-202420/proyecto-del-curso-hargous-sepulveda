@@ -7,7 +7,8 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import './BeerList.css';
 import { Link, useLocation } from 'react-router-dom';
-
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 const BeerList = () => {
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(true);

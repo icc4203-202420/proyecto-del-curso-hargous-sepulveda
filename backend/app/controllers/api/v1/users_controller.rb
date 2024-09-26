@@ -14,7 +14,17 @@ class API::V1::UsersController < ApplicationController
       render json: { error: "User not found" }, status: :not_found
     end
   end
-
+  def search
+    query = "%#{params[:q]}%"
+    if params[:q]
+      @users = User.where("handle LIKE ?", query)
+    else
+      @users = User.all
+    end
+  
+    render json: { users: @users }, status: :ok
+  end
+  
   def create
     @user = User.new(user_params)
     if @user.save
