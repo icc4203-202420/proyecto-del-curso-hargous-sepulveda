@@ -2,6 +2,7 @@
 
 #content {
   position: relative;
+  padding: 16px;
 }
 
 #content img {
@@ -10,28 +11,35 @@
   right: 0;
 }
 
-.beer-card-container {
+.show-beer {
   display: flex;
-  flex-direction: column; 
   align-items: center;
-  justify-content: flex-start;
-  margin-top: 20%; 
-  max-width: 600px !important;
-  margin: 20px auto;
-  max-height: 90vh; 
+  flex-direction: column;
+  max-height: 81vh;
+  width: 100%;
   overflow-y: auto;
 }
 
+.beer-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 20px auto;
+  max-width: 95%;
+}
+
 .close-button {
-  background-color: #9E9CB2 !important;
-  color: #1D1B20 !important;
-  align-self: flex-end;
+  background-color: #9E9CB2;
+  color: #1D1B20;
   margin-right: 16px;
   margin-top: 8px;
+  align-self: flex-end;
 }
 
 .beer-card {
   width: 100%;
+  max-width: 700px;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -44,6 +52,7 @@
   border-top-right-radius: 16px;
 }
 
+
 .beer-card-content {
   padding: 1rem;
 }
@@ -54,89 +63,61 @@
   margin-bottom: 1rem;
 }
 
+
 .beer-card-text {
   font-size: 1rem;
   color: #333;
   margin-bottom: 0.5rem;
 }
 
+
 .beer-card-strong {
   font-weight: bold;
 }
 
-/* Rating Bubble */
-.average-rating-bubble {
-  position: relative;
-  padding: 1%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+.average-rating-bubble, .rating {
+  padding: 8px;
   background-color: #2E2E42;
   border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   color: #FFFFFF;
   font-size: 1.2rem;
-  align-self: flex-end;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
 
 .rating_bubble {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   max-width: 100%;
-  flex-direction: row-reverse;
 }
 
-.rating {
-  position: relative;
-  padding: 1%;
-  max-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #2E2E42;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  color: #FFFFFF;
-  font-size: 1.2rem;
-  align-self: flex-start;
-}
 
 .bar-section {
-
-  margin-bottom: 1rem !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
   background-color: #9E9CB2;
-  border-radius: 16px !important;
-  padding: 1rem;
+  border-radius: 16px;
   width: 100%;
-  overflow-x: auto; 
-  white-space: nowrap; 
+  margin-bottom: 1rem;
 }
 
-/* Bar Section Sub */
-.bar-section_sub {
+
+.bar-section-sub {
   display: flex;
-  flex-direction: row;
-  overflow-x: auto; 
+  overflow-x: auto;
   gap: 1rem;
   padding: 1rem;
   background-color: #9E9CB2;
-  border-radius: 16px !important;
+  border-radius: 16px;
   white-space: nowrap;
-  max-width: 100%;
-  height: fit-content;
-  scroll-behavior: smooth;
 }
 
 .reviews-section {
-  margin-bottom: 1rem !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
   background-color: #9E9CB2;
-  border-radius: 16px !important;
-  padding: 1rem;
-  width: 500px;
+  border-radius: 16px;
+  padding: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 .reviews-section_sub {
@@ -145,133 +126,32 @@
   gap: 1rem;
   padding: 1rem;
   background-color: #9E9CB2;
-  border-radius: 16px!important;
-  white-space: nowrap;
-  max-width: 100%;
-  height: fit-content;
+  border-radius: 16px;
   scroll-behavior: smooth;
-  
 }
 
 .review-card {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  height:fit-content;
-  border-radius: 8px!important;
-  background-color: #CCCBCE !important;
-  display: flex;
-  min-width: 300px;
-  flex-direction: column; /* Stack content vertically */
-  width: 100%; /* Make sure the card takes up full width */
-  box-sizing: border-box; /* Ensure padding and border are included in width */
-}
-
-/* Rating */
-.rating {
-  margin-bottom: 8px; /* Space between rating and other content */
-}
-
-.rating-text {
-  background-color: #2E2E42;
-  color: #FFFFFF;
-  padding: 0.5rem;
+  background-color: #CCCBCE;
   border-radius: 8px;
+  min-width: 300px;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Reviewer Text */
-.reviewer-text {
-  margin-bottom: 8px;
+.review-rating {
   color: #2E2E42;
+  margin-bottom: 8px;
 }
 
-/* Review Text */
+
 .review-text {
   color: #2E2E42;
-  font-size: 1rem; /* Adjust font size as needed */
-  line-height: 1.4; /* Improve readability */
-  word-wrap: break-word; /* Break long words onto the next line */
-  white-space: pre-wrap; /* Preserve whitespace and new lines */
+  font-size: 1rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
 }
 
-.review-rating,
-.review-reviewer {
-  color: #2E2E42;
-}
-
-.no-reviews {
-  color: #2E2E42;
-}
-
-/* Media Queries for Responsiveness */
-
-/* Mobile Devices */
-@media (max-width: 600px) {
-  .beer-card-container {
-    max-width: 100%;
-  }
-
-  .beer-card {
-    max-height: none;
-    width: 100%;
-  }
-
-  .beer-card-title {
-    font-size: 1.2rem;
-  }
-
-  .average-rating-bubble {
-    font-size: 1rem;
-  }
-
-  .reviews-section {
-    padding: 0.5rem;
-  }
-
-  .review-card {
-    padding: 0.5rem;
-  }
-}
-
-/* Tablets */
-@media (min-width: 601px) and (max-width: 1024px) {
-  .beer-card-container {
-    max-width: 90%;
-  }
-
-  .beer-card-title {
-    font-size: 1.4rem;
-  }
-
-  .average-rating-bubble {
-    font-size: 1.1rem;
-  }
-
-  .reviews-section {
-    padding: 0.75rem;
-  }
-}
-
-/* Large Screens (Desktops) */
-@media (min-width: 1025px) {
-  .beer-card-container {
-    max-width: 800px;
-  }
-
-  .beer-card-title {
-    font-size: 1.6rem;
-  }
-
-  .average-rating-bubble {
-    font-size: 1.3rem;
-  }
-
-  .reviews-section {
-    padding: 1.5rem;
-  }
-
-  .review-card {
-    padding: 1rem;
-  }
-}
 
 

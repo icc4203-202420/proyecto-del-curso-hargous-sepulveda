@@ -127,7 +127,7 @@ const Bar = () => {
             <Box className="reviews-section-sub">
               {Array.isArray(beers) && beers.length > 0 ? (
                 beers.map((beer) => (
-                  <Link to={`/beers/${beer.id}`} key={beer.id} className="review-card">
+                  <Link to={`/beers/${beer.id}`} key={beer.id} >
                     <Box key={beer.id} className="review-card">
                       <Typography variant="h6">{beer.name}</Typography>
                       {beer.image_url && (
