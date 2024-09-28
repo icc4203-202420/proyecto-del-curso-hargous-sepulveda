@@ -138,7 +138,7 @@ const CreateReview = () => {
           name="rating"
           value={formData.rating}
           onChange={handleRatingChange}
-          precision={1}
+          precision={0.5}
           icon={<SportsBarIcon fontSize="inherit" />}
           emptyIcon={<SportsBarOutlinedIcon fontSize="inherit" />}
         />

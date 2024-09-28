@@ -41,45 +41,41 @@ const Beer = () => {
   const [bars, setBars] = useState([]);
   const [users, setUsers] = useState([]);
   const [reviewState, dispatch] = useReducer(reviewReducer, initialReviewState);
+  
+
+  const currentUserId = 1; 
 
   useEffect(() => {
     const fetchBeerAndDetails = async () => {
       try {
-        // Fetch beer details
+
         const beerResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}`);
         setBeer(beerResponse.data.beer);
 
-        const barresponse = await axios.get('http://localhost:3001/api/v1/bars/search');
-        const barsWithDetails = barresponse.data.map((bar) => ({
-          ...bar,
-          line1: bar.address.line1,
-          line2: bar.address.line2,
-          country: bar.address?.country.name || 'Unknown',
-          city: bar.address.city
-        }));
-        setBars(barsWithDetails);
-        // Fetch brand details if available
+        const barsResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/bars`);
+        setBars(barsResponse.data.bars);
+
         if (beerResponse.data.beer.brand_id) {
           const brandResponse = await axios.get(`http://localhost:3001/api/v1/brands/${beerResponse.data.beer.brand_id}`);
           setBrand(brandResponse.data.name);
         }
         if (beerResponse.data.beer.brewery_id) {
-          const breweryResponse = await axios.get(`http://localhost:3001/api/v1/breweries/${beerResponse.data.beer.brewery_id}`);
+          const breweryResponse = await axios.get(`http://localhost:3001/api/v1/brewery/${beerResponse.data.beer.brewery_id}`);
           setBrewery(breweryResponse.data.name);
         }
 
-        // Fetch users
         const usersResponse = await axios.get(`http://localhost:3001/api/v1/users/search`);
         setUsers(usersResponse.data.users);
 
-        // Fetch reviews
         dispatch({ type: 'FETCH_INIT' });
         const reviewResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
-        const reviewsWithUserHandle = reviewResponse.data.reviews.map(review => {
-          const user = usersResponse.data.users.find(user => user.id === review.user_id);
-          return { ...review, user_handle: user ? user.handle : 'Unknown' };
-        });
-        dispatch({ type: 'FETCH_SUCCESS', payload: reviewsWithUserHandle });
+
+        const reviews = reviewResponse.data.reviews;
+        const currentUserReview = reviews.find(review => review.user_id === currentUserId);
+        const otherReviews = reviews.filter(review => review.user_id !== currentUserId);
+        const orderedReviews = currentUserReview ? [currentUserReview, ...otherReviews] : reviews;
+
+        dispatch({ type: 'FETCH_SUCCESS', payload: orderedReviews });
 
         setLoading(false);
       } catch (error) {
@@ -98,15 +94,20 @@ const Beer = () => {
 
   const { loading: reviewLoading, error: reviewError, reviews } = reviewState;
 
+  const getUserHandle = (userId) => {
+    const user = users.find((user) => user.id === userId);
+    return user ? user.handle : 'Unknown User';
+  };
+
   return (
     beer && (
       <div className="show-beer">
-        <div className="mid">
+        <div className='mid'>
           <Card className="beer-card">
             <Box className="beer-card-container">
               <IconButton
                 className="close-button"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(-1)} 
                 aria-label="close"
               >
                 <CloseIcon />
@@ -159,7 +160,7 @@ const Beer = () => {
                 </Typography>
               </CardContent>
 
-              {/* Render bars where the beer is served */}
+
               <Box className="bar-section">
                 <Typography variant="h5">Available At</Typography>
                 <Box className="bar-section-sub">
@@ -176,7 +177,9 @@ const Beer = () => {
                               alt={`${bar.name} image`}
                             />
                           )}
-                          <Typography variant="body2">Address: {bar.line1 && bar.city && bar.country ? `${bar.line1}, ${bar.city}, ${bar.country}` : 'N/A'}</Typography>
+                          <Typography variant="body2">
+                            Address: {`${bar.line1}, ${bar.city}, ${bar.country}` || 'N/A'}
+                          </Typography>
                         </Box>
                       </Link>
                     ))
@@ -196,29 +199,24 @@ const Beer = () => {
                   ) : reviews.length > 0 ? (
                     reviews.map(review => (
                       <Card key={review.id} className="review-card">
-                        <div className="rating">
-                          <Typography className="rating-text" variant="body2">
-                            Rating: {review.rating}/5
-                          </Typography>
+                        <div className='rating'>
+                          <Typography className="rating-text" variant="body2">Rating: {review.rating}/5</Typography>
                         </div>
                         <Typography className="reviewer-text" variant="body2">
-                          Reviewer: {review.user_handle}
+                          Reviewer: {getUserHandle(review.user_id)}
                         </Typography>
-                        <Typography className="review-text" variant="body2">
-                          {review.text}
-                        </Typography>
+                        <Typography className="review-text" variant="body2">{review.text}</Typography>
                       </Card>
                     ))
                   ) : (
-                    <Typography variant="body2">No reviews yet.</Typography>
+                    <Typography variant="body2">No Reviews available.</Typography>
                   )}
                 </Box>
               </Box>
-              <Typography variant="body2">Did you try it?</Typography>
-              <Button 
-                variant="contained" 
-                color="primary"
-                onClick={() => navigate(`/beers/${id}/review`)}
+
+              <Button
+                variant="contained"
+                onClick={() => navigate(`/beers/${id}/review`)} 
               >
                 Leave a Review
               </Button>
