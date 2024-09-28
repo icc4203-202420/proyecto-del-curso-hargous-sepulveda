@@ -124,7 +124,7 @@ const Beer = () => {
                 )}
               </Box>
               <Box className="average-rating-bubble">
-                Rating: {beer.avg_rating ? `${beer.avg_rating}/5` : 'N/A'}
+                Rating: {beer.avg_rating ? `${Math.round(beer.avg_rating * 10) / 10}/5` : 'N/A'}
               </Box>
               <CardContent className="beer-card-content">
                 <Typography className="beer-card-title" variant="h4" component="div">
@@ -214,6 +214,14 @@ const Beer = () => {
                   )}
                 </Box>
               </Box>
+              <Typography variant="body2">Did you try it?</Typography>
+              <Button 
+                variant="contained" 
+                color="primary"
+                onClick={() => navigate(`/beers/${id}/review`)}
+              >
+                Leave a Review
+              </Button>
             </Box>
           </Card>
         </div>

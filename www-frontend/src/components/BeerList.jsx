@@ -63,7 +63,7 @@ const BeerList = () => {
                         {beer.name}
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {beer.avg_rating ? `${beer.avg_rating}/5` : 'No rating'}
+                        {beer.avg_rating ? `${Math.round(beer.avg_rating * 10) / 10}/5` : 'No rating'}
                       </Typography>
                     </CardContent>
                     <CardMedia

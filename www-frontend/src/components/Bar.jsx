@@ -138,7 +138,7 @@ const Bar = () => {
                           alt={`${beer.name} image`}
                         />
                       )}
-                      <Typography variant="body2">Rating: {beer.avg_rating || 'N/A'}</Typography>
+                      <Typography variant="body2">Rating: {Math.round(beer.avg_rating * 10) / 10 || 'N/A'}</Typography>
                     </Box>
                   </Link>
                 ))
