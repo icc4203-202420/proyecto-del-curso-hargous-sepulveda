@@ -37,14 +37,19 @@ Rails.application.routes.draw do
       end
 
       resources :brands, only: [:show]
-
       resources :events, only: [:index, :show, :create, :update, :destroy] do
-        # Agregar ruta para subir imagen con un PATCH
-        patch :upload_picture, on: :member  # PATCH /api/v1/events/:id/upload_image
+        patch :upload_image, on: :member
+        patch :upload_flyer, on: :member  # Ruta para subir el flyer
         collection do
           get 'search'
         end
+
+        # Añadir rutas para event_pictures anidadas bajo events
+        resources :event_pictures, only: [:index, :create]  # Para listar y crear imágenes de eventos
       end
+
+      # Ruta para eliminar event_pictures, no anidada ya que depende del ID de la imagen
+      resources :event_pictures, only: [:destroy]
 
       resources :users do
         collection do

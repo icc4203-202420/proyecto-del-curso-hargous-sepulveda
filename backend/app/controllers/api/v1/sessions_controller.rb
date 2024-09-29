@@ -2,16 +2,11 @@ class API::V1::SessionsController < Devise::SessionsController
   include ::RackSessionsFix
   respond_to :json
   private
-  def respond_with(resource, _opts = {})
-    token = request.env['warden-jwt_auth.token'] # Get the token from Warden
+  def respond_with(current_user, _opts = {})
     render json: {
-      status: {
-        code: 200,
-        message: 'Logged in successfully.',
-        token: token, # Include JWT token in the response
-        data: {
-          user: resource
-        }
+      status: { 
+        code: 200, message: 'Logged in successfully.',
+        data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
       }
     }, status: :ok
   end

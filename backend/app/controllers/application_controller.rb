@@ -1,26 +1,8 @@
 class ApplicationController < ActionController::API
-  # Decode the JWT token from the Authorization header and set current_user
-  def authenticate_with_jwt
-    if request.headers['Authorization'].present?
-      token = request.headers['Authorization'].split(' ').last
-      begin
-        jwt_payload = JWT.decode(
-          token,
-          Rails.application.credentials.devise_jwt_secret_key,
-          true,
-          { algorithm: 'HS256' }
-        ).first
-        @current_user = User.find(jwt_payload['sub'])
-      rescue JWT::DecodeError, ActiveRecord::RecordNotFound => e
-        render json: { status: 401, error: 'Invalid token or user not found.' }, status: :unauthorized
-      end
-    else
-      render json: { status: 401, error: 'Authorization header missing.' }, status: :unauthorized
-    end
-  end
-
-  # Expose current_user for other controllers
-  def current_user
-    @current_user
+  before_action :configure_permitted_parameters, if: :devise_controller?
+  protected
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: %i[name avatar])
+    devise_parameter_sanitizer.permit(:account_update, keys: %i[name avatar])
   end
 end
