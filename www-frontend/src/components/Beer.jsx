@@ -69,8 +69,9 @@ const Beer = () => {
         const reviewResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}/reviews`);
 
         const reviews = reviewResponse.data.reviews;
-        const currentUserReview = reviews.find(review => review.user_id === currentUserId);
-        const otherReviews = reviews.filter(review => review.user_id !== currentUserId);
+        const currentUserReview = reviews.find(review => review.user_id === parseInt(currentUserId, 10));
+        const otherReviews = reviews.filter(review => review.user_id !== parseInt(currentUserId, 10));
+
         const orderedReviews = currentUserReview ? [currentUserReview, ...otherReviews] : reviews;
 
         dispatch({ type: 'FETCH_SUCCESS', payload: orderedReviews });
