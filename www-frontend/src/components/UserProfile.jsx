@@ -255,11 +255,11 @@ const UserProfile = () => {
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button
             onClick={handleConfirmAddFriend}
-            disabled={!selectedEventTitle} // Disable button if no event is selected
           >
             Confirm
           </Button>
         </DialogActions>
+
       </Dialog>
     </div>
   );

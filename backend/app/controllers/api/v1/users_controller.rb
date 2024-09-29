@@ -85,7 +85,25 @@ class API::V1::UsersController < ApplicationController
     end
   end
   
-
+  def destroy_friendship
+    user = User.find(params[:id]) # Usuario que está eliminando la amistad
+    friend = User.find_by(id: params[:friend_id]) # Amigo que será eliminado
+  
+    return render json: { error: 'Friend not found' }, status: :not_found unless friend
+  
+    # Encuentra la amistad
+    friendship = user.friendships.find_by(friend_id: friend.id)
+    
+    return render json: { error: 'Friendship not found' }, status: :not_found unless friendship
+  
+    # Elimina la amistad
+    if friendship.destroy
+      render json: { message: 'Friendship deleted successfully' }, status: :ok
+    else
+      render json: { error: 'Unable to delete friendship' }, status: :unprocessable_entity
+    end
+  end
+  
   private
 
   def set_user
