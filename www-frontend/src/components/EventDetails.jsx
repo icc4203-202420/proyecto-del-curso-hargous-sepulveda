@@ -7,7 +7,10 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+import "./EventDetails.css";
 const EventDetails = () => {
   const { id } = useParams(); // Obtener el ID del evento desde la URL
   const [event, setEvent] = useState(null);
@@ -22,7 +25,7 @@ const EventDetails = () => {
   const [selectedImage, setSelectedImage] = useState(null); // Nuevo estado para la imagen seleccionada
   const [uploadStatus, setUploadStatus] = useState(''); // Estado para mensajes de éxito/error en la subida
   const currentUserId = sessionStorage.getItem('userId'); // ID del usuario autenticado
-
+  const [users, setUsers] = useState([]);
   const fetchEventDetails = async () => {
     try {
       const eventResponse = await axios.get('http://localhost:3001/api/v1/events');
@@ -55,6 +58,8 @@ const EventDetails = () => {
         const friendsResponse = await axios.get(`http://localhost:3001/api/v1/users/${currentUserId}/friendships`);
         setFriends(friendsResponse.data);
 
+        const usersResponse = await axios.get(`http://localhost:3001/api/v1/users/search`);
+        setUsers(usersResponse.data.users);
         // Fetch event pictures
         fetchEventPictures(selectedEvent.id); // Llama a la función para obtener las imágenes del evento
       } else {
@@ -82,6 +87,10 @@ const EventDetails = () => {
     fetchEventDetails();
   }, [id]);
 
+  const getUserHandle = (userId) => {
+    const user = users.find((user) => user.id === userId);
+    return user ? user.handle : 'Unknown User';
+  };
   const confirmAttendance = async () => {
     try {
       await axios.post(`http://localhost:3001/api/v1/attendances`, {
@@ -148,8 +157,9 @@ const EventDetails = () => {
 
   return (
     event ? (
-      <Card sx={{ maxWidth: 600, margin: 'auto', mt: 4, padding: 2, boxShadow: 3 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <div className="show-event">
+      <Card className="event-card" sx={{ maxWidth: 600, margin: 'auto', mt: 4, padding: 2, boxShadow: 3 }}>
+        <Box className="event-card-container" sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <CardContent sx={{ flex: 1 }}>
             <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
               {event.name}
@@ -220,25 +230,31 @@ const EventDetails = () => {
               <Typography variant="body2">No hay otros asistentes confirmados.</Typography>
             )}
 
-            {/* Renderiza las imágenes del evento */}
-            <Typography variant="h6" sx={{ mt: 3 }}>
-              Imágenes del Evento:
-            </Typography>
-            {eventPictures.length > 0 ? (
-              eventPictures.map((picture) => (
-                picture.flyer_urls.length > 0 && (
-                  <div key={picture.id}>
-                    <img
-                      src={picture.flyer_urls[0]} // Asumiendo que flyer_urls contiene la URL de la imagen
-                      alt={`Flyer de la imagen ${picture.id}`}
-                      style={{ width: '200px', borderRadius: '8px', margin: '10px' }}
-                    />
-                  </div>
-                )
-              ))
+          {/* Renderiza las imágenes del evento */}
+          <Typography variant="h6" sx={{ mt: 3 }}>
+            Imágenes del Evento:
+          </Typography>
+          {
+            eventPictures.length > 0 ? ( 
+              <Box sx={{ width: 500, height: 450, overflowY: 'scroll' }}>
+                <ImageList variant="masonry" cols={3} gap={8}>
+                  {eventPictures.map((picture) => (
+                    <ImageListItem key={picture.id}>
+                      <img
+                        srcSet={`${picture.flyer_urls[0]}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                        src={`${picture.flyer_urls[0]}?w=248&fit=crop&auto=format`}
+                        alt={`Flyer de la imagen ${picture.id}`}
+                        loading="lazy"
+                      />
+                      <ImageListItemBar position="below" title={getUserHandle(picture.user_id) || "Autor no disponible"} />
+                    </ImageListItem>
+                  ))}
+                </ImageList>
+              </Box>
             ) : (
               <Typography variant="body2">No hay imágenes disponibles.</Typography>
-            )}
+            )
+          }
           </CardContent>
           {event.thumbnail_url && (
             <CardMedia
@@ -250,10 +266,12 @@ const EventDetails = () => {
           )}
         </Box>
       </Card>
+      </div>
     ) : (
       <div>No se encontró el evento.</div>
     )
-  );
+    );
 };
 
 export default EventDetails;
+
