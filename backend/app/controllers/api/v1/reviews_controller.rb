@@ -1,10 +1,15 @@
 class API::V1::ReviewsController < ApplicationController
   respond_to :json
-  before_action :set_beer, only: [:index]
+  before_action :set_beer, only: [:index], unless: -> { params[:user_id].present? }
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    @reviews = Review.where(beer: @beer)
+    if params[:user_id]
+      @reviews = Review.where(user_id: params[:user_id])
+    else
+      @reviews = Review.where(beer: @beer)
+    end
+    
     render json: { reviews: @reviews }, status: :ok
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found

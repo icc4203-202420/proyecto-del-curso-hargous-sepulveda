@@ -21,7 +21,7 @@ import CreateReview from './CreateReview.jsx';
 import PrivateRoute from './PrivateRoute'; 
 import Home from './Home';
 import EventDetails from './EventDetails.jsx';
-
+import UserProfile from './UserProfile.jsx'
 const Footer = ({ value, onChange }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(sessionStorage.getItem('jwtToken')));
 
@@ -56,6 +56,7 @@ const Footer = ({ value, onChange }) => {
           <Route path="/bars/:id" element={<PrivateRoute><Bar /></PrivateRoute>} />
           <Route path="/events" element={<PrivateRoute><Events /></PrivateRoute>} />
           <Route path="/beers/:id" element={<PrivateRoute><Beer /></PrivateRoute>} />
+          <Route path="/users/:id" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
           <Route path="/beers/:id/review" element={<PrivateRoute><CreateReview /></PrivateRoute>} />
         </Routes>
       </Container>

@@ -60,7 +60,7 @@ const Login = () => {
   
         setTimeout(() => {
           navigate('/account'); 
-        }, 800);
+        }, 200);
       }
     } catch (err) {
       if (err.response && err.response.status === 401) {

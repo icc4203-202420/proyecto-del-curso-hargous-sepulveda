@@ -42,13 +42,11 @@ const Beer = () => {
   const [users, setUsers] = useState([]);
   const [reviewState, dispatch] = useReducer(reviewReducer, initialReviewState);
   
-
-  const currentUserId = 1; 
-
+  const currentUserId = sessionStorage.getItem('userId'); 
+  console.log(currentUserId)
   useEffect(() => {
     const fetchBeerAndDetails = async () => {
       try {
-
         const beerResponse = await axios.get(`http://localhost:3001/api/v1/beers/${id}`);
         setBeer(beerResponse.data.beer);
 
@@ -160,7 +158,6 @@ const Beer = () => {
                 </Typography>
               </CardContent>
 
-
               <Box className="bar-section">
                 <Typography variant="h5">Available At</Typography>
                 <Box className="bar-section-sub">
@@ -193,7 +190,7 @@ const Beer = () => {
                 <Typography variant="h5">Reviews</Typography>
                 <Box className="reviews-section_sub">
                   {reviewLoading ? (
-                    <Typography variant="body2">Cargando evaluaciones...</Typography>
+                    <Typography variant="body2">Loading reviews...</Typography>
                   ) : reviewError ? (
                     <Typography variant="body2">{reviewError}</Typography>
                   ) : reviews.length > 0 ? (
@@ -209,7 +206,7 @@ const Beer = () => {
                       </Card>
                     ))
                   ) : (
-                    <Typography variant="body2">No Reviews available.</Typography>
+                    <Typography variant="body2">No reviews available.</Typography>
                   )}
                 </Box>
               </Box>

@@ -1,19 +1,20 @@
 class API::V1::UsersController < ApplicationController
   respond_to :json
   # autenticación
-  before_action :verify_jwt_token, only: [:update,  :create_friendship]
-  before_action :set_user, only: [:show, :update,  :create_friendship]
+  before_action :verify_jwt_token, only: [:update]
+  before_action :set_user, only: [:show, :update]
 # friendship autentication by now erased
   def show
     user = User.find_by(id: params[:id])
     
     if user
  
-      render json: { user: { id: user.id, name: "#{user.first_name} #{user.last_name}", email: user.email } }, status: :ok
+      render json: { user: { id: user.id, name: "#{user.first_name} #{user.last_name}", email: user.email , handle: user.handle} }, status: :ok
     else
       render json: { error: "User not found" }, status: :not_found
     end
   end
+  
   def search
     query = "%#{params[:q]}%"
     if params[:q]
@@ -50,13 +51,20 @@ class API::V1::UsersController < ApplicationController
 
   # POST /api/v1/users/:id/friendships
   def create_friendship
+    user = User.find(params[:id])
     friend = User.find_by(id: params[:friend_id])
+
     return render json: { error: 'Friend not found' }, status: :not_found unless friend
-  
+
+    existing_friendship = user.friendships.find_by(friend_id: friend.id)
+    if existing_friendship
+      return render json: { error: 'Friendship already exists' }, status: :unprocessable_entity
+    end
+
     bar = Bar.find_by(id: params[:bar_id]) if params[:bar_id]
-  
-    friendship = @user.friendships.build(friend: friend, bar: bar)
-  
+
+    friendship = user.friendships.build(friend: friend, bar: bar)
+
     if friendship.save
       render json: friendship, status: :created
     else
