@@ -14,6 +14,8 @@ const UserList = () => {
 
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('q');
+  
+  const currentUserId = sessionStorage.getItem('userId'); // Obtener el ID del usuario logueado
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -22,8 +24,11 @@ const UserList = () => {
         const response = query 
           ? await axios.get(`http://localhost:3001/api/v1/users/search?q=${query}`)
           : await axios.get('http://localhost:3001/api/v1/users/search');
-          
-        setUsers(response.data.users);
+
+        // Filtrar el usuario logueado de la lista de usuarios
+        const filteredUsers = response.data.users.filter(user => user.id !== parseInt(currentUserId));
+
+        setUsers(filteredUsers);
       } catch (error) {
         console.error('Error fetching users:', error);
         setError('Error fetching users');
@@ -33,7 +38,7 @@ const UserList = () => {
     };
 
     fetchUsers();
-  }, [query]);
+  }, [query, currentUserId]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -58,7 +63,5 @@ const UserList = () => {
     </div>
   );
 };
-
-
 
 export default UserList;

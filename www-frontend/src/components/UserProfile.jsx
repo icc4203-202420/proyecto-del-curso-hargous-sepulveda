@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useReducer } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import CloseIcon from '@mui/icons-material/Close';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import './UserProfile.css';
+import React, { useState, useEffect, useReducer } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import CloseIcon from "@mui/icons-material/Close";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import "./UserProfile.css";
 
 // Initial state for reviews and events
 const initialReviewState = {
@@ -29,11 +29,11 @@ const initialReviewState = {
 
 const reviewReducer = (state, action) => {
   switch (action.type) {
-    case 'FETCH_INIT':
+    case "FETCH_INIT":
       return { ...state, loading: true, error: null };
-    case 'FETCH_SUCCESS':
+    case "FETCH_SUCCESS":
       return { ...state, loading: false, reviews: action.payload };
-    case 'FETCH_FAILURE':
+    case "FETCH_FAILURE":
       return { ...state, loading: false, error: action.payload };
     default:
       return state;
@@ -49,57 +49,72 @@ const UserProfile = () => {
   const [reviewState, dispatch] = useReducer(reviewReducer, initialReviewState);
   const [isFriend, setIsFriend] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedEventTitle, setSelectedEventTitle] = useState('');
+  const [selectedEventTitle, setSelectedEventTitle] = useState("");
   const [eventSuggestions, setEventSuggestions] = useState([]);
-  const [loadingEvents, setLoadingEvents] = useState(true); // State for loading events
-  const [eventError, setEventError] = useState(null); // State for event error
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [eventError, setEventError] = useState(null);
 
-  const currentUserId = sessionStorage.getItem('userId');
+  const currentUserId = sessionStorage.getItem("userId");
+
   useEffect(() => {
     const fetchUserDetailsAndReviews = async () => {
       try {
-        const userResponse = await axios.get(`http://localhost:3001/api/v1/users/${id}`);
+        const userResponse = await axios.get(
+          `http://localhost:3001/api/v1/users/${id}`
+        );
         setUser(userResponse.data.user);
         setLoadingUser(false);
 
-        const friendshipResponse = await axios.get(`http://localhost:3001/api/v1/users/${id}/friendships`);
-        const isFriend = friendshipResponse.data.some(friend => friend.id === currentUserId);
+        // Verificar si ya son amigos
+        const friendshipResponse = await axios.get(
+          `http://localhost:3001/api/v1/users/${currentUserId}/friendships`
+        );
+        const isFriend = friendshipResponse.data.some(
+          (friend) => friend.id === parseInt(id)
+        );
         setIsFriend(isFriend);
 
-        dispatch({ type: 'FETCH_INIT' });
-        const reviewResponse = await axios.get(`http://localhost:3001/api/v1/users/${id}/reviews`);
+        dispatch({ type: "FETCH_INIT" });
+        const reviewResponse = await axios.get(
+          `http://localhost:3001/api/v1/users/${id}/reviews`
+        );
         let reviews = reviewResponse.data.reviews;
 
         if (reviews.length > 0) {
-          const beerIds = [...new Set(reviews.map(review => review.beer_id))];
-          const beerPromises = beerIds.map(beerId =>
+          const beerIds = [...new Set(reviews.map((review) => review.beer_id))];
+          const beerPromises = beerIds.map((beerId) =>
             axios.get(`http://localhost:3001/api/v1/beers/${beerId}`)
           );
           const beersResponses = await Promise.all(beerPromises);
-          const beers = beersResponses.map(response => response.data.beer);
+          const beers = beersResponses.map((response) => response.data.beer);
           const beerMap = {};
-          beers.forEach(beer => {
+          beers.forEach((beer) => {
             beerMap[beer.id] = beer;
           });
-          reviews = reviews.map(review => ({
+          reviews = reviews.map((review) => ({
             ...review,
-            beer: beerMap[review.beer_id] || { id: null, name: 'Unknown Beer' },
+            beer: beerMap[review.beer_id] || { id: null, name: "Unknown Beer" },
           }));
         }
 
-        dispatch({ type: 'FETCH_SUCCESS', payload: reviews });
+        dispatch({ type: "FETCH_SUCCESS", payload: reviews });
 
         // Fetch events for the suggestions
-        const eventsResponse = await axios.get(`http://localhost:3001/api/v1/events`);
+        const eventsResponse = await axios.get(
+          `http://localhost:3001/api/v1/events`
+        );
         setEventSuggestions(eventsResponse.data.events);
         setLoadingEvents(false); // Set loading to false after fetching
       } catch (error) {
-        console.error('Error fetching user details or reviews:', error);
+        console.error("Error fetching user details or reviews:", error);
         if (loadingUser) {
-          setErrorUser('Error fetching user details');
+          setErrorUser("Error fetching user details");
           setLoadingUser(false);
         } else {
-          dispatch({ type: 'FETCH_FAILURE', payload: 'Error fetching reviews' });
+          dispatch({
+            type: "FETCH_FAILURE",
+            payload: "Error fetching reviews",
+          });
         }
       }
     };
@@ -112,37 +127,49 @@ const UserProfile = () => {
   };
 
   const handleConfirmAddFriend = async () => {
-    const token = sessionStorage.getItem('jwtToken');
+    const token = sessionStorage.getItem("jwtToken");
+
+    const requestData = {
+      friend_id: id,
+      event_id: selectedEventTitle === "" ? null : selectedEventTitle,
+    };
+
     try {
       await axios.post(
-        `http://localhost:3001/api/v1/users/${id}/friendships`,
-        { friend_id: currentUserId, event_id: selectedEventTitle }, // Use selected event title
+        `http://localhost:3001/api/v1/users/${currentUserId}/friendships`,
+        requestData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setIsFriend(true);
+      setIsFriend(true); // Actualizar a true cuando se agregue la amistad
       setDialogOpen(false);
     } catch (error) {
-      console.error('Error adding friend:', error);
+      console.error(
+        "Error adding friend:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 
   const handleRemoveFriend = async () => {
     try {
-      const token = sessionStorage.getItem('jwtToken');
-      await axios.delete(`http://localhost:3001/api/v1/users/${id}/friendships`, {
-        data: { friend_id: currentUserId },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setIsFriend(false);
+      const token = sessionStorage.getItem("jwtToken");
+      await axios.delete(
+        `http://localhost:3001/api/v1/users/${currentUserId}/friendships`,
+        {
+          data: { friend_id: id },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setIsFriend(false); // Actualizar a false cuando se elimine la amistad
     } catch (error) {
-      console.error('Error removing friend:', error);
+      console.error("Error removing friend:", error);
     }
   };
 
@@ -173,7 +200,11 @@ const UserProfile = () => {
               <CloseIcon />
             </IconButton>
             <CardContent className="profile-card-content">
-              <Typography className="profile-card-title" variant="h4" component="div">
+              <Typography
+                className="profile-card-title"
+                variant="h4"
+                component="div"
+              >
                 @{user.handle}
               </Typography>
               <IconButton
@@ -184,7 +215,8 @@ const UserProfile = () => {
                 {isFriend ? <PersonRemoveIcon /> : <PersonAddIcon />}
               </IconButton>
               <Typography className="profile-card-text">
-                <span className="profile-card-strong">Name:</span> {user.name || 'N/A'}
+                <span className="profile-card-strong">Name:</span>{" "}
+                {user.name || "N/A"}
               </Typography>
               {user.bio && (
                 <Typography className="profile-card-text">
@@ -203,18 +235,22 @@ const UserProfile = () => {
                 ) : reviewError ? (
                   <Alert severity="error">{reviewError}</Alert>
                 ) : reviews.length > 0 ? (
-                  reviews.map(review => (
+                  reviews.map((review) => (
                     <Card key={review.id} className="review-card">
                       <Box className="review-header">
-                        <div className='rating'>
-                          <Typography className="rating-text" variant="body2">Rating: {review.rating}/5</Typography>
+                        <div className="rating">
+                          <Typography className="rating-text" variant="body2">
+                            Rating: {review.rating}/5
+                          </Typography>
                         </div>
                         <Typography className="beer-text" variant="body2">
-                          Beer:{' '}
+                          Beer:{" "}
                           {review.beer.id ? (
-                            <Link to={`/beers/${review.beer.id}`}>{review.beer.name}</Link>
+                            <Link to={`/beers/${review.beer.id}`}>
+                              {review.beer.name}
+                            </Link>
                           ) : (
-                            'Unknown Beer'
+                            "Unknown Beer"
                           )}
                         </Typography>
                       </Box>
@@ -224,7 +260,9 @@ const UserProfile = () => {
                     </Card>
                   ))
                 ) : (
-                  <Typography variant="body2">{user.handle} hasn't left any reviews yet.</Typography>
+                  <Typography variant="body2">
+                    {user.handle} hasn't left any reviews yet.
+                  </Typography>
                 )}
               </Box>
             </Box>
@@ -238,7 +276,9 @@ const UserProfile = () => {
           <Autocomplete
             options={eventSuggestions}
             getOptionLabel={(option) => option.name} // Assuming the event object has a title field
-            onChange={(event, newValue) => setSelectedEventTitle(newValue?.id || '')}
+            onChange={(event, newValue) =>
+              setSelectedEventTitle(newValue?.id || "")
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -253,21 +293,11 @@ const UserProfile = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleConfirmAddFriend}
-          >
-            Confirm
-          </Button>
+          <Button onClick={handleConfirmAddFriend}>Confirm</Button>
         </DialogActions>
-
       </Dialog>
     </div>
   );
 };
 
 export default UserProfile;
-
-
-
-
-

@@ -37,7 +37,10 @@ Rails.application.routes.draw do
       end
 
       resources :brands, only: [:show]
+
       resources :events, only: [:index, :show, :create, :update, :destroy] do
+        # Agregar ruta para subir imagen con un PATCH
+        patch :upload_picture, on: :member  # PATCH /api/v1/events/:id/upload_image
         collection do
           get 'search'
         end

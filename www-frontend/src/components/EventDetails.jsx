@@ -6,7 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button'; // Importa el componente de botón
+import Button from '@mui/material/Button'; 
 
 const EventDetails = () => {
   const { id } = useParams(); // Obtener el ID del evento desde la URL
@@ -18,7 +18,8 @@ const EventDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasConfirmed, setHasConfirmed] = useState(false); // Nuevo estado para asistencia confirmada
-
+  const [selectedImage, setSelectedImage] = useState(null); // Nuevo estado para la imagen seleccionada
+  const [uploadStatus, setUploadStatus] = useState(''); // Estado para mensajes de éxito/error en la subida
   const currentUserId = sessionStorage.getItem('userId'); // ID del usuario autenticado
 
   const fetchEventDetails = async () => {
@@ -46,12 +47,10 @@ const EventDetails = () => {
         const attendeesNames = await Promise.all(attendeesNamesPromises);
         setAttendees(attendeesNames);
 
-        // Verificar si el usuario actual ya confirmó asistencia
         if (attendeesData.includes(parseInt(currentUserId))) {
           setHasConfirmed(true);
         }
 
-        // Obtener las amistades del usuario
         const friendsResponse = await axios.get(`http://localhost:3001/api/v1/users/${currentUserId}/friendships`);
         setFriends(friendsResponse.data);
       } else {
@@ -65,7 +64,7 @@ const EventDetails = () => {
   };
 
   useEffect(() => {
-    fetchEventDetails(); // Llamar cuando se monta el componente
+    fetchEventDetails();
   }, [id]);
 
   const confirmAttendance = async () => {
@@ -75,13 +74,43 @@ const EventDetails = () => {
         user_id: currentUserId,
       });
       setHasConfirmed(true);
-      fetchEventDetails(); // Volver a cargar los detalles después de confirmar
+      fetchEventDetails();
     } catch (error) {
       console.error('Error confirming attendance:', error);
     }
   };
 
-  // Filtrar amigos que también están asistiendo
+  const handleImageChange = (e) => {
+    setSelectedImage(e.target.files[0]);
+  };
+
+  const uploadImage = async () => {
+    if (!selectedImage) {
+      setUploadStatus('Por favor selecciona una imagen.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('event_picture', selectedImage);
+    formData.append('event_id', id);
+
+    const token = sessionStorage.getItem('jwtToken');
+
+    try {
+      await axios.patch(`http://localhost:3001/api/v1/events/${id}/upload_picture`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setUploadStatus('Imagen subida exitosamente.');
+      fetchEventDetails(); // Refresca los detalles después de la subida
+    } catch (error) {
+      console.error('Error al subir la imagen:', error);
+      setUploadStatus('Error al subir la imagen.');
+    }
+  };
+
   const friendsAttending = attendees.filter((attendee) =>
     friends.some((friend) => friend.id === attendee.userId)
   );
@@ -120,7 +149,7 @@ const EventDetails = () => {
               <strong>Fecha de fin:</strong> {new Date(event.end_date).toLocaleString() || 'No disponible'}
             </Typography>
 
-            {/* Mostrar el botón o mensaje según la asistencia confirmada */}
+            {/* Confirmar asistencia */}
             {hasConfirmed ? (
               <Typography variant="h6" color="green" sx={{ mt: 3 }}>
                 Has confirmado tu asistencia
@@ -131,11 +160,19 @@ const EventDetails = () => {
               </Button>
             )}
 
+            {/* Subir imagen */}
+            <Typography variant="h6" sx={{ mt: 3 }}>
+              Subir una foto del evento
+            </Typography>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={uploadImage}>
+              Subir Imagen
+            </Button>
+            {uploadStatus && <Typography variant="body2" sx={{ mt: 1 }}>{uploadStatus}</Typography>}
+
             <Typography variant="h6" sx={{ mt: 3 }}>
               Amigos que asisten:
             </Typography>
-
-            {/* Mostrar amigos que están asistiendo */}
             {friendsAttending.length > 0 ? (
               friendsAttending.map((friend, index) => (
                 <Typography key={index} variant="body2" color="primary">
@@ -149,8 +186,6 @@ const EventDetails = () => {
             <Typography variant="h6" sx={{ mt: 3 }}>
               Otros asistentes:
             </Typography>
-
-            {/* Mostrar otros asistentes */}
             {otherAttendees.length > 0 ? (
               otherAttendees.map((attendee, index) => (
                 <Typography key={index} variant="body2">

@@ -15,19 +15,13 @@ function Account() {
     const storedUserId = sessionStorage.getItem('userId'); 
     const storedUserName = sessionStorage.getItem('userName'); 
 
-    if (token) {
+    if (token && storedUserId && storedUserName) {  // Verifica que los datos existan en sessionStorage
       setHasToken(true);
       setUserId(storedUserId); 
       setUserName(storedUserName); 
 
-      // Verifica si las amistades ya están en sessionStorage
-      const storedFriends = sessionStorage.getItem('friends');
-      if (storedFriends) {
-        setFriends(JSON.parse(storedFriends));  // Cargar amistades desde sessionStorage
-      } else {
-        // Si no están en sessionStorage, obtener de la API
-        fetchFriends(storedUserId);
-      }
+      // Siempre obtener las amistades desde la API al cargar la página
+      fetchFriends(storedUserId);
     } else {
       setHasToken(false); 
       navigate('/login'); 
@@ -36,10 +30,16 @@ function Account() {
 
   // Función para obtener las amistades desde la API
   const fetchFriends = async (userId) => {
+    const token = sessionStorage.getItem('jwtToken');  // Asegura que se use el token
     try {
-      const response = await axios.get(`http://localhost:3001/api/v1/users/${userId}/friendships`);
+      const response = await axios.get(`http://localhost:3001/api/v1/users/${userId}/friendships`, {
+        headers: {
+          'Authorization': `Bearer ${token}`  // Envía el token de autenticación
+        }
+      });
       setFriends(response.data);  // Guardar amistades en el estado
-      sessionStorage.setItem('friends', JSON.stringify(response.data));  // Guardar amistades en sessionStorage
+
+      console.log('Amigos obtenidos:', response.data);  // Verificar que amigos se obtuvieron correctamente
     } catch (error) {
       console.error('Error al obtener la lista de amigos:', error);
     }
@@ -49,7 +49,6 @@ function Account() {
     sessionStorage.removeItem('jwtToken');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('friends');  // Eliminar amistades de sessionStorage al cerrar sesión
     setHasToken(false); 
     navigate('/login');
   };
@@ -65,7 +64,9 @@ function Account() {
             {friends.length > 0 ? (
               <ul>
                 {friends.map((friend) => (
-                  <li key={friend.id}>{friend.first_name} {friend.last_name}</li>
+                  <li key={friend.id}>
+                    {friend.first_name} {friend.last_name}
+                  </li>
                 ))}
               </ul>
             ) : (
