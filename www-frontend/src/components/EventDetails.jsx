@@ -6,7 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button'; 
+import Button from '@mui/material/Button';
 
 const EventDetails = () => {
   const { id } = useParams(); // Obtener el ID del evento desde la URL
@@ -90,25 +90,34 @@ const EventDetails = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('event_picture', selectedImage);
-    formData.append('event_id', id);
+    // Lee el archivo seleccionado como base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
 
-    const token = sessionStorage.getItem('jwtToken');
-
-    try {
-      await axios.patch(`http://localhost:3001/api/v1/events/${id}/upload_picture`, formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+      const data = {
+        event_picture: {
+          user_id: currentUserId,
+          flyer_base64: base64Image,
         },
-      });
-      setUploadStatus('Imagen subida exitosamente.');
-      fetchEventDetails(); // Refresca los detalles después de la subida
-    } catch (error) {
-      console.error('Error al subir la imagen:', error);
-      setUploadStatus('Error al subir la imagen.');
-    }
+      };
+
+      try {
+        const response = await axios.post(`http://localhost:3001/api/v1/events/${id}/event_pictures`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        setUploadStatus('Imagen subida exitosamente.');
+        fetchEventDetails(); // Refresca los detalles después de la subida
+        console.log('URL de la imagen:', response.data.flyer_url); // Verifica si la imagen fue subida correctamente
+      } catch (error) {
+        console.error('Error al subir la imagen:', error);
+        setUploadStatus('Error al subir la imagen.');
+      }
+    };
+
+    reader.readAsDataURL(selectedImage); // Convierte el archivo a base64
   };
 
   const friendsAttending = attendees.filter((attendee) =>
