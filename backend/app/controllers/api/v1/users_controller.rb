@@ -53,7 +53,7 @@ class API::V1::UsersController < ApplicationController
   def create_friendship
     user = User.find(params[:id]) # Usuario que inicia la amistad
     friend = User.find_by(id: params[:friend_id]) # Amigo a ser agregado
-  
+    
     return render json: { error: 'Friend not found' }, status: :not_found unless friend
   
     # Verifica si la amistad ya existe
@@ -62,22 +62,20 @@ class API::V1::UsersController < ApplicationController
       return render json: { error: 'Friendship already exists' }, status: :unprocessable_entity
     end
   
-    # Verifica si event_id está presente y obtén bar_id desde el evento
+    # Si se proporciona un event_id, obtiene el evento y su bar asociado
+    bar = nil
     if params[:event_id]
       event = Event.find_by(id: params[:event_id])
       return render json: { error: 'Event not found' }, status: :not_found unless event
-      bar = event.bar
-      return render json: { error: 'Event has no associated bar' }, status: :unprocessable_entity unless bar
-      # Asigna tanto el event_id como el bar_id desde el evento
-      friendship = user.friendships.build(friend: friend, bar: bar, event: event)
+      bar = event.bar # Asocia el bar del evento si existe
     elsif params[:bar_id]
-      # Si no hay event_id, se usa bar_id directamente
+      # Si se proporciona un bar_id directamente, lo asigna
       bar = Bar.find_by(id: params[:bar_id])
       return render json: { error: 'Bar not found' }, status: :not_found unless bar
-      friendship = user.friendships.build(friend: friend, bar: bar)
-    else
-      return render json: { error: 'Bar or Event is required' }, status: :unprocessable_entity
     end
+  
+    # Crea la amistad con o sin el bar/evento asociado
+    friendship = user.friendships.build(friend: friend, bar: bar, event: event)
   
     # Guarda la amistad
     if friendship.save
