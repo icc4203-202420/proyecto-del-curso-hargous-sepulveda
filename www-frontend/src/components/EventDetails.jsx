@@ -15,6 +15,7 @@ const EventDetails = () => {
   const [barId, setBarId] = useState(null); // Estado para guardar el ID del bar
   const [attendees, setAttendees] = useState([]); // Lista de asistentes (nombres)
   const [friends, setFriends] = useState([]); // Lista de amigos del usuario autenticado
+  const [eventPictures, setEventPictures] = useState([]); // Estado para guardar las imágenes del evento
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasConfirmed, setHasConfirmed] = useState(false); // Nuevo estado para asistencia confirmada
@@ -53,6 +54,9 @@ const EventDetails = () => {
 
         const friendsResponse = await axios.get(`http://localhost:3001/api/v1/users/${currentUserId}/friendships`);
         setFriends(friendsResponse.data);
+
+        // Fetch event pictures
+        fetchEventPictures(selectedEvent.id); // Llama a la función para obtener las imágenes del evento
       } else {
         setEvent(null);
       }
@@ -60,6 +64,17 @@ const EventDetails = () => {
     } catch (error) {
       setError('Error fetching event details or attendees');
       setLoading(false);
+    }
+  };
+
+  const fetchEventPictures = async (eventId) => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/v1/events/${eventId}/event_pictures`);
+      setEventPictures(response.data); // Guarda las imágenes del evento
+      console.log('Flyer URLs:', response.data.map(picture => picture.flyer_urls).flat()); // Imprime los flyer_urls
+    } catch (error) {
+      console.error('Error fetching event pictures:', error);
+      setError('Error fetching event pictures');
     }
   };
 
@@ -109,7 +124,7 @@ const EventDetails = () => {
           },
         });
         setUploadStatus('Imagen subida exitosamente.');
-        fetchEventDetails(); // Refresca los detalles después de la subida
+        fetchEventPictures(selectedEvent.id); // Refresca las imágenes después de la subida
         console.log('URL de la imagen:', response.data.flyer_url); // Verifica si la imagen fue subida correctamente
       } catch (error) {
         console.error('Error al subir la imagen:', error);
@@ -203,6 +218,26 @@ const EventDetails = () => {
               ))
             ) : (
               <Typography variant="body2">No hay otros asistentes confirmados.</Typography>
+            )}
+
+            {/* Renderiza las imágenes del evento */}
+            <Typography variant="h6" sx={{ mt: 3 }}>
+              Imágenes del Evento:
+            </Typography>
+            {eventPictures.length > 0 ? (
+              eventPictures.map((picture) => (
+                picture.flyer_urls.length > 0 && (
+                  <div key={picture.id}>
+                    <img
+                      src={picture.flyer_urls[0]} // Asumiendo que flyer_urls contiene la URL de la imagen
+                      alt={`Flyer de la imagen ${picture.id}`}
+                      style={{ width: '200px', borderRadius: '8px', margin: '10px' }}
+                    />
+                  </div>
+                )
+              ))
+            ) : (
+              <Typography variant="body2">No hay imágenes disponibles.</Typography>
             )}
           </CardContent>
           {event.thumbnail_url && (
