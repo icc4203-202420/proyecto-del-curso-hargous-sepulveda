@@ -106,7 +106,7 @@ export default function Header() {
   }, [query, navigate, location.pathname])
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, zIndex: 1100 }}>
       <AppBar position="fixed" id='barra_fondo'>
         <Toolbar sx={{ justifyContent: 'center', position: 'relative' }}>
           <img
@@ -133,7 +133,8 @@ export default function Header() {
       </AppBar>
       <Box id="main-content">
       
-        <Box id="button-group-container">
+      {location.pathname !== '/' && (
+        <Box id="button-group-container" sx={{ display: 'flex', justifyContent: 'center', zIndex: 40}}>
           <ButtonGroup variant="outlined" aria-label="Basic button group">
             <Button onClick={() => navigate(`/beers?q=${query}`)}>Beers</Button>
             <Button onClick={() => navigate(`/bars?q=${query}`)}>Bars</Button>
@@ -141,6 +142,7 @@ export default function Header() {
             <Button onClick={() => navigate(`/users?q=${query}`)}>Users</Button>
           </ButtonGroup>
         </Box>
+      )}
 
     </Box>
 

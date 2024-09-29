@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -97,20 +97,30 @@ const Beer = () => {
     const user = users.find((user) => user.id === userId);
     return user ? user.handle : 'Unknown User';
   };
+  const location = useLocation();
 
+  const didReview = location.state?.didReview || false;
+  
+  const handleGoBack = () => {
+    if (didReview) {
+      navigate(-3); 
+    } else {
+      navigate(-1); 
+    }
+  };
   return (
     beer && (
       <div className="show-beer">
         <div className='mid'>
           <Card className="beer-card">
             <Box className="beer-card-container">
-              <IconButton
-                className="close-button"
-                onClick={() => navigate(-1)} 
-                aria-label="close"
-              >
-                <CloseIcon />
-              </IconButton>
+            <IconButton
+              className="close-button"
+              onClick={handleGoBack}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
               <Box className="beer-card-media-container">
                 {beer.image_url ? (
                   <CardMedia

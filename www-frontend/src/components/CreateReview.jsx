@@ -62,15 +62,15 @@ const CreateReview = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Deshabilita el botón mientras se envía
-
+    setIsSubmitting(true);
+  
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setIsSubmitting(false);
       return;
     }
-
+  
     try {
       const response = await fetch(`http://localhost:3001/api/v1/beers/${id}/reviews`, {
         method: 'POST',
@@ -86,32 +86,31 @@ const CreateReview = () => {
           }
         }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         if (errorData.errors) {
           setErrors({
-            submit: errorData.errors.join(', ') // Muestra todos los errores del backend
+            submit: errorData.errors.join(', ')
           });
         } else {
-          throw new Error('Hubo un problema con la red.');
+          throw new Error('Network error.');
         }
-        setIsSubmitting(false); // Habilita el botón nuevamente
+        setIsSubmitting(false);
         return;
       }
-
-      // Reseña enviada exitosamente
+  
       setSuccessMessage('Reseña enviada exitosamente!');
-      setFormData({ text: '', rating: 1 }); // Resetea el formulario
+      setFormData({ text: '', rating: 1 });
+  
       setTimeout(() => {
-        navigate(`/beers/${id}`); // Redirige después de 2 segundos
-      }, 2000);
-
+        navigate(`/beers/${id}`, { state: { didReview: true } });
+      }, 200);
+  
     } catch (error) {
       console.error('Error:', error);
       setErrors({ submit: 'No se pudo enviar la reseña. Inténtalo de nuevo.' });
     } finally {
-      setIsSubmitting(false); // Habilita el botón nuevamente
+      setIsSubmitting(false);
     }
   };
 
