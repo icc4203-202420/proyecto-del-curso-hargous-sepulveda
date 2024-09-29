@@ -54,8 +54,7 @@ const UserProfile = () => {
   const [loadingEvents, setLoadingEvents] = useState(true); // State for loading events
   const [eventError, setEventError] = useState(null); // State for event error
 
-  const currentUserId = localStorage.getItem('currentUserId');
-
+  const currentUserId = sessionStorage.getItem('userId');
   useEffect(() => {
     const fetchUserDetailsAndReviews = async () => {
       try {
@@ -117,7 +116,7 @@ const UserProfile = () => {
     try {
       await axios.post(
         `http://localhost:3001/api/v1/users/${id}/friendships`,
-        { friend_id: currentUserId, event_title: selectedEventTitle }, // Use selected event title
+        { friend_id: currentUserId, event_id: selectedEventTitle }, // Use selected event title
         {
           headers: {
             'Content-Type': 'application/json',
@@ -239,7 +238,7 @@ const UserProfile = () => {
           <Autocomplete
             options={eventSuggestions}
             getOptionLabel={(option) => option.name} // Assuming the event object has a title field
-            onChange={(event, newValue) => setSelectedEventTitle(newValue?.name || '')}
+            onChange={(event, newValue) => setSelectedEventTitle(newValue?.id || '')}
             renderInput={(params) => (
               <TextField
                 {...params}
