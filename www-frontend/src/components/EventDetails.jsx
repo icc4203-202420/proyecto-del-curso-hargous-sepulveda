@@ -133,11 +133,10 @@ const EventDetails = () => {
           },
         });
         setUploadStatus('Imagen subida exitosamente.');
-        fetchEventPictures(selectedEvent.id); // Refresca las imágenes después de la subida
+        fetchEventPictures(id); // Refresca las imágenes después de la subida
         console.log('URL de la imagen:', response.data.flyer_url); // Verifica si la imagen fue subida correctamente
       } catch (error) {
         console.error('Error al subir la imagen:', error);
-        setUploadStatus('Error al subir la imagen.');
       }
     };
 
@@ -247,6 +246,9 @@ const EventDetails = () => {
                         loading="lazy"
                       />
                       <ImageListItemBar position="below" title={getUserHandle(picture.user_id) || "Autor no disponible"} />
+                      <ImageListItemBar position="below" title={new Date(picture.created_at).toLocaleString()} />
+                      <ImageListItemBar position="below" title={picture.likes_count + ' Me gusta'} />
+                      <ImageListItemBar position="below" title={picture.comments_count + ' Comentarios'} />
                     </ImageListItem>
                   ))}
                 </ImageList>
@@ -274,4 +276,3 @@ const EventDetails = () => {
 };
 
 export default EventDetails;
-
