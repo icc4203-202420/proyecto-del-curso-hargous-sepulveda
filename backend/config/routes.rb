@@ -57,14 +57,9 @@ Rails.application.routes.draw do
         end
         
         # Rutas anidadas para event_pictures dentro de eventos
-        resources :event_pictures, only: [:index, :create]  # Para listar y crear imágenes de eventos
+        resources :event_pictures, only: [:index, :create, :destroy, :update]  # Para listar y crear imágenes de eventos
       end
-      resources :event_pictures do
-        member do
-          post 'add_tag'
-          delete 'remove_tag'
-        end
-      end
+      
       # Ruta para eliminar event_pictures de manera independiente (por ID)
       resources :event_pictures, only: [:destroy]
 

@@ -1,6 +1,21 @@
 class API::V1::EventPicturesController < ApplicationController
   before_action :set_event, only: [:create, :index]
   before_action :set_event_picture, only: [:destroy]
+# PATCH /api/v1/events/:event_id/event_pictures/:id
+def update
+  @event_picture = EventPicture.find_by(id: params[:id])
+
+  if @event_picture.nil?
+    return render json: { error: 'Event picture not found' }, status: :not_found
+  end
+
+  if @event_picture.update(event_picture_params)
+    render json: { message: 'Event picture updated successfully', event_picture: @event_picture }, status: :ok
+  else
+    render json: { error: 'Error updating event picture' }, status: :unprocessable_entity
+  end
+end
+
 
 # GET /api/v1/events/:event_id/event_pictures
 def index
@@ -52,7 +67,7 @@ end
       render json: { error: 'No file provided' }, status: :unprocessable_entity
     end
   end
-
+  
   # DELETE /api/v1/event_pictures/:id
   def destroy
     @event_picture.destroy
