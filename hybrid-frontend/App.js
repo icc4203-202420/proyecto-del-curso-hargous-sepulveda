@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import Login from './components/Login'; 
 import Signup from './components/Signup'; 
-import Home from './components/Home'; 
+import Home from './components/BeerList'; 
 import Beer from './components/Beer';
 import CreateReview from './components/CreateReview';
 
