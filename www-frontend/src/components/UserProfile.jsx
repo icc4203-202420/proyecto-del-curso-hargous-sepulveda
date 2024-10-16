@@ -167,7 +167,7 @@ const UserProfile = () => {
           },
         }
       );
-      setIsFriend(false); // Actualizar a false cuando se elimine la amistad
+      setIsFriend(false); 
     } catch (error) {
       console.error("Error removing friend:", error);
     }

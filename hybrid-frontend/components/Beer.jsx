@@ -122,7 +122,7 @@ const Beer = ({ route }) => {
       </View>
       <View style={styles.detailsContainer}>
         <Text style={styles.detailLabel}>Calificación Promedio:</Text>
-        <Text style={styles.detailValue}>{beer.avg_rating || 'N/A'}</Text>
+        <Text style={styles.detailValue}>{`${Math.round(beer.avg_rating * 10) / 10}/5` || 'N/A'}</Text>
       </View>
 
       {/* Horizontal scroll for bars */}

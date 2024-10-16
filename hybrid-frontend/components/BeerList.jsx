@@ -66,9 +66,9 @@ const BeerList = () => {
               <View style={styles.cardContent}>
                 <View style={styles.textContent}>
                   <Text style={styles.beerName}>{item.name}</Text>
-                  <Text style={styles.beerRating}>
-                    {item.avg_rating ? `${Math.round(item.avg_rating * 10) / 10}/5` : 'No rating'}
-                  </Text>
+
+                    
+                  <Text style={styles.textContent}>{`Calificación Promedio:${Math.round(item.avg_rating * 10) / 10}/5` || 'No Rating'}</Text>
                   <Text style={styles.beerInfo}>IBU: {item.ibu}</Text>
                   <Text style={styles.beerInfo}>Alcohol: {item.alcohol}</Text>
                 </View>
