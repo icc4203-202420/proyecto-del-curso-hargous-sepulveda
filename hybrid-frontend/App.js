@@ -6,6 +6,8 @@ import { StyleSheet, View } from 'react-native';
 import Login from './components/Login'; 
 import Signup from './components/Signup'; 
 import Home from './components/Home'; 
+import Beer from './components/Beer';
+import CreateReview from './components/CreateReview';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +29,16 @@ export default function App() {
           name="Home" 
           component={Home} 
           options={{ title: 'Home' }} 
+        />
+        <Stack.Screen 
+          name="Beer" 
+          component={Beer} 
+          options={{ title: 'Detalles de la Cerveza' }} 
+        />
+        <Stack.Screen 
+          name="CreateReview" 
+          component={CreateReview} 
+          options={{ title: 'Crear Evaluación' }} 
         />
       </Stack.Navigator>
       <StatusBar style="auto" />
