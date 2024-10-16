@@ -3,11 +3,7 @@ import { View, TextInput, Button, FlatList, Text, StyleSheet, TouchableOpacity }
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 import { BACKEND_URL } from '@env';
 
-<<<<<<< HEAD
 const BeerList = () => {
-=======
-const Home = () => {
->>>>>>> 940077fea66b0659fd4e6e1914e72c2b73c4dcb1
   const navigation = useNavigation(); // Initialize navigation
   const [query, setQuery] = useState('');
   const [beers, setBeers] = useState([]);
@@ -46,11 +42,7 @@ const Home = () => {
                 <Text>Estilo: {item.style}</Text>
                 <Text>IBU: {item.ibu}</Text>
                 <Text>Alcohol: {item.alcohol}</Text>
-<<<<<<< HEAD
-                <Text>CalificaciÃ³n Promedio: {item.avg_rating}</Text>
-=======
                 <Text>Calificación Promedio: {item.avg_rating}</Text>
->>>>>>> 940077fea66b0659fd4e6e1914e72c2b73c4dcb1
               </View>
             </TouchableOpacity>
           )}
@@ -95,8 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-<<<<<<< HEAD
 export default BeerList;
-=======
-export default Home;
->>>>>>> 940077fea66b0659fd4e6e1914e72c2b73c4dcb1
