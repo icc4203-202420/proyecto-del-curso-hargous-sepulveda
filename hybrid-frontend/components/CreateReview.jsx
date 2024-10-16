@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Home = () => {
+const CreateReview = () => {
   return (
     <View style={styles.container}>
-      <Text>Welcome to the Home Screen!</Text>
+      <Text>Escribe tu evaluación aquí</Text>
+      {/* Aquí podrías agregar tu formulario de evaluación */}
     </View>
   );
 };
@@ -17,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default CreateReview;
