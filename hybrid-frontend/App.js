@@ -1,56 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from 'react-native-elements';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import Login from './components/Login'; 
-import Signup from './components/Signup'; 
-import Home from './components/BeerList'; 
-import Beer from './components/Beer';
-import CreateReview from './components/CreateReview';
+import BeerList from './components/BeerList';
+import BarList from './components/BarList';
+import Events from './components/Events';
+import Account from './components/Account';
+import Home from './components/Home';
+import Login from './components/Login';
+import Signup from './components/Signup';
 
-const Stack = createNativeStackNavigator();
 
-export default function App() {
+const Tab = createBottomTabNavigator();
+
+export default function Footer() {
+
+
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen 
-          name="Login" 
-          component={Login} 
-          options={{ title: 'Iniciar Sesión' }} 
-        />
-        <Stack.Screen 
-          name="Signup" 
-          component={Signup} 
-          options={{ title: 'Registrarse' }} 
-        />
-        <Stack.Screen 
-          name="Home" 
-          component={Home} 
-          options={{ title: 'Home' }} 
-        />
-        <Stack.Screen 
-          name="Beer" 
-          component={Beer} 
-          options={{ title: 'Detalles de la Cerveza' }} 
-        />
-        <Stack.Screen 
-          name="CreateReview" 
-          component={CreateReview} 
-          options={{ title: 'Crear Evaluación' }} 
-        />
-      </Stack.Navigator>
-      <StatusBar style="auto" />
+      <Tab.Navigator>
+        {/* Tabs visible only when authenticated */}
+        {(
+          <>
+            <Tab.Screen
+              name="Beers"
+              component={BeerList}
+              options={{
+                tabBarIcon: () => <Icon name="beer" type="font-awesome" />
+              }}
+            />
+            <Tab.Screen
+              name="Bars"
+              component={BarList}
+              options={{
+                tabBarIcon: () => <Icon name="glass" type="font-awesome" />
+              }}
+            />
+            <Tab.Screen
+              name="Home"
+              component={Home}
+              options={{
+                tabBarIcon: () => <Icon name="home" type="font-awesome" />
+              }}
+            />
+            <Tab.Screen
+              name="Events"
+              component={Events}
+              options={{
+                tabBarIcon: () => <Icon name="calendar" type="font-awesome" />
+              }}
+            />
+            <Tab.Screen
+              name="Account"
+              component={Account}
+              options={{
+                tabBarIcon: () => <Icon name="user" type="font-awesome" />
+              }}
+            />
+          </>
+        )}
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
