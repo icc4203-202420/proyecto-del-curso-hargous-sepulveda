@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, Button } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-
-export default function Header() {
+import { Icon } from 'react-native-elements';
+export default function Header({ onSearch }) { 
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
   const route = useRoute();
 
   const handleSearch = () => {
-    // Navigate to the Beers screen with the search query as a parameter
-    navigation.navigate('Beers', { searchQuery: query });
+    if (onSearch) {
+      onSearch(query); 
+    }
+
   };
 
   return (
@@ -21,9 +23,9 @@ export default function Header() {
           value={query}
           onChangeText={setQuery}
         />
-        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-          <Text style={styles.searchButtonText}>Search</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+        <Icon name="search" type="font-awesome" color="#fff" />
+      </TouchableOpacity>
       </View>
       {route.name !== 'Home' && (
         <View style={styles.buttonGroupContainer}>
@@ -40,7 +42,10 @@ export default function Header() {
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: '#525277',
-    padding: 10,
+    paddingTop: 7,
+    paddingHorizontal: 7,
+    paddingBottom: 3,
+
   },
   searchContainer: {
     flexDirection: 'row',
@@ -56,17 +61,23 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   searchButton: {
-    backgroundColor: '#A6A7B5',
+    backgroundColor: '#323242',
     padding: 10,
     borderRadius: 5,
   },
   searchButtonText: {
     color: '#fff',
+    fontWeight: 'bold',
   },
   buttonGroupContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
+    padding: 0,
+    borderRadius: 16,
+    backgroundColor: '#2E2E42',
   },
 });
 

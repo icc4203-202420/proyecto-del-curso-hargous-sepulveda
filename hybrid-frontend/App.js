@@ -23,7 +23,6 @@ function Tabs() {
 
   return (
     <>
-      <Header onSearch={handleSearch} />
       <Tab.Navigator>
         <Tab.Screen
           name="Beers"
