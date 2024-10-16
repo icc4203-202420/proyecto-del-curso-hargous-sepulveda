@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
-import { BACKEND_URL } from '@env'; // Import backend URL from .env file
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_URL } from '@env';
+
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email('Email no válido')
+    .required('El email es requerido'),
+  password: Yup.string()
+    .required('La contraseña es requerida')
+    .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+});
 
 const Login = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [serverError, setServerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleLogin = async () => {
+  const handleLogin = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/login`, {
         method: 'POST',
@@ -14,55 +26,83 @@ const Login = ({ navigation }) => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          'user[email]': username,
-          'user[password]': password,
+          'user[email]': values.email,
+          'user[password]': values.password,
         }).toString(),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Login successful', 'Welcome back!'); // Alert for successful login
-        console.log('Login response:', data);
+        setServerError('');
+        setSuccessMessage('Has sido logueado exitosamente.');
+
+        // Store the JWT token
+        const receivedToken = response.headers.get('Authorization');
+        await AsyncStorage.setItem('jwtToken', receivedToken);
+
         // Navigate to Home screen after successful login
         navigation.navigate('Home');
+        resetForm(); // Optionally reset the form
       } else {
-        Alert.alert('Login failed', data.message || 'Invalid credentials');
+        setServerError(data.message || 'Correo electrónico o contraseña incorrectos.');
       }
     } catch (error) {
-      console.error('Error during login:', error);
-      Alert.alert('Error', 'An error occurred while logging in. Please try again later.');
+      console.error('Error durante el inicio de sesión:', error);
+      setServerError('Error en el servidor. Intenta nuevamente más tarde.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Correo Electrónico"
-          value={username}
-          onChangeText={setUsername}
-          inputMode="email"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <Pressable style={styles.button} onPress={handleLogin} role="button">
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
-        </Pressable>
-        <Pressable onPress={() => navigation.navigate('Signup')} role="link">
-          <Text style={styles.link}>
-            ¿No tienes una cuenta? Regístrate aquí
-          </Text>
-        </Pressable>
-      </View>
+      <Formik
+        initialValues={{ email: '', password: '' }}
+        validationSchema={validationSchema}
+        onSubmit={handleLogin}
+      >
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+          <View style={styles.form}>
+            <Text style={styles.title}>Iniciar Sesión</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Correo Electrónico"
+              value={values.email}
+              onChangeText={handleChange('email')}
+              onBlur={handleBlur('email')}
+              autoCapitalize="none"
+            />
+            {touched.email && errors.email && <Text style={styles.error}>{errors.email}</Text>}
+
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              secureTextEntry
+              value={values.password}
+              onChangeText={handleChange('password')}
+              onBlur={handleBlur('password')}
+            />
+            {touched.password && errors.password && <Text style={styles.error}>{errors.password}</Text>}
+
+            <Pressable style={styles.button} onPress={handleSubmit} disabled={isSubmitting}>
+              <Text style={styles.buttonText}>
+                {isSubmitting ? 'Enviando...' : 'Iniciar Sesión'}
+              </Text>
+            </Pressable>
+
+            {successMessage && <Text style={styles.success}>{successMessage}</Text>}
+            {serverError && <Text style={styles.error}>{serverError}</Text>}
+
+            <Pressable onPress={() => navigation.navigate('Signup')}>
+              <Text style={styles.link}>
+                ¿No tienes una cuenta? Regístrate aquí
+              </Text>
+            </Pressable>
+          </View>
+        )}
+      </Formik>
     </View>
   );
 };
@@ -79,7 +119,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 30,
     borderRadius: 8,
-    // Removed boxShadow as it's not supported in React Native
     width: '100%',
     maxWidth: 400,
     alignItems: 'center',
@@ -117,6 +156,14 @@ const styles = StyleSheet.create({
     marginTop: 15,
     color: '#007bff',
     textAlign: 'center',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
+  },
+  success: {
+    color: 'green',
+    marginBottom: 10,
   },
 });
 
