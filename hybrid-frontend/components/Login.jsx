@@ -1,13 +1,38 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
+import { BACKEND_URL } from '@env'; // Import backend URL from .env file
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Logic for handling login
-    console.log('Logging in with', username, password);
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/v1/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'user[email]': username,
+          'user[password]': password,
+        }).toString(),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Login successful', 'Welcome back!'); // Alert for successful login
+        console.log('Login response:', data);
+        // Navigate to Home screen after successful login
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Login failed', data.message || 'Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      Alert.alert('Error', 'An error occurred while logging in. Please try again later.');
+    }
   };
 
   return (
@@ -16,9 +41,11 @@ const Login = ({ navigation }) => {
         <Text style={styles.title}>Iniciar Sesión</Text>
         <TextInput
           style={styles.input}
-          placeholder="Nombre de usuario"
+          placeholder="Correo Electrónico"
           value={username}
           onChangeText={setUsername}
+          inputMode="email"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
@@ -27,14 +54,14 @@ const Login = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Pressable style={styles.button} onPress={handleLogin} role="button">
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate('Signup')} role="link">
           <Text style={styles.link}>
             ¿No tienes una cuenta? Regístrate aquí
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -52,7 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 30,
     borderRadius: 8,
-    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+    // Removed boxShadow as it's not supported in React Native
     width: '100%',
     maxWidth: 400,
     alignItems: 'center',

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 const LoginStyles = StyleSheet.create({
   container: {
@@ -14,7 +14,20 @@ const LoginStyles = StyleSheet.create({
     borderRadius: 8,
     width: '100%',
     maxWidth: 400,
-    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 4, // Shadow effect on Android
+      },
+      web: {
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+      },
+    }),
     alignItems: 'center',
   },
   title: {

@@ -3,8 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import Login from './components/Login'; // Import your Login component
-import Signup from './components/Signup'; // Import your Signup component
+import Login from './components/Login'; 
+import Signup from './components/Signup'; 
+import Home from './components/Home'; 
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,11 @@ export default function App() {
           name="Signup" 
           component={Signup} 
           options={{ title: 'Registrarse' }} 
+        />
+        <Stack.Screen 
+          name="Home" 
+          component={Home} 
+          options={{ title: 'Home' }} 
         />
       </Stack.Navigator>
       <StatusBar style="auto" />
