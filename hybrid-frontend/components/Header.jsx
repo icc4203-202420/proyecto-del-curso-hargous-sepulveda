@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Button } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
+
 export default function Header({ onSearch }) { 
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
@@ -11,7 +12,6 @@ export default function Header({ onSearch }) {
     if (onSearch) {
       onSearch(query); 
     }
-
   };
 
   return (
@@ -23,16 +23,25 @@ export default function Header({ onSearch }) {
           value={query}
           onChangeText={setQuery}
         />
-      <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-        <Icon name="search" type="font-awesome" color="#fff" />
-      </TouchableOpacity>
+        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+          <Icon name="search" type="font-awesome" color="#fff" />
+        </TouchableOpacity>
       </View>
+
       {route.name !== 'Home' && (
         <View style={styles.buttonGroupContainer}>
-          <Button onPress={() => navigation.navigate('Beers')} title="Beers" />
-          <Button onPress={() => navigation.navigate('Bars')} title="Bars" />
-          <Button onPress={() => navigation.navigate('Events')} title="Events" />
-          <Button onPress={() => navigation.navigate('Users')} title="Users" />
+          <TouchableOpacity onPress={() => navigation.navigate('Beers')}>
+            <Text style={styles.navButtonText}>Beers</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Bars')}>
+            <Text style={styles.navButtonText}>Bars</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+            <Text style={styles.navButtonText}>Events</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Users')}>
+            <Text style={styles.navButtonText}>Users</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -45,7 +54,6 @@ const styles = StyleSheet.create({
     paddingTop: 7,
     paddingHorizontal: 7,
     paddingBottom: 3,
-
   },
   searchContainer: {
     flexDirection: 'row',
@@ -65,9 +73,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-  searchButtonText: {
+  navButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   buttonGroupContainer: {
     flexDirection: 'row',
@@ -80,6 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2E2E42',
   },
 });
+
 
 
 

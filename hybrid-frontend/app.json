@@ -22,6 +22,9 @@
     },
     "web": {
       "favicon": "./assets/BeerHub_logo_1.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

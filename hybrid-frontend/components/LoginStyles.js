@@ -5,7 +5,7 @@ const LoginStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f1f4f7',
+    backgroundColor: '#2E2E42',
     padding: 20,
   },
   form: {

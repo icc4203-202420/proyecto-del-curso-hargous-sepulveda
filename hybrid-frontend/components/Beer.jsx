@@ -89,7 +89,7 @@ const Beer = ({ route }) => {
     );
   }
 
-  return (
+  return ( 
     <ScrollView style={styles.container}>
       <Text style={styles.beerName}>{beer.name}</Text>
       <View style={styles.detailsContainer}>
@@ -191,6 +191,7 @@ const Beer = ({ route }) => {
         </View>
       </Modal>
     </ScrollView>
+    
   );
 };
 
