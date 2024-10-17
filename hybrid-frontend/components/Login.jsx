@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -64,8 +64,10 @@ const Login = ({ navigation }) => {
       >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
           <View style={styles.form}>
+            
             <Text style={styles.title}>Iniciar Sesión</Text>
 
+            
             <TextInput
               style={styles.input}
               placeholder="Correo Electrónico"
@@ -74,8 +76,12 @@ const Login = ({ navigation }) => {
               onBlur={handleBlur('email')}
               autoCapitalize="none"
             />
-            {touched.email && errors.email && <Text style={styles.error}>{errors.email}</Text>}
+            
+            {touched.email && errors.email && (
+              <Text style={styles.error}>{errors.email}</Text>
+            )}
 
+            
             <TextInput
               style={styles.input}
               placeholder="Contraseña"
@@ -84,17 +90,31 @@ const Login = ({ navigation }) => {
               onChangeText={handleChange('password')}
               onBlur={handleBlur('password')}
             />
-            {touched.password && errors.password && <Text style={styles.error}>{errors.password}</Text>}
+            
+            {touched.password && errors.password && (
+              <Text style={styles.error}>{errors.password}</Text>
+            )}
 
-            <Pressable style={styles.button} onPress={handleSubmit} disabled={isSubmitting}>
+            
+            <Pressable
+              style={styles.button}
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+            >
               <Text style={styles.buttonText}>
                 {isSubmitting ? 'Enviando...' : 'Iniciar Sesión'}
               </Text>
             </Pressable>
 
-            {successMessage && <Text style={styles.success}>{successMessage}</Text>}
-            {serverError && <Text style={styles.error}>{serverError}</Text>}
+            
+            {successMessage ? (
+              <Text style={styles.success}>{successMessage}</Text>
+            ) : null}
+            {serverError ? (
+              <Text style={styles.error}>{serverError}</Text>
+            ) : null}
 
+            
             <Pressable onPress={() => navigation.navigate('Signup')}>
               <Text style={styles.link}>
                 ¿No tienes una cuenta? Regístrate aquí
@@ -106,7 +126,6 @@ const Login = ({ navigation }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

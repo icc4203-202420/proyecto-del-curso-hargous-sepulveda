@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './SignupStyles'; 
-import { BACKEND_URL } from '@env';  
+import { BACKEND_URL } from '@env';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -74,7 +74,7 @@ const Signup = () => {
       setErrors(validationErrors);
       return;
     }
-  
+
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/signup`, {
         method: 'POST',
@@ -92,10 +92,10 @@ const Signup = () => {
           },
         }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-  
+
         const existingUserErrors = [];
         if (errorData.errors) {
           if (errorData.errors.email) {
@@ -105,7 +105,7 @@ const Signup = () => {
             existingUserErrors.push('El nombre de usuario ya está en uso.');
           }
         }
-  
+
         if (existingUserErrors.length > 0) {
           Alert.alert('Error', existingUserErrors.join('\n'));
         } else {
@@ -113,22 +113,21 @@ const Signup = () => {
         }
         return;
       }
-  
+
       const result = await response.json();
       console.log('Registro exitoso:', result);
       setSuccessMessage('Registro exitoso. Serás redirigido al inicio de sesión.');
       resetForm();
-  
+
       setTimeout(() => {
         navigation.navigate('Login');
       }, 2000);
-  
+
     } catch (error) {
       console.error('Error:', error);
       Alert.alert('Error', 'No se pudo registrar. Inténtalo de nuevo.');
     }
   };
-  
 
   const resetForm = () => {
     setFormData({
@@ -151,7 +150,7 @@ const Signup = () => {
         value={formData.firstName}
         onChangeText={(value) => handleChange('firstName', value)}
       />
-      {errors.firstName && <Text style={styles.error}>{errors.firstName}</Text>}
+      {errors.firstName ? <Text style={styles.error}>{errors.firstName}</Text> : null}
 
       <TextInput
         style={styles.signupInput}
@@ -159,7 +158,7 @@ const Signup = () => {
         value={formData.lastName}
         onChangeText={(value) => handleChange('lastName', value)}
       />
-      {errors.lastName && <Text style={styles.error}>{errors.lastName}</Text>}
+      {errors.lastName ? <Text style={styles.error}>{errors.lastName}</Text> : null}
 
       <TextInput
         style={styles.signupInput}
@@ -168,7 +167,7 @@ const Signup = () => {
         onChangeText={(value) => handleChange('email', value)}
         keyboardType="email-address"
       />
-      {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+      {errors.email ? <Text style={styles.error}>{errors.email}</Text> : null}
 
       <TextInput
         style={styles.signupInput}
@@ -176,7 +175,7 @@ const Signup = () => {
         value={formData.handle}
         onChangeText={(value) => handleChange('handle', value)}
       />
-      {errors.handle && <Text style={styles.error}>{errors.handle}</Text>}
+      {errors.handle ? <Text style={styles.error}>{errors.handle}</Text> : null}
 
       <TextInput
         style={styles.signupInput}
@@ -185,7 +184,7 @@ const Signup = () => {
         onChangeText={(value) => handleChange('password', value)}
         secureTextEntry
       />
-      {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+      {errors.password ? <Text style={styles.error}>{errors.password}</Text> : null}
 
       <TextInput
         style={styles.signupInput}
@@ -194,14 +193,14 @@ const Signup = () => {
         onChangeText={(value) => handleChange('passwordConfirmation', value)}
         secureTextEntry
       />
-      {errors.passwordConfirmation && <Text style={styles.error}>{errors.passwordConfirmation}</Text>}
+      {errors.passwordConfirmation ? <Text style={styles.error}>{errors.passwordConfirmation}</Text> : null}
 
       <Button title="Registrarse" onPress={handleSubmit} />
-      {successMessage && <Text style={styles.successMessage}>{successMessage}</Text>}
+      {successMessage !== '' && <Text style={styles.successMessage}>{successMessage}</Text>}
 
       <Text>
-        ¿Ya tienes una cuenta? 
-        <Text style={styles.link} onPress={() => navigation.navigate('Login')}> Iniciar sesión</Text>
+        ¿Ya tienes una cuenta?{' '}
+        <Text style={styles.link} onPress={() => navigation.navigate('Login')}>Iniciar sesión</Text>
       </Text>
     </View>
   );
