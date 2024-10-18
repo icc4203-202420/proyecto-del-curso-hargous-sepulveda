@@ -1,58 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Modal, Button, TextInput } from 'react-native';
 import { BACKEND_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon, Rating } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
 
 const Beer = ({ route }) => {
   const { id } = route.params;
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
-  const [brewery, setBrewery] = useState(null);
   const [bars, setBars] = useState([]);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [review, setReview] = useState('');
-  const [rating, setRating] = useState('');
-
-  const currentUserId = sessionStorage.getItem('userId');
+  const [rating, setRating] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigation = useNavigation();
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const fetchBeerAndDetails = async () => {
       try {
-        
+        const userId = await AsyncStorage.getItem('userId'); 
+        setCurrentUserId(parseInt(userId));
+
         const beerResponse = await fetch(`${BACKEND_URL}/api/v1/beers/${id}`);
         const beerData = await beerResponse.json(); 
         setBeer(beerData.beer);
-
-        
         const barsResponse = await fetch(`${BACKEND_URL}/api/v1/beers/${id}/bars`);
         const barsData = await barsResponse.json(); 
         setBars(barsData.bars);
-
-      
+        
         if (beerData.beer.brand_id) {
           const brandResponse = await fetch(`${BACKEND_URL}/api/v1/brands/${beerData.beer.brand_id}`);
           const brandData = await brandResponse.json(); 
           setBrand(brandData.name);
         }
-
         
         const usersResponse = await fetch(`${BACKEND_URL}/api/v1/users/search`);
         const usersData = await usersResponse.json(); 
         setUsers(usersData.users);
-
         
         const reviewResponse = await fetch(`${BACKEND_URL}/api/v1/beers/${id}/reviews`);
         const reviewData = await reviewResponse.json(); 
         const reviews = reviewData.reviews;
-
+  
         
-        const currentUserReview = reviews.find(review => review.user_id === parseInt(currentUserId, 10));
-        const otherReviews = reviews.filter(review => review.user_id !== parseInt(currentUserId, 10));
+        const currentUserReview = reviews.find(review => review.user_id === parseInt(userId, 10));
+        const otherReviews = reviews.filter(review => review.user_id !== parseInt(userId, 10));
         const orderedReviews = currentUserReview ? [currentUserReview, ...otherReviews] : reviews;
-
+  
         setReviews(orderedReviews);
         setLoading(false);
       } catch (error) {
@@ -61,23 +61,13 @@ const Beer = ({ route }) => {
         setLoading(false);
       }
     };
-
+  
     fetchBeerAndDetails();
   }, [id]);
 
-  const handleReviewSubmit = async () => {
-    if (!review || !rating) {
-      alert('Por favor completa la reseña y la calificación.');
-      return;
-    }
-  
-    const currentUserId = await AsyncStorage.getItem('userId'); // Cambiado a AsyncStorage
-  
-    if (!currentUserId) {
-      alert('Por favor inicia sesión para dejar una reseña.');
-      return;
-    }
-  
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/beers/${id}/reviews`, {
         method: 'POST',
@@ -89,41 +79,55 @@ const Beer = ({ route }) => {
             text: review,
             rating: rating,
             beer_id: id,
-            user_id: parseInt(currentUserId, 10), // Asegúrate de que user_id no sea null
-          },
+            user_id: currentUserId,
+          }
         }),
       });
-  
-      if (response.ok) {
-        const newReview = await response.json();
-        setReviews(prevReviews => [...prevReviews, newReview]);
-        setReview('');
-        setRating('');
-        setModalVisible(false);
-      } else {
-        console.error('Error submitting review:', await response.json());
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.errors) {
+          setError(errorData.errors.join(', '));
+        } else {
+          throw new Error('Network error.');
+        }
+        setIsSubmitting(false);
+        return;
       }
+
+      setReview('');
+      setRating(1);
+      setModalVisible(false);
+
+     
+      const updatedReviews = await fetch(`${BACKEND_URL}/api/v1/beers/${id}/reviews`);
+      const updatedReviewData = await updatedReviews.json();
+      setReviews(updatedReviewData.reviews);
+
     } catch (error) {
-      console.error('Error submitting review:', error);
+      console.error('Error:', error);
+      setError('No se pudo enviar la reseña. Inténtalo de nuevo.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
+
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingText}>Cargando detalles de la cerveza...</Text>
+        <Text style={styles.loadingText}>Cargando...</Text>
       </View>
     );
   }
 
-  if (!beer) {
+  if (error) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>No se encontraron detalles de la cerveza.</Text>
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
-
+  
   return ( 
     <ScrollView style={styles.container}>
       <Text style={styles.beerName}>{beer.name}</Text>
@@ -194,10 +198,10 @@ const Beer = ({ route }) => {
         )}
       </ScrollView>
 
-      {/* Modal for submitting a review */}
+      
       <Button title="Dejar una Reseña" onPress={() => setModalVisible(true)} />
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
@@ -213,14 +217,20 @@ const Beer = ({ route }) => {
               multiline
               numberOfLines={4}
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Escribe tu calificación aquí..."
-              value={rating}
-              onChangeText={setRating}
-              keyboardType="numeric"
+            <Text style={styles.label}>Calificación: {rating}</Text>
+            
+            <Rating
+              style={styles.rating}
+              imageSize={30}
+              startingValue={rating}
+              fractions={0} 
+              ratingImage="beer"
+              onFinishRating={(value) => setRating(value)}
+              minValue={0}
+              maxValue={5}
             />
-            <Button title="Enviar" onPress={handleReviewSubmit} />
+            
+            <Button title="Enviar" onPress={handleSubmit} />
             <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
           </View>
         </View>
@@ -345,6 +355,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    marginBottom: 15,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
   },
 });
 

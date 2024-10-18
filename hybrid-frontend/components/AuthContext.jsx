@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(!!token);
       setLoading(false);
     };
-
     checkToken();
   }, []);
 

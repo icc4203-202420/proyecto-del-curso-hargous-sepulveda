@@ -51,7 +51,7 @@ export default function Header({ onSearch }) {
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: '#525277',
-    paddingTop: 7,
+    paddingTop: 20,
     paddingHorizontal: 7,
     paddingBottom: 3,
   },
