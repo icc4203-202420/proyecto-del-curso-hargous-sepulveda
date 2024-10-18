@@ -12,15 +12,12 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Beer from './components/Beer';
+import { AuthProvider, useAuth } from './components/AuthContext';  
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function Tabs() {
-  const handleSearch = (query) => {
-    console.log("Searching for:", query);
-  };
-
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -42,7 +39,7 @@ function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Home"
+        name="HomeTab"
         component={Home}
         options={{
           tabBarIcon: () => <Icon name="home" type="font-awesome" size={24} />,
@@ -74,50 +71,61 @@ function Tabs() {
 
 export default function App() {
   return (
-    <SafeAreaProvider> 
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Signup"
-            component={Signup}
-            options={{ headerShown: true, headerTitle: "Sign Up" }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={Tabs}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="BeerList"
-            component={BeerList}
-            options={{ headerTitle: "Beer List" }}
-          />
-          <Stack.Screen
-            name="BarList"
-            component={BarList}
-            options={{ headerTitle: "Bar List" }}
-          />
-          <Stack.Screen
-            name="Events"
-            component={Events}
-            options={{ headerTitle: "Events" }}
-          />
-          <Stack.Screen
-            name="Beer"
-            component={Beer}
-            options={{ headerTitle: "Beer Details" }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <NavigationContainer>
+          <MainNavigator />
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }
 
+function MainNavigator() {
+  const { isAuthenticated, loading } = useAuth();
 
+ 
+  if (loading) {
+    return null;  
+  }
 
-
+  return (
+    <Stack.Navigator initialRouteName={isAuthenticated ? "Home" : "Login"}>
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Signup"
+        component={Signup}
+        options={{ headerShown: true, headerTitle: "Sign Up" }}
+      />
+      <Stack.Screen
+        name="Home"
+        component={Tabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BeerList"
+        component={BeerList}
+        options={{ headerTitle: "Beer List" }}
+      />
+      <Stack.Screen
+        name="BarList"
+        component={BarList}
+        options={{ headerTitle: "Bar List" }}
+      />
+      <Stack.Screen
+        name="Events"
+        component={Events}
+        options={{ headerTitle: "Events" }}
+      />
+      <Stack.Screen
+        name="Beer"
+        component={Beer}
+        options={{ headerTitle: "Beer Details" }}
+      />
+    </Stack.Navigator>
+  );
+}

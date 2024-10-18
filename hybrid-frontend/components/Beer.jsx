@@ -65,14 +65,49 @@ const Beer = ({ route }) => {
     fetchBeerAndDetails();
   }, [id]);
 
-  const handleReviewSubmit = () => {
-    // Logic to handle review submission
-    console.log('Review submitted:', review, 'Rating:', rating);
-    setReview('');
-    setRating('');
-    setModalVisible(false);
+  const handleReviewSubmit = async () => {
+    if (!review || !rating) {
+      alert('Por favor completa la reseña y la calificación.');
+      return;
+    }
+  
+    const currentUserId = await AsyncStorage.getItem('userId'); // Cambiado a AsyncStorage
+  
+    if (!currentUserId) {
+      alert('Por favor inicia sesión para dejar una reseña.');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/v1/beers/${id}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          review: {
+            text: review,
+            rating: rating,
+            beer_id: id,
+            user_id: parseInt(currentUserId, 10), // Asegúrate de que user_id no sea null
+          },
+        }),
+      });
+  
+      if (response.ok) {
+        const newReview = await response.json();
+        setReviews(prevReviews => [...prevReviews, newReview]);
+        setReview('');
+        setRating('');
+        setModalVisible(false);
+      } else {
+        console.error('Error submitting review:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    }
   };
-
+  
   if (loading) {
     return (
       <View style={styles.container}>
