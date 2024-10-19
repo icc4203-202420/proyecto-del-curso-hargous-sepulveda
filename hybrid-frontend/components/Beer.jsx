@@ -164,7 +164,7 @@ const Beer = ({ route }) => {
         <Text style={styles.detailValue}>{`${Math.round(beer.avg_rating * 10) / 10}/5` || 'N/A'}</Text>
       </View>
 
-      {/* Horizontal scroll for bars */}
+
       <Text style={styles.barsTitle}>Bares:</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {bars.length > 0 ? (
@@ -178,12 +178,12 @@ const Beer = ({ route }) => {
         )}
       </ScrollView>
 
-      {/* Horizontal scroll for reviews */}
+   
       <Text style={styles.reviewsTitle}>Reseñas:</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {reviews.length > 0 ? (
           reviews.map((item) => {
-            // Find the reviewer by user_id
+           
             const reviewer = users.find(user => user.id === item.user_id);
             return (
               <View key={item.id} style={styles.reviewContainer}>

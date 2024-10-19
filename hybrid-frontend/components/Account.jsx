@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, Alert, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, FlatList, Alert, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '@env';
@@ -93,7 +93,11 @@ const Account = () => {
           ) : (
             <Text style={styles.noFriendsText}>No tienes amigos agregados.</Text>
           )}
-          <Button title="Cerrar sesión" onPress={handleLogout} color="#FF5733" />
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+          </TouchableOpacity>
+          
         </ScrollView>
       ) : null}
     </View>
@@ -142,6 +146,20 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginTop: 20,
+  },
+ 
+  logoutButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#FF5733',
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
+  logoutButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
