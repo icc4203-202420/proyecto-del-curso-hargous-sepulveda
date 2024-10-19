@@ -22,6 +22,8 @@ export default function Header({ onSearch }) {
           style={styles.searchInput}
           value={query}
           onChangeText={setQuery}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
         />
         <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
           <Icon name="search" type="font-awesome" color="#fff" />
