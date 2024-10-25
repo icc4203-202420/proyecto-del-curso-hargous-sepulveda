@@ -13,6 +13,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Beer from './components/Beer';
+import Bar from './components/Bar';
 import { AuthProvider, useAuth } from './components/AuthContext';
 
 const Tab = createBottomTabNavigator();
@@ -137,6 +138,11 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
         component={Beer}
         options={{ headerTitle: "Beer Details" }}
       />
+      <Stack.Screen
+        name="Bar"
+        component={Bar}
+        options={{ headerTitle: "Bar Details" }}
+      />
     </Stack.Navigator>
   );
 }
@@ -147,7 +153,6 @@ function RefreshHandler() {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       console.log('Refrescando datos en cada redirección...');
-      // Aquí puedes añadir la lógica de refresco, como hacer fetch de datos
     });
 
     return unsubscribe; 
