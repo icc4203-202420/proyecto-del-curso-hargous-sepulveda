@@ -11,7 +11,19 @@ class API::V1::BarsController < ApplicationController
     render json: { bars: @bars }, status: :ok
   end
   def search
-    @bars = Bar.all
+    query = params[:q]
+  
+    if query.present?
+      @bars = Bar.joins(address: :country)
+                 .where("LOWER(bars.name) LIKE LOWER(:query) OR 
+                         LOWER(addresses.line1) LIKE LOWER(:query) OR 
+                         LOWER(addresses.line2) LIKE LOWER(:query) OR
+                         LOWER(addresses.city) LIKE LOWER(:query) OR
+                         LOWER(countries.name) LIKE LOWER(:query)", query: "%#{query}%")
+    else
+      @bars = Bar.all
+    end
+  
     render json: @bars.to_json(include: { address: { include: :country } })
   end
 

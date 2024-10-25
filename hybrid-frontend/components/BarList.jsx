@@ -6,23 +6,21 @@ import Header from "./Header";
 
 const BarList = () => {
   const navigation = useNavigation();
-  const [query, setQuery] = useState(''); 
+  const [query, setQuery] = useState('');
   const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
 
   const fetchAllBars = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/bars/search`);
-      
-      
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      
       const barsWithDetails = data.map((bar) => ({
         ...bar,
         line1: bar.address?.line1 || 'No address available',
@@ -31,7 +29,6 @@ const BarList = () => {
         city: bar.address?.city,
       }));
       setBars(barsWithDetails);
-      console.log(barsWithDetails)
     } catch (err) {
       console.error('Error fetching all bars:', err);
       setError('Error fetching all bars.');
@@ -53,7 +50,16 @@ const BarList = () => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setBars(data.bars || []);
+      console.log(data)
+      const barsWithDetails = data.map((bar) => ({
+        ...bar,
+        line1: bar.address?.line1 || 'No address available',
+        line2: bar.address?.line2,
+        country: bar.address?.country?.name,
+        city: bar.address?.city,
+      }));
+      console.log(barsWithDetails)
+      setBars(barsWithDetails);
     } catch (err) {
       console.error('Error fetching bars:', err);
       setError('Error fetching bars.');
@@ -67,6 +73,10 @@ const BarList = () => {
   };
 
   const flatListData = bars.map((bar) => ({ type: 'bar', ...bar }));
+
+  useEffect(() => {
+    fetchAllBars();
+  }, []); 
 
   useEffect(() => {
     searchBars();
@@ -84,8 +94,8 @@ const BarList = () => {
             <View style={styles.textContent}>
               <Text style={styles.barName}>{item.name}</Text>
               <Text style={styles.barAddress}>
-                {item.address 
-                  ? `Address: ${item.line1}, ${item.city}, ${item.country}` 
+                {item.line1 
+                  ? `Address: ${item.line1}${item.line2 ? `, ${item.line2}` : ''}, ${item.city}, ${item.country}` 
                   : 'No Address'}
               </Text>
             </View>
@@ -188,5 +198,6 @@ const styles = StyleSheet.create({
 });
 
 export default BarList;
+
 
 

@@ -50,7 +50,7 @@ const Bar = () => {
             const eventsResponse = await fetch(`http://localhost:3001/api/v1/events?bar_id=${id}`);
             const eventsData = await eventsResponse.json();
             setEvents(eventsData.events);
-            setModalVisible(true); // Show modal after fetching events
+            setModalVisible(true);
         } catch (error) {
             console.error('Error fetching events:', error);
             setError('Error fetching events');
@@ -67,7 +67,7 @@ const Bar = () => {
                     {bar.image_url ? (
                       <Image source={{ uri: bar.image_url }} style={styles.barImage} />
                     ) : (
-                      <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.barImage} />
+                      <Image source={{ uri: 'https://via.placeholder.com/200' }} style={styles.barImage} />
                     )}
                     <Text style={styles.barTitle}>{bar.name || 'N/A'}</Text>
                     <Text style={styles.barText}><strong>Country:</strong> {country.name || 'N/A'}</Text>
@@ -80,18 +80,13 @@ const Bar = () => {
   
                     <View style={styles.beersSection}>
                         <Text style={styles.sectionTitle}>Beers Available</Text>
-                        <ScrollView horizontal>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {Array.isArray(beers) && beers.length > 0 ? (
                                 beers.map((beer) => (
-                                    <TouchableOpacity key={beer.id} onPress={() => navigation.navigate('BeerDetails', { id: beer.id })}>
+                                    <TouchableOpacity key={beer.id} onPress={() => navigation.navigate('Beer', { id: beer.id })}>
                                         <View style={styles.beerCard}>
-                                            {beer.image_url ? (
-                                                <Image source={{ uri: beer.image_url }} style={styles.beerImage} />
-                                            ) : (
-                                                <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.beerImage} />
-                                            )}
                                             <Text style={styles.beerTitle}>{beer.name}</Text>
-                                            <Text>Rating: {Math.round(beer.avg_rating * 10) / 10 || 'N/A'}</Text>
+                                            <Text style={styles.beerRating}>Rating: {Math.round(beer.avg_rating * 10) / 10 || 'N/A'}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))
@@ -109,7 +104,7 @@ const Bar = () => {
                                 <Text style={styles.modalTitle}>Events at {bar.name}</Text>
                                 {events.length > 0 ? (
                                     events.map((event) => (
-                                        <TouchableOpacity key={event.id} onPress={() => navigation.navigate('EventDetails', { id: event.id })}>
+                                        <TouchableOpacity key={event.id} onPress={() => navigation.navigate('Event', { id: event.id })}>
                                             <View style={styles.eventCard}>
                                                 <Text style={styles.eventTitle}>{event.name}</Text>
                                                 <Text><strong>Event ID:</strong> {event.id || 'N/A'}</Text>
@@ -161,14 +156,18 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 8,
-    },
+    },  
     beerCard: {
-        padding: 8,
+        padding: 10,
+        marginRight: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
-        marginHorizontal: 8,
-        borderRadius: 4,
-        width: 120, 
+        borderColor: '#ddd',
+        borderRadius: 5,
+        backgroundColor: '#f9f9f9',
+        maxWidth: 300,
+      },
+    beerRating: {
+        fontWeight: 'bold',
     },
     beerImage: {
         width: 50,
