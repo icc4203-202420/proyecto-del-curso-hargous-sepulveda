@@ -41,7 +41,7 @@ export default function Header({ onSearch }) {
           <TouchableOpacity onPress={() => navigation.navigate('Events')}>
             <Text style={styles.navButtonText}>Events</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Users')}>
+          <TouchableOpacity onPress={() => navigation.navigate('UserList')}>
             <Text style={styles.navButtonText}>Users</Text>
           </TouchableOpacity>
         </View>

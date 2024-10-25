@@ -7,6 +7,7 @@ import { Icon } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerList from './components/BeerList';
 import BarList from './components/BarList';
+import UserList from './components/UserList';
 import Events from './components/Events';
 import Account from './components/Account';
 import Home from './components/Home';
@@ -14,6 +15,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Beer from './components/Beer';
 import Bar from './components/Bar';
+import UserProfile from './components/UserProfile';
 import { AuthProvider, useAuth } from './components/AuthContext';
 
 const Tab = createBottomTabNavigator();
@@ -55,6 +57,14 @@ function Tabs() {
         options={{
           tabBarIcon: () => <Icon name="calendar" type="font-awesome" size={24} />,
           tabBarLabel: 'Events',
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="UserList"
+        component={UserList}
+        options={{
+          tabBarButton: () => null, 
           headerShown: false,
         }}
       />
@@ -121,17 +131,17 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
       <Stack.Screen
         name="BeerList"
         component={BeerList}
-        options={{ headerTitle: "Beer List" }}
+        options={{ headerShown: false, headerTitle: "Beer List" }}
       />
       <Stack.Screen
         name="BarList"
         component={BarList}
-        options={{ headerTitle: "Bar List" }}
+        options={{ headerShown: false, headerTitle: "Bar List" }}
       />
       <Stack.Screen
         name="Events"
         component={Events}
-        options={{ headerTitle: "Events" }}
+        options={{ headerShown: false, headerTitle: "Events" }}
       />
       <Stack.Screen
         name="Beer"
@@ -142,6 +152,16 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
         name="Bar"
         component={Bar}
         options={{ headerTitle: "Bar Details" }}
+      />
+      <Stack.Screen
+        name="UserList"
+        component={UserList}
+        options={{ headerShown: false, headerTitle: "UserList" }}
+      />
+      <Stack.Screen
+        name="UserProfile"
+        component={UserProfile}
+        options={{ headerTitle: "User Details" }}
       />
     </Stack.Navigator>
   );
