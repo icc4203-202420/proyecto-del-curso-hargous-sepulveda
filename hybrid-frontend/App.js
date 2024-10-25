@@ -68,6 +68,7 @@ function Tabs() {
           headerShown: false,
         }}
       />
+      
       <Tab.Screen
         name="Account"
         component={Account}
@@ -77,7 +78,9 @@ function Tabs() {
           headerShown: false,
         }}
       />
+
     </Tab.Navigator>
+    
   );
 }
 

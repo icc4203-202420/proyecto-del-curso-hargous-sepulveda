@@ -3,7 +3,7 @@ import { View, FlatList, Text, Image, StyleSheet, TouchableOpacity, ActivityIndi
 import { useNavigation } from '@react-navigation/native';
 import { BACKEND_URL } from '@env';
 import Header from "./Header";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const UserList = () => {
   const navigation = useNavigation();
   const [query, setQuery] = useState('');
@@ -11,17 +11,21 @@ const UserList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
+  
   const fetchAllUsers = async () => {
     setLoading(true);
     setError(null);
+    const userId = await AsyncStorage.getItem('userId'); 
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/users/search`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log(data)
-      setUsers(data.users);
+      
+      // Filter out the current user
+      const filteredUsers = data.users.filter(user => user.id !== parseInt(userId));
+      setUsers(filteredUsers);
     } catch (err) {
       console.error('Error fetching all users:', err);
       setError('Error fetching all users.');
@@ -29,8 +33,9 @@ const UserList = () => {
       setLoading(false);
     }
   };
-
+  
   const searchUsers = async () => {
+    const userId = await AsyncStorage.getItem('userId'); 
     if (!query.trim()) {
       fetchAllUsers(); 
       return;
@@ -43,7 +48,10 @@ const UserList = () => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setUsers(data.users);
+      
+      // Filter out the current user
+      const filteredUsers = data.users.filter(user => user.id !== parseInt(userId));
+      setUsers(filteredUsers);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Error fetching users.');
