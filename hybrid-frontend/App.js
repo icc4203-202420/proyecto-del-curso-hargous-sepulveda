@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerList from './components/BeerList';
 import BarList from './components/BarList';
 import UserList from './components/UserList';
-import Events from './components/Events';
+import EventList from './components/EventList';
 import Account from './components/Account';
 import Home from './components/Home';
 import Login from './components/Login';
@@ -53,7 +53,7 @@ function Tabs() {
       />
       <Tab.Screen
         name="Events"
-        component={Events}
+        component={EventList}
         options={{
           tabBarIcon: () => <Icon name="calendar" type="font-awesome" size={24} />,
           tabBarLabel: 'Events',
@@ -143,7 +143,7 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
       />
       <Stack.Screen
         name="Events"
-        component={Events}
+        component={EventList}
         options={{ headerShown: false, headerTitle: "Events" }}
       />
       <Stack.Screen

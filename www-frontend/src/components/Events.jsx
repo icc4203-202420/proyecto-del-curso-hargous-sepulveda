@@ -61,6 +61,7 @@ const Events = () => {
         event.name.toLowerCase().includes(lowerCaseQuery) ||
         (event.bar_name && event.bar_name.toLowerCase().includes(lowerCaseQuery))
       );
+      console.log(query)
 
       setFilteredEvents(filtered);
     } else {

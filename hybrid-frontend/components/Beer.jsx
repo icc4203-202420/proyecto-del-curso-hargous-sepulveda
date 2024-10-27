@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Modal, Button, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Modal, Button, TextInput, TouchableOpacity } from 'react-native';
 import { BACKEND_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon, Rating } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
 const Beer = ({ route }) => {
-  const { id } = route.params;
+  const { id } = route.params; 
   const [beer, setBeer] = useState(null);
   const [brand, setBrand] = useState(null);
   const [bars, setBars] = useState([]);
@@ -15,7 +15,7 @@ const Beer = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [review, setReview] = useState('');
   const [rating, setRating] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
@@ -169,9 +169,11 @@ const Beer = ({ route }) => {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {bars.length > 0 ? (
           bars.map((bar) => (
+            <TouchableOpacity key={bar.id} onPress={() => navigation.navigate('Bar', { id: bar.id })}>
             <View key={bar.id} style={styles.barContainer}>
               <Text style={styles.barText}>{bar.name}</Text>
             </View>
+            </TouchableOpacity>
           ))
         ) : (
           <Text style={styles.noBarsText}>Sin bares disponibles</Text>
