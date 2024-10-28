@@ -76,7 +76,7 @@ const EventList = () => {
   };
 
   const handleEventPress = (id) => {
-    navigation.navigate('Event', { id });
+    navigation.navigate('EventDetails', { id });
   };
 
   const groupByBar = (events) => {

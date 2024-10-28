@@ -10,6 +10,7 @@ import BarList from './components/BarList';
 import UserList from './components/UserList';
 import EventList from './components/EventList';
 import Account from './components/Account';
+import EventDetails from './components/EventDetails';
 import Home from './components/Home';
 import Login from './components/Login';
 import Signup from './components/Signup';
@@ -150,6 +151,11 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
         name="Beer"
         component={Beer}
         options={{ headerTitle: "Beer Details" }}
+      />
+      <Stack.Screen
+        name="EventDetails"
+        component={EventDetails}
+        options={{headerTitle: "Event Details" }}
       />
       <Stack.Screen
         name="Bar"
