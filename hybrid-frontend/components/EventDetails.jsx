@@ -36,16 +36,13 @@ const EventDetails = () => {
         }
         
         const eventData = await eventResponse.json();
-        console.log('Event data:', eventData);
         
         const selectedEvent = eventData.events.find((e) => e.id === id);
-        console.log('Selected event:', selectedEvent);
         
         if (selectedEvent) {
           setEvent(selectedEvent);
   
           if (selectedEvent.bar_id) {
-            console.log(`Fetching bar details for bar ID: ${selectedEvent.bar_id}`);
             const barResponse = await fetch(`${BACKEND_URL}/api/v1/bars/${selectedEvent.bar_id}`);
             
             if (!barResponse.ok) {
@@ -53,13 +50,11 @@ const EventDetails = () => {
             }
             
             const barData = await barResponse.json();
-            console.log('Bar data:', barData);
             
             setBarName(barData.bar.name);
             setBarId(selectedEvent.bar_id);
           }
   
-          console.log(`Fetching attendees for event ID: ${id}`);
           const attendanceResponse = await fetch(`${BACKEND_URL}/api/v1/attendances/event/${id}`);
           
           if (!attendanceResponse.ok) {
@@ -67,11 +62,9 @@ const EventDetails = () => {
           }
           
           const attendanceData = await attendanceResponse.json();
-          console.log('Attendance data:', attendanceData);
   
           const attendeesData = attendanceData.attendees;
           const attendeesNamesPromises = attendeesData.map(async (userId) => {
-            console.log(`Fetching user details for user ID: ${userId}`);
             const userResponse = await fetch(`${BACKEND_URL}/api/v1/users/${userId}`);
             
             if (!userResponse.ok) {
@@ -79,14 +72,12 @@ const EventDetails = () => {
             }
             
             const userData = await userResponse.json();
-            console.log('User data:', userData);
   
             return { userId, name: userData.user.name };
           });
           
           const currentUserId = await AsyncStorage.getItem('userId');
           const attendeesNames = await Promise.all(attendeesNamesPromises);
-          console.log('Attendees names:', attendeesNames);
   
           setAttendees(attendeesNames);
   
@@ -94,7 +85,6 @@ const EventDetails = () => {
             setHasConfirmed(true);
           }
   
-          console.log(`Fetching friends for user ID: ${currentUserId}`);
           const friendsResponse = await fetch(`${BACKEND_URL}/api/v1/users/${currentUserId}/friendships`);
           
           if (!friendsResponse.ok) {
@@ -102,11 +92,9 @@ const EventDetails = () => {
           }
           
           const friendsData = await friendsResponse.json();
-          console.log('Friends data:', friendsData);
           
           setFriends(friendsData);
   
-          console.log('Fetching event pictures');
           fetchEventPictures(selectedEvent.id);
         } else {
           setEvent(null);
