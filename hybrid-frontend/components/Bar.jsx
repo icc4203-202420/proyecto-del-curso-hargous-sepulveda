@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Button, FlatList, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { BACKEND_URL } from "@env";
 
 const Bar = () => {
     const route = useRoute();
@@ -14,26 +15,26 @@ const Bar = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
-  
+
     useEffect(() => {
         const fetchBarAndBeers = async () => {
             try {
-                const barResponse = await fetch(`http://localhost:3001/api/v1/bars/${id}`);
+                const barResponse = await fetch(`${BACKEND_URL}/api/v1/bars/${id}`);
                 const barData = await barResponse.json();
                 setBar(barData.bar);
-  
-                const beersResponse = await fetch(`http://localhost:3001/api/v1/bars/${id}/beers`);
+
+                const beersResponse = await fetch(`${BACKEND_URL}/api/v1/bars/${id}/beers`);
                 const beersData = await beersResponse.json();
                 setBeers(beersData);
-  
-                const addressResponse = await fetch(`http://localhost:3001/api/v1/bars/${id}/addresses`);
+
+                const addressResponse = await fetch(`${BACKEND_URL}/api/v1/bars/${id}/addresses`);
                 const addressData = await addressResponse.json();
                 setAddress(addressData);
-  
-                const countryResponse = await fetch(`http://localhost:3001/api/v1/bars/${id}/countrys`);
+
+                const countryResponse = await fetch(`${BACKEND_URL}/api/v1/bars/${id}/countrys`);
                 const countryData = await countryResponse.json();
                 setCountry(countryData.country);
-  
+
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching bar details or beers:', error);
@@ -41,13 +42,13 @@ const Bar = () => {
                 setLoading(false);
             }
         };
-  
+
         fetchBarAndBeers();
     }, [id]);
-  
+
     const fetchEvents = async () => {
         try {
-            const eventsResponse = await fetch(`http://localhost:3001/api/v1/events?bar_id=${id}`);
+            const eventsResponse = await fetch(`${BACKEND_URL}/api/v1/events?bar_id=${id}`);
             const eventsData = await eventsResponse.json();
             setEvents(eventsData.events);
             setModalVisible(true);
@@ -56,28 +57,28 @@ const Bar = () => {
             setError('Error fetching events');
         }
     };
-  
+
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text style={styles.errorText}>{error}</Text>;
-  
+
     return (
         bar && (
             <ScrollView style={styles.container}>
                 <View style={styles.card}>
                     {bar.image_url ? (
-                      <Image source={{ uri: bar.image_url }} style={styles.barImage} />
+                        <Image source={{ uri: bar.image_url }} style={styles.barImage} />
                     ) : (
-                      <Image source={{ uri: 'https://via.placeholder.com/200' }} style={styles.barImage} />
+                        <Image source={{ uri: 'https://via.placeholder.com/200' }} style={styles.barImage} />
                     )}
                     <Text style={styles.barTitle}>{bar.name || 'N/A'}</Text>
-                    <Text style={styles.barText}><strong>Country:</strong> {country.name || 'N/A'}</Text>
-                    <Text style={styles.barText}><strong>City:</strong> {address.city || 'N/A'}</Text>
+                    <Text style={styles.barText}><Text style={styles.boldText}>Country:</Text> {country.name || 'N/A'}</Text>
+                    <Text style={styles.barText}><Text style={styles.boldText}>City:</Text> {address.city || 'N/A'}</Text>
                     <Text style={styles.barText}>
-                        <strong>Address:</strong> {address.line1 || 'N/A'}, {address.line2 || 'N/A'}
+                        <Text style={styles.boldText}>Address:</Text> {address.line1 || 'N/A'}, {address.line2 || 'N/A'}
                     </Text>
-  
+
                     <Button title="View Events" onPress={fetchEvents} />
-  
+
                     <View style={styles.beersSection}>
                         <Text style={styles.sectionTitle}>Beers Available</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -96,7 +97,6 @@ const Bar = () => {
                         </ScrollView>
                     </View>
 
-  
                     {/* Modal for events */}
                     <Modal visible={modalVisible} animationType="fade" transparent={true}>
                         <View style={styles.modalContainer}>
@@ -107,10 +107,10 @@ const Bar = () => {
                                         <TouchableOpacity key={event.id} onPress={() => navigation.navigate('Event', { id: event.id })}>
                                             <View style={styles.eventCard}>
                                                 <Text style={styles.eventTitle}>{event.name}</Text>
-                                                <Text><strong>Event ID:</strong> {event.id || 'N/A'}</Text>
-                                                <Text><strong>Description:</strong> {event.description || 'N/A'}</Text>
-                                                <Text><strong>Start Date:</strong> {new Date(event.start_date).toLocaleString() || 'N/A'}</Text>
-                                                <Text><strong>End Date:</strong> {new Date(event.end_date).toLocaleString() || 'N/A'}</Text>
+                                                <Text><Text style={styles.boldText}>Event ID:</Text> {event.id || 'N/A'}</Text>
+                                                <Text><Text style={styles.boldText}>Description:</Text> {event.description || 'N/A'}</Text>
+                                                <Text><Text style={styles.boldText}>Start Date:</Text> {new Date(event.start_date).toLocaleString() || 'N/A'}</Text>
+                                                <Text><Text style={styles.boldText}>End Date:</Text> {new Date(event.end_date).toLocaleString() || 'N/A'}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     ))
@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginVertical: 4,
     },
-    closeButton: {
-        alignSelf: 'flex-end',
+    boldText: {
+        fontWeight: 'bold',
     },
     beersSection: {
         marginTop: 16,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 8,
-    },  
+    },
     beerCard: {
         padding: 10,
         marginRight: 10,
@@ -165,14 +165,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#f9f9f9',
         maxWidth: 300,
-      },
+    },
     beerRating: {
         fontWeight: 'bold',
-    },
-    beerImage: {
-        width: 50,
-        height: 50,
-        resizeMode: 'cover',
     },
     modalContainer: {
         flex: 1,
@@ -210,6 +205,7 @@ const styles = StyleSheet.create({
 });
 
 export default Bar;
+
 
 
 
