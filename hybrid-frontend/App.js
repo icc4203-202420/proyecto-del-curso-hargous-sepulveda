@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
 import BeerList from './components/BeerList';
@@ -99,11 +99,13 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
       <AuthProvider>
         <NavigationContainer>
           <MainNavigator isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         </NavigationContainer>
       </AuthProvider>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }
