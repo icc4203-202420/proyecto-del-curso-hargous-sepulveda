@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Icon } from 'react-native-elements';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import BeerList from './components/BeerList';
 import BarList from './components/BarList';
 import UserList from './components/UserList';
@@ -90,7 +90,7 @@ export default function App() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem('jwtToken');
+      const token = await SecureStore.getItemAsync('jwtToken');
       setIsLoggedIn(!!token);
     };
 
