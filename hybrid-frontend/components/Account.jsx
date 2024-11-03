@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Alert, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env';
 
 const Account = () => {
@@ -9,15 +9,15 @@ const Account = () => {
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
   const [friends, setFriends] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchStoredData = async () => {
       try {
-        const token = await AsyncStorage.getItem('jwtToken');
-        const storedUserId = await AsyncStorage.getItem('userId');
-        const storedUserName = await AsyncStorage.getItem('userName');
+        const token = await SecureStore.getItemAsync('jwtToken');
+        const storedUserId = await SecureStore.getItemAsync('userId');
+        const storedUserName = await SecureStore.getItemAsync('userName');
 
         if (token && storedUserId && storedUserName) {
           setHasToken(true);
@@ -31,7 +31,7 @@ const Account = () => {
       } catch (error) {
         Alert.alert('Error', 'Error al recuperar la información.');
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -40,7 +40,7 @@ const Account = () => {
 
   const fetchFriends = async (userId) => {
     try {
-      const token = await AsyncStorage.getItem('jwtToken');
+      const token = await SecureStore.getItemAsync('jwtToken');
       const response = await fetch(`${BACKEND_URL}/api/v1/users/${userId}/friendships`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -56,9 +56,9 @@ const Account = () => {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('jwtToken');
-      await AsyncStorage.removeItem('userId');
-      await AsyncStorage.removeItem('userName');
+      await SecureStore.deleteItemAsync('jwtToken');
+      await SecureStore.deleteItemAsync('userId');
+      await SecureStore.deleteItemAsync('userName');
       setHasToken(false);
       navigation.navigate('Login');
     } catch (error) {
@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
- 
   logoutButton: {
     marginTop: 20,
     padding: 15,

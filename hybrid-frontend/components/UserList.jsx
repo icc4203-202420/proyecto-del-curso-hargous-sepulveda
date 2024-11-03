@@ -3,7 +3,8 @@ import { View, FlatList, Text, Image, StyleSheet, TouchableOpacity, ActivityIndi
 import { useNavigation } from '@react-navigation/native';
 import { BACKEND_URL } from '@env';
 import Header from "./Header";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+
 const UserList = () => {
   const navigation = useNavigation();
   const [query, setQuery] = useState('');
@@ -15,7 +16,8 @@ const UserList = () => {
   const fetchAllUsers = async () => {
     setLoading(true);
     setError(null);
-    const userId = await AsyncStorage.getItem('userId'); 
+    const userId = await SecureStore.getItemAsync('userId');
+
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/users/search`);
       if (!response.ok) {
@@ -35,7 +37,8 @@ const UserList = () => {
   };
   
   const searchUsers = async () => {
-    const userId = await AsyncStorage.getItem('userId'); 
+    const userId = await SecureStore.getItemAsync('userId');
+
     if (!query.trim()) {
       fetchAllUsers(); 
       return;

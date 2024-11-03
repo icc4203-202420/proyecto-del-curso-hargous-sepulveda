@@ -100,3 +100,9 @@ if Rails.env.development?
     end
   end
 end
+Event.all.each do |event|
+  event.update(
+    start_date: Time.current + 1.day,   # Fecha de inicio en un día desde ahora
+    end_date: Time.current + 2.days     # Fecha de fin en dos días desde ahora
+  )
+end

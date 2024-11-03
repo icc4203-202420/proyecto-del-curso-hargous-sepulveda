@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Modal, Button, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -76,7 +76,7 @@ const EventDetails = () => {
             return { userId, name: userData.user.name };
           });
           
-          const currentUserId = await AsyncStorage.getItem('userId');
+          const currentUserId = await SecureStore.getItemAsync('userId');
           const attendeesNames = await Promise.all(attendeesNamesPromises);
   
           setAttendees(attendeesNames);
@@ -135,7 +135,7 @@ const EventDetails = () => {
       await fetch(`${BACKEND_URL}/api/v1/attendances`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event_id: id, user_id: await AsyncStorage.getItem('userId') }),
+        body: JSON.stringify({ event_id: id, user_id: await SecureStore.getItemAsync('userId') }),
       });
       setHasConfirmed(true);
     } catch (error) {
@@ -168,7 +168,7 @@ const EventDetails = () => {
     reader.onloadend = async () => {
       const base64Image = reader.result;
       const data = {
-        event_picture: { user_id: await AsyncStorage.getItem('userId'), flyer_base64: base64Image, description },
+        event_picture: { user_id: await SecureStore.getItemAsync('userId'), flyer_base64: base64Image, description },
       };
       try {
         await fetch(`${BACKEND_URL}/api/v1/events/${id}/event_pictures`, {

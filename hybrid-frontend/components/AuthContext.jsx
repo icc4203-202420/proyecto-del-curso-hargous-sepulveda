@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 const AuthContext = createContext();
 
@@ -9,9 +9,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkToken = async () => {
-      const token = await AsyncStorage.getItem('jwtToken');
-      setIsAuthenticated(!!token);
-      setLoading(false);
+      try {
+        const token = await SecureStore.getItemAsync('jwtToken');
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error('Error al obtener el token:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     checkToken();
   }, []);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup'; 
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env'; 
 
 const validationSchema = Yup.object().shape({
@@ -41,9 +41,10 @@ const Login = ({ navigation }) => {
           const user = data.status.data.user;
 
           if (user) {
-            AsyncStorage.setItem('jwtToken', receivedToken);
-            AsyncStorage.setItem('userId', String(user.id)); 
-            AsyncStorage.setItem('userName', `${user.first_name} ${user.last_name}`);
+            SecureStore.setItemAsync('jwtToken', receivedToken);
+            SecureStore.setItemAsync('userId', String(user.id));
+            SecureStore.setItemAsync('userName', `${user.first_name} ${user.last_name}`);
+            
 
             console.log('Token almacenado:', receivedToken);
             console.log('ID del usuario almacenado:', user.id);

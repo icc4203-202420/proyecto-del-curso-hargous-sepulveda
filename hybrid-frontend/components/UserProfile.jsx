@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, Button, ActivityIndicator, TouchableOpacity, Mo
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { Card } from "react-native-elements";
 import { BACKEND_URL } from '@env';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 const UserProfile = () => {
   const navigation = useNavigation();
@@ -83,7 +83,8 @@ const UserProfile = () => {
   };
 
   const handleConfirmAddFriend = async () => {
-    const userId = await AsyncStorage.getItem('userId');
+    const userId = await SecureStore.getItemAsync('userId');
+
     try {
       const requestData = {
         friend_id: id,
@@ -102,7 +103,8 @@ const UserProfile = () => {
   };
 
   const handleRemoveFriend = async () => {
-    const userId = await AsyncStorage.getItem('userId');
+    const userId = await SecureStore.getItemAsync('userId');
+
     try {
       await fetch(`${BACKEND_URL}/api/v1/users/${parseInt(userId)}/friendships`, {
         method: "DELETE",

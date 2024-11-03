@@ -12,13 +12,31 @@ class API::V1::EventsController < ApplicationController
   end
 
   # GET /api/v1/events/:id
-  def show
-    event_data = @event.as_json.tap do |data|
-      data[:flyer_url] = url_for(@event.flyer) if @event.flyer.attached?
-      data[:thumbnail_url] = url_for(@event.thumbnail) if @event.thumbnail.attached?
+
+# GET /api/v1/events/:id
+def show
+  event_data = @event.as_json.tap do |data|
+    if @event.flyer.attached?
+      data[:flyer_url] = url_for(@event.flyer)
+      data[:thumbnail_url] = url_for(@event.thumbnail)
     end
-    render json: { event: event_data }, status: :ok
   end
+  render json: { event: event_data }, status: :ok
+end
+
+
+# POST /api/v1/events/:id/generate_summary
+def generate_summary
+  if @event.end_date && @event.end_date < Time.current
+    #lógica para generar el video/resumen del evento y notificar a los usuarios.
+    # crear una tarea asíncrona o una llamada a un servicio?
+    
+    render json: { message: 'Resumen generado y notificado a los usuarios.' }, status: :ok
+  else
+    render json: { error: 'El evento aún no ha terminado.' }, status: :unprocessable_entity
+  end
+end
+
 
   # POST /api/v1/events/:id/upload_flyer
   def upload_flyer

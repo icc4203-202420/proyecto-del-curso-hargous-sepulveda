@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Modal, Button, TextInput, TouchableOpacity } from 'react-native';
 import { BACKEND_URL } from '@env';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { Icon, Rating } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
@@ -24,7 +24,7 @@ const Beer = ({ route }) => {
   useEffect(() => {
     const fetchBeerAndDetails = async () => {
       try {
-        const userId = await AsyncStorage.getItem('userId'); 
+        const userId = await SecureStore.getItemAsync('userId'); 
         setCurrentUserId(parseInt(userId));
 
         const beerResponse = await fetch(`${BACKEND_URL}/api/v1/beers/${id}`);
