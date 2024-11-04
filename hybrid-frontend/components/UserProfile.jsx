@@ -29,16 +29,15 @@ const UserProfile = () => {
         const userResponse = await fetch(`${BACKEND_URL}/api/v1/users/${id}`);
         const userData = await userResponse.json();
         setUser(userData.user);
-        const userId = await AsyncStorage.getItem('userId'); 
-        setCurrentUserId(parseInt(userId));
-        const friendshipResponse = await fetch(`${BACKEND_URL}/api/v1/users/${parseInt(userId)}/friendships`);
+        const userId = await SecureStore.getItem('userId'); 
+        setCurrentUserId(userId);
+        const friendshipResponse = await fetch(`${BACKEND_URL}/api/v1/users/${userId}/friendships`);
         const friendshipData = await friendshipResponse.json();
-        const isFriend = friendshipData.some(friend => friend.id === parseInt(id));
+        const isFriend = friendshipData.some(friend => friend.id === id);
         setIsFriend(isFriend);
         const reviewResponse = await fetch(`${BACKEND_URL}/api/v1/users/${id}/reviews`);
         const reviewData = await reviewResponse.json();
-        
-        // Fetch beers based on beer IDs in the reviews
+        console.log(reviewData);
         if (reviewData.reviews.length > 0) {
           const beerIds = [...new Set(reviewData.reviews.map((review) => review.beer_id))];
           const beerPromises = beerIds.map((beerId) =>
@@ -132,7 +131,7 @@ const UserProfile = () => {
       </View>
 
       <Text style={styles.sectionHeader}>Reviews</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      
         <FlatList
           data={reviews}
           keyExtractor={(review) => review.id.toString()}
@@ -148,7 +147,7 @@ const UserProfile = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 10 }}
         />
-      </ScrollView>
+      
 
       <Modal visible={modalVisible} animationType="fade" transparent>
         <View style={styles.modalOverlay}>

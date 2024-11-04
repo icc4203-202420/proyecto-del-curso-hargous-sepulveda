@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Alert, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, FlatList, Alert, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env';
 
@@ -12,31 +12,27 @@ const Account = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchStoredData = async () => {
-      try {
-        const token = await SecureStore.getItemAsync('jwtToken');
-        const storedUserId = await SecureStore.getItemAsync('userId');
-        const storedUserName = await SecureStore.getItemAsync('userName');
+  const fetchStoredData = async () => {
+    try {
+      const token = await SecureStore.getItemAsync('jwtToken');
+      const storedUserId = await SecureStore.getItemAsync('userId');
+      const storedUserName = await SecureStore.getItemAsync('userName');
 
-        if (token && storedUserId && storedUserName) {
-          setHasToken(true);
-          setUserId(storedUserId);
-          setUserName(storedUserName);
-          fetchFriends(storedUserId);
-        } else {
-          setHasToken(false);
-          navigation.navigate('Login');
-        }
-      } catch (error) {
-        Alert.alert('Error', 'Error al recuperar la información.');
-      } finally {
-        setLoading(false);
+      if (token && storedUserId && storedUserName) {
+        setHasToken(true);
+        setUserId(storedUserId);
+        setUserName(storedUserName);
+        fetchFriends(storedUserId); // Fetch friends whenever user data is available
+      } else {
+        setHasToken(false);
+        navigation.navigate('Login');
       }
-    };
-
-    fetchStoredData();
-  }, [navigation]);
+    } catch (error) {
+      Alert.alert('Error', 'Error al recuperar la información.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchFriends = async (userId) => {
     try {
@@ -46,6 +42,10 @@ const Account = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch friends');
+      }
 
       const data = await response.json();
       setFriends(data);
@@ -66,6 +66,13 @@ const Account = () => {
     }
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reload data every time screen is focused
+      fetchStoredData();
+    }, [])
+  );
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -76,30 +83,29 @@ const Account = () => {
 
   return (
     <View style={styles.container}>
-      {hasToken ? (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={styles.welcomeText}>Bienvenido, {userName}.</Text>
-          <Text style={styles.friendsTitle}>Tus amigos:</Text>
-          {friends.length > 0 ? (
-            <FlatList
-              data={friends}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.friendItem}>
-                  <Text style={styles.friendName}>{item.first_name} {item.last_name}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          ) : (
-            <Text style={styles.noFriendsText}>No tienes amigos agregados.</Text>
+      {hasToken && (
+        <FlatList
+          data={friends}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={
+            <>
+              <Text style={styles.welcomeText}>Bienvenido, {userName}.</Text>
+              <Text style={styles.friendsTitle}>Tus amigos:</Text>
+            </>
+          }
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.friendItem}>
+              <Text style={styles.friendName}>{item.first_name} {item.last_name}</Text>
+            </TouchableOpacity>
           )}
-
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
-          </TouchableOpacity>
-          
-        </ScrollView>
-      ) : null}
+          ListEmptyComponent={<Text style={styles.noFriendsText}>No tienes amigos agregados.</Text>}
+          ListFooterComponent={
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+            </TouchableOpacity>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -109,9 +115,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f1f4f7',
-  },
-  scrollContainer: {
-    alignItems: 'center',
   },
   welcomeText: {
     fontSize: 24,
