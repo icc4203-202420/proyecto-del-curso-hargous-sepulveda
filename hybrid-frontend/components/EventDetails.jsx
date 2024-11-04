@@ -138,7 +138,6 @@ const EventDetails = () => {
     }
   };
 
-
   useEffect(() => {
     if (query) {
       const filteredSuggestions = users.filter(user => user.handle.toLowerCase().includes(query.toLowerCase()));
@@ -160,7 +159,14 @@ const EventDetails = () => {
   const closeTaggingModal = () => {
     setModalData({ ...modalData, open: false, description: '', image: null });
   };
+
   const uploadImage = async () => {
+    // Prevent uploading if the event has ended
+    if (hasEventEnded) {
+      Alert.alert('Upload Not Allowed', 'The event has ended. You cannot upload more images.');
+      return;
+    }
+
     if (!modalData.image || !modalData.image.base64) {
       Alert.alert('Upload Status', 'Please, select an image to upload.');
       return;
@@ -219,25 +225,25 @@ const EventDetails = () => {
             const username = part;
             const user = users.find((user) => user.handle === username); 
             const tagId = user ? user.id : null;
-            console.log(tagId);
             return (
               <TouchableOpacity 
                 key={index}
                 onPress={() => handleUserPress(tagId)}
-                
               >
                 <Text style={{ color: 'blue' }}>{`@${username}`}</Text>
               </TouchableOpacity>
             );
           }
-  
           return part; 
         })}
       </Text>
     );
   };
-  
-  
+
+  const currentDate = new Date();
+  const endDate = new Date(event?.end_date);
+  const hasEventEnded = endDate < currentDate;
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.eventTitle}>{event?.title || 'Event Title'}</Text>
@@ -249,27 +255,38 @@ const EventDetails = () => {
         <Text style={styles.bold}>Start Date:</Text> {new Date(event?.start_date).toLocaleString() || 'Not available'}
       </Text>
       <Text style={styles.date}>
-        <Text style={styles.bold}>End Date:</Text> {new Date(event?.end_date).toLocaleString() || 'Not available'}
+        <Text style={styles.bold}>End Date:</Text> {endDate.toLocaleString() || 'Not available'}
       </Text>
+      {hasEventEnded && (
+        <Text style={styles.expiredText}>This event has ended.</Text>
+      )}
       <Text style={styles.attendees}>Attendees: {attendees.length}</Text>
 
-      {hasConfirmed ? (
-        <Text style={styles.confirmedText}>Attendance confirmed</Text>
+      {!hasEventEnded ? (
+        hasConfirmed ? (
+          <Text style={styles.confirmedText}>Attendance confirmed</Text>
+        ) : (
+          <Button title="Confirm Attendance" onPress={confirmAttendance} />
+        )
       ) : (
-        <Button title="Confirm Attendance" onPress={confirmAttendance} />
+        <Button title="Summary" onPress={() => Alert.alert('Summary', 'Here is the summary of the event.')} />
       )}
-      <Button title="Upload Image" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
+
+      {/* Disable the Upload Image button if the event has ended */}
+      {!hasEventEnded && (
+        <Button title="Upload Image" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
+      )}
+      
       <Text style={styles.bold}>Event Pictures:</Text>
       {eventPictures.map((picture, index) => (
-      <View key={index} style={{ marginVertical: 10, paddingBottom: 15 }}>
-        <Image 
-          source={{ uri: picture.flyer_urls[0] }} 
-          style={{ width: 200, height: 200 }} 
-        />
-        <Text>{renderDescriptionWithTags(picture.description)}</Text>
-      </View>
-    ))}
-      
+        <View key={index} style={{ marginVertical: 10, paddingBottom: 15 }}>
+          <Image 
+            source={{ uri: picture.flyer_urls[0] }} 
+            style={{ width: 200, height: 200 }} 
+          />
+          <Text>{renderDescriptionWithTags(picture.description)}</Text>
+        </View>
+      ))}
 
       <Modal visible={modalData.open} animationType="slide" onRequestClose={closeTaggingModal}>
         <View style={styles.modalContent}>
@@ -302,6 +319,7 @@ const EventDetails = () => {
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   loading: { flex: 1, justifyContent: 'center' },
@@ -311,6 +329,7 @@ const styles = StyleSheet.create({
   date: { fontSize: 16, marginBottom: 4 },
   attendees: { fontSize: 16, marginBottom: 8 },
   confirmedText: { fontSize: 16, color: 'green', marginVertical: 10 },
+  expiredText: { fontSize: 16, color: 'red', marginVertical: 10 },
   pictureContainer: { marginBottom: 16 },
   picture: { width: '100%', height: 200, resizeMode: 'cover' },
   modalContent: { flex: 1, justifyContent: 'center', padding: 16 },
@@ -321,5 +340,3 @@ const styles = StyleSheet.create({
 });
 
 export default EventDetails;
-
-
