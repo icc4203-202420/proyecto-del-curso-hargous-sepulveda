@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as Notifications from 'expo-notifications';
 
 const EventDetails = () => {
@@ -17,120 +18,70 @@ const EventDetails = () => {
   const [attendees, setAttendees] = useState([]);
   const [friends, setFriends] = useState([]);
   const [eventPictures, setEventPictures] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [status, setStatus] = useState({ loading: true, error: null });
   const [hasConfirmed, setHasConfirmed] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [description, setDescription] = useState('');
-  const [openModal, setOpenModal] = useState(false);
+  const [modalData, setModalData] = useState({ open: false, description: '', image: null, uploading: false });
+
   const inputRef = useRef(null);
 
+  const fetchData = async (url, options = {}) => {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`Request failed, status: ${response.status}`);
+    return await response.json();
+  };
+  const fetchEventPictures = async (eventId) => {
+    try {
+      const pictureData = await fetchData(`${BACKEND_URL}/api/v1/events/${eventId}/event_pictures`);
+      setEventPictures(pictureData);
+    } catch (error) {
+      console.error('Error fetching event pictures:', error);
+      setStatus((prevStatus) => ({ ...prevStatus, error: 'Error fetching event pictures' }));
+    }
+  };
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        console.log(`Fetching event details for event ID: ${id}`);
-        const eventResponse = await fetch(`${BACKEND_URL}/api/v1/events`);
-        
-        if (!eventResponse.ok) {
-          throw new Error(`Failed to fetch events, status: ${eventResponse.status}`);
-        }
-        
-        const eventData = await eventResponse.json();
-        
+        const eventData = await fetchData(`${BACKEND_URL}/api/v1/events`);
         const selectedEvent = eventData.events.find((e) => e.id === id);
-        
-        if (selectedEvent) {
-          setEvent(selectedEvent);
-  
-          if (selectedEvent.bar_id) {
-            const barResponse = await fetch(`${BACKEND_URL}/api/v1/bars/${selectedEvent.bar_id}`);
-            
-            if (!barResponse.ok) {
-              throw new Error(`Failed to fetch bar details, status: ${barResponse.status}`);
-            }
-            
-            const barData = await barResponse.json();
-            
-            setBarName(barData.bar.name);
-            setBarId(selectedEvent.bar_id);
-          }
-  
-          const attendanceResponse = await fetch(`${BACKEND_URL}/api/v1/attendances/event/${id}`);
-          
-          if (!attendanceResponse.ok) {
-            throw new Error(`Failed to fetch attendees, status: ${attendanceResponse.status}`);
-          }
-          
-          const attendanceData = await attendanceResponse.json();
-  
-          const attendeesData = attendanceData.attendees;
-          const attendeesNamesPromises = attendeesData.map(async (userId) => {
-            const userResponse = await fetch(`${BACKEND_URL}/api/v1/users/${userId}`);
-            
-            if (!userResponse.ok) {
-              throw new Error(`Failed to fetch user details, status: ${userResponse.status}`);
-            }
-            
-            const userData = await userResponse.json();
-  
-            return { userId, name: userData.user.name };
-          });
-          
-          const currentUserId = await SecureStore.getItemAsync('userId');
-          const attendeesNames = await Promise.all(attendeesNamesPromises);
-  
-          setAttendees(attendeesNames);
-  
-          if (attendeesData.includes(parseInt(currentUserId))) {
-            setHasConfirmed(true);
-          }
-  
-          const friendsResponse = await fetch(`${BACKEND_URL}/api/v1/users/${currentUserId}/friendships`);
-          
-          if (!friendsResponse.ok) {
-            throw new Error(`Failed to fetch friends, status: ${friendsResponse.status}`);
-          }
-          
-          const friendsData = await friendsResponse.json();
-          
-          setFriends(friendsData);
-  
-          await fetchEventPictures(selectedEvent.id);
-        } else {
-          setEvent(null);
-        }
-        setLoading(false);
+
+        if (!selectedEvent) return setEvent(null);
+
+        setEvent(selectedEvent);
+
+        const [barData, attendanceData, friendsData] = await Promise.all([
+          fetchData(`${BACKEND_URL}/api/v1/bars/${selectedEvent.bar_id}`),
+          fetchData(`${BACKEND_URL}/api/v1/attendances/event/${id}`),
+          fetchData(`${BACKEND_URL}/api/v1/users/${await SecureStore.getItemAsync('userId')}/friendships`),
+        ]);
+
+        setBarName(barData.bar.name);
+        setBarId(selectedEvent.bar_id);
+        setAttendees(attendanceData.attendees);
+        setFriends(friendsData);
+
+        const currentUserId = await SecureStore.getItemAsync('userId');
+        setHasConfirmed(attendanceData.attendees.includes(parseInt(currentUserId)));
+
+        await fetchEventPictures(selectedEvent.id);
+        setStatus({ loading: false, error: null });
       } catch (error) {
-        console.error('Error fetching event details or attendees:', error);
-        setError('Error fetching event details or attendees');
-        setLoading(false);
+        console.error('Error fetching event details:', error);
+        setStatus({ loading: false, error: 'Error fetching event details' });
       }
     };
-  
+
     const fetchEventPictures = async (eventId) => {
       try {
-        console.log(`Fetching event pictures for event ID: ${eventId}`);
-        const response = await fetch(`${BACKEND_URL}/api/v1/events/${eventId}/event_pictures`);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch event pictures, status: ${response.status}`);
-        }
-        
-        const pictureData = await response.json();
-        console.log('Event picture data:', pictureData);
-        
+        const pictureData = await fetchData(`${BACKEND_URL}/api/v1/events/${eventId}/event_pictures`);
         setEventPictures(pictureData);
       } catch (error) {
         console.error('Error fetching event pictures:', error);
-        setError('Error fetching event pictures');
+        setStatus({ ...status, error: 'Error fetching event pictures' });
       }
     };
-  
+
     fetchEventDetails();
   }, [id]);
-  
 
   const confirmAttendance = async () => {
     try {
@@ -145,102 +96,97 @@ const EventDetails = () => {
     }
   };
 
-  const handleImageChange = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const handleImageChange = async (source) => {
+    console.log('Iniciando selección de imagen...');
+  
+    // Verificar permisos para la cámara
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      alert('Permission to access camera roll is required!');
+      Alert.alert('Permiso Requerido', '¡Se requiere permiso para acceder a la cámara!');
+      console.log('Permiso para la cámara denegado');
       return;
     }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-      base64: true,
-    });
-
-    if (!result.cancelled) {
-      setSelectedImage(result);
+  
+    console.log(`Permiso para la cámara otorgado. Fuente seleccionada: ${source}`);
+  
+    // Abrir cámara o galería
+    const result = source === 'camera'
+      ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 1 })
+      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, quality: 1 });
+  
+    console.log('Resultado de ImagePicker:', result);
+  
+    // Verificar si se obtuvo un resultado y si `assets[0].uri` está definido
+    if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].uri) {
+      const imageUri = result.assets[0].uri;
+      console.log('Imagen seleccionada exitosamente, URI:', imageUri);
+      try {
+        const resizedImage = await ImageManipulator.manipulateAsync(
+          imageUri,
+          [{ resize: { width: 720, height: 720 } }],
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+        );
+        
+  
+        console.log('Imagen redimensionada exitosamente, nueva URI:', resizedImage.uri);
+        setModalData({ ...modalData, image: resizedImage });
+      } catch (error) {
+        console.error('Error al manipular la imagen:', error);
+        Alert.alert('Error', 'Hubo un problema al procesar la imagen seleccionada.');
+      }
+    } else {
+      Alert.alert('Cancelado', 'No se seleccionó ninguna imagen.');
+      console.log('La selección de imagen fue cancelada o el URI no está disponible');
     }
   };
-
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setDescription('');
-    setSelectedImage(null);
-    setUploadStatus('');
-  };
+  
+  
+  
 
   const uploadImage = async () => {
-    if (!selectedImage) {
-      setUploadStatus('Please select an image.');
-      Alert.alert('Upload Status', 'Please select an image to upload.');
+    if (!modalData.image || !modalData.image.base64) {
+      Alert.alert('Estado de subida', 'Por favor, selecciona una imagen para subir.');
       return;
     }
-    setIsUploading(true);
-    
-    const base64Image = selectedImage.base64;
+  
+    setModalData({ ...modalData, uploading: true });
     const data = {
       event_picture: {
         user_id: await SecureStore.getItemAsync('userId'),
-        flyer_base64: `data:image/jpeg;base64,${base64Image}`,
-        description,
+        flyer_base64: `data:image/jpeg;base64,${modalData.image.base64}`,
+        description: modalData.description,
       },
     };
+  
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/events/${id}/event_pictures`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to upload image, status: ${response.status}`);
-      }
-
-      setUploadStatus('Image uploaded successfully.');
-      Alert.alert('Upload Status', 'Image uploaded successfully.');
+  
+      const responseData = await response.json(); // Mostrar respuesta del servidor
+      console.log('Respuesta del servidor:', responseData);
+  
+      if (!response.ok) throw new Error(`Failed to upload image, status: ${response.status}`);
+  
+      Alert.alert('Estado de subida', 'Imagen subida exitosamente.');
       await fetchEventPictures(id);
+  
       await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Upload Status',
-          body: 'Image uploaded successfully.',
-        },
+        content: { title: 'Estado de subida', body: 'Imagen subida exitosamente.' },
         trigger: null,
       });
-      setTimeout(() => handleCloseModal(), 2000);
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setUploadStatus('Error uploading image.');
-      Alert.alert('Upload Status', 'Error uploading image.');
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Upload Status',
-          body: 'Error uploading image.',
-        },
-        trigger: null,
-      });
+      console.error('Error al subir la imagen:', error);
+      Alert.alert('Estado de subida', 'Error al subir la imagen.');
     } finally {
-      setIsUploading(false);
+      setModalData({ open: false, description: '', image: null, uploading: false });
     }
   };
-
-  const sendNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Custom Notification',
-        body: 'This is a custom notification triggered by pressing the button.',
-      },
-      trigger: null,
-    });
-  };
-
-  if (loading) return <ActivityIndicator style={styles.loading} size="large" />;
-  if (error) return <Text style={styles.errorText}>{error}</Text>;
+  
+  if (status.loading) return <ActivityIndicator style={styles.loading} size="large" />;
+  if (status.error) return <Text style={styles.errorText}>{status.error}</Text>;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -252,7 +198,7 @@ const EventDetails = () => {
             <Text style={styles.link}>{barName}</Text>
           </TouchableOpacity>
         ) : (
-          'No Bar'
+          <Text>No Bar</Text>
         )}
       </Text>
       <Text style={styles.description}>
@@ -264,32 +210,22 @@ const EventDetails = () => {
       <Text style={styles.date}>
         <Text style={styles.bold}>End Date:</Text> {new Date(event?.end_date).toLocaleString() || 'Not available'}
       </Text>
-
       {hasConfirmed ? (
         <Text style={styles.confirmedText}>Attendance confirmed</Text>
       ) : (
         <Button title="Confirm Attendance" onPress={confirmAttendance} />
       )}
+      <Button title="Upload Event Picture" onPress={() => setModalData({ ...modalData, open: true })} />
 
-      <Button title="Upload Event Picture" onPress={handleOpenModal} />
-      <Button title="Send Notification" onPress={sendNotification} />
-      {uploadStatus ? <Text style={styles.statusText}>{uploadStatus}</Text> : null}
-
-      <Modal visible={openModal} onRequestClose={handleCloseModal} transparent={true} animationType="slide">
+      <Modal visible={modalData.open} onRequestClose={() => setModalData({ ...modalData, open: false })} transparent={true} animationType="slide">
         <View style={styles.modalContainerCentered}>
           <Text style={styles.modalTitle}>Upload Image</Text>
-          <Button title="Select Image" onPress={handleImageChange} />
-          {selectedImage && (
-            <Image source={{ uri: selectedImage.uri }} style={styles.selectedImage} />
-          )}
-          <TextInput
-            placeholder="Add a description..."
-            value={description}
-            onChangeText={setDescription}
-            style={styles.input}
-          />
-          <Button title={isUploading ? 'Uploading...' : 'Upload'} onPress={uploadImage} disabled={isUploading} />
-          <Button title="Cancel" onPress={handleCloseModal} />
+          <Button title="Take Picture" onPress={() => handleImageChange('camera')} />
+          <Button title="Select from gallery" onPress={() => handleImageChange('gallery')} />
+          {modalData.image && <Image source={{ uri: modalData.image.uri }} style={styles.selectedImage} />}
+          <TextInput placeholder="Add a description..." value={modalData.description} onChangeText={(text) => setModalData({ ...modalData, description: text })} style={styles.input} />
+          <Button title={modalData.uploading ? 'Uploading...' : 'Upload'} onPress={uploadImage} disabled={modalData.uploading} />
+          <Button title="Cancel" onPress={() => setModalData({ ...modalData, open: false })} />
         </View>
       </Modal>
 
@@ -302,90 +238,20 @@ const EventDetails = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-
-  eventTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-
-  barName: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-
-  link: {
-    color: 'blue',
-  },
-
-  description: {
-    fontSize: 16,
-    marginVertical: 10,
-  },
-
-  date: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-
-  bold: {
-    fontWeight: 'bold',
-  },
-
-  confirmedText: {
-    fontSize: 16,
-    color: 'green',
-    marginVertical: 10,
-  },
-
-  statusText: {
-    fontSize: 14,
-    color: 'gray',
-  },
-
-  modalContainerCentered: {
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: '50%',
-  },
-
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-  },
-
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-  },
-
-  selectedImage: {
-    width: 200,
-    height: 200,
-    marginVertical: 10,
-  },
+  container: { padding: 20, backgroundColor: '#f5f5f5' },
+  eventTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+  barName: { fontSize: 18, marginBottom: 10 },
+  link: { color: 'blue' },
+  description: { fontSize: 16, marginVertical: 10 },
+  date: { fontSize: 16, marginBottom: 10 },
+  bold: { fontWeight: 'bold' },
+  confirmedText: { fontSize: 16, color: 'green', marginVertical: 10 },
+  errorText: { color: 'red', fontSize: 16 },
+  modalContainerCentered: { padding: 20, backgroundColor: 'white', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginTop: '50%' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
+  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, width: '100%' },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  selectedImage: { width: 200, height: 200, marginVertical: 10 },
 });
 
 export default EventDetails;

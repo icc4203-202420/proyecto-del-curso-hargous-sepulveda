@@ -51,16 +51,14 @@ Rails.application.routes.draw do
       resources :events, only: [:index, :show, :create, :update, :destroy] do
         patch :upload_image, on: :member
         patch :upload_flyer, on: :member  # Ruta para subir el flyer
-        post :generate_summary, on: :member # Ruta para generar el resumen del evento
 
         collection do
           get 'search'
         end
-
+        
         # Rutas anidadas para event_pictures dentro de eventos
         resources :event_pictures, only: [:index, :create, :destroy, :update]  # Para listar y crear imágenes de eventos
       end
-
       
       # Ruta para eliminar event_pictures de manera independiente (por ID)
       resources :event_pictures, only: [:destroy]
