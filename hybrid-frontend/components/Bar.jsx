@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Button, FlatList, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { BACKEND_URL } from "@env";
+import { BACKEND_URL } from '@env';
 
 const Bar = () => {
     const route = useRoute();

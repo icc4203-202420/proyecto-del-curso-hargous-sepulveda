@@ -22,7 +22,7 @@ const Account = () => {
         setHasToken(true);
         setUserId(storedUserId);
         setUserName(storedUserName);
-        fetchFriends(storedUserId); // Fetch friends whenever user data is available
+        fetchFriends(storedUserId);
       } else {
         setHasToken(false);
         navigation.navigate('Login');
