@@ -99,24 +99,22 @@ const EventDetails = () => {
   const handleImageChange = async (source) => {
     console.log('Iniciando selección de imagen...');
   
-    // Verificar permisos para la cámara
+
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permiso Requerido', '¡Se requiere permiso para acceder a la cámara!');
+      Alert.alert('Access Required', '¡Access must be granted to upload a photo!');
       console.log('Permiso para la cámara denegado');
       return;
     }
   
     console.log(`Permiso para la cámara otorgado. Fuente seleccionada: ${source}`);
   
-    // Abrir cámara o galería
     const result = source === 'camera'
       ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 1 })
       : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, quality: 1 });
   
     console.log('Resultado de ImagePicker:', result);
   
-    // Verificar si se obtuvo un resultado y si `assets[0].uri` está definido
     if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].uri) {
       const imageUri = result.assets[0].uri;
       console.log('Imagen seleccionada exitosamente, URI:', imageUri);
@@ -132,10 +130,10 @@ const EventDetails = () => {
         setModalData({ ...modalData, image: resizedImage });
       } catch (error) {
         console.error('Error al manipular la imagen:', error);
-        Alert.alert('Error', 'Hubo un problema al procesar la imagen seleccionada.');
+        Alert.alert('Error', 'Has appeared a problem at uploading the image.');
       }
     } else {
-      Alert.alert('Cancelado', 'No se seleccionó ninguna imagen.');
+      Alert.alert('Canceled', 'No image was selected.');
       console.log('La selección de imagen fue cancelada o el URI no está disponible');
     }
   };
@@ -145,7 +143,7 @@ const EventDetails = () => {
 
   const uploadImage = async () => {
     if (!modalData.image || !modalData.image.base64) {
-      Alert.alert('Estado de subida', 'Por favor, selecciona una imagen para subir.');
+      Alert.alert('Uploading State', 'Please, Select an image to upload.');
       return;
     }
   
@@ -170,16 +168,16 @@ const EventDetails = () => {
   
       if (!response.ok) throw new Error(`Failed to upload image, status: ${response.status}`);
   
-      Alert.alert('Estado de subida', 'Imagen subida exitosamente.');
+      Alert.alert('Uploading State', 'Image was upload with success.');
       await fetchEventPictures(id);
   
       await Notifications.scheduleNotificationAsync({
-        content: { title: 'Estado de subida', body: 'Imagen subida exitosamente.' },
+        content: { title: 'Uploading State', body: 'Image was upload with success.' },
         trigger: null,
       });
     } catch (error) {
-      console.error('Error al subir la imagen:', error);
-      Alert.alert('Estado de subida', 'Error al subir la imagen.');
+      console.error('Error at uploading the image:', error);
+      Alert.alert('Uploading State', 'Error at uploading the image.');
     } finally {
       setModalData({ open: false, description: '', image: null, uploading: false });
     }
