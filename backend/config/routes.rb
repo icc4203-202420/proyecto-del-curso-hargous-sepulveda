@@ -51,7 +51,7 @@ Rails.application.routes.draw do
       resources :events, only: [:index, :show, :create, :update, :destroy] do
         patch :upload_image, on: :member
         patch :upload_flyer, on: :member  # Ruta para subir el flyer
-
+        post 'generate_summary', on: :member
         collection do
           get 'search'
         end

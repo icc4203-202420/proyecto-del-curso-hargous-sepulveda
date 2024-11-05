@@ -27,11 +27,11 @@ end
 
 # POST /api/v1/events/:id/generate_summary
 def generate_summary
-  if @event.end_date && @event.end_date < Time.current
-    #lógica para generar el video/resumen del evento y notificar a los usuarios.
-    # crear una tarea asíncrona o una llamada a un servicio?
-    
-    render json: { message: 'Resumen generado y notificado a los usuarios.' }, status: :ok
+  event = Event.find(params[:id])
+
+  if event.end_date < Time.now
+    GenerateEventVideoJob.perform_later(event)
+    render json: { message: "El video se está generando. Recibirás una notificación cuando esté listo." }
   else
     render json: { error: 'El evento aún no ha terminado.' }, status: :unprocessable_entity
   end

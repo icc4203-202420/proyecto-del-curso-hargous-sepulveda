@@ -1,23 +1,11 @@
 require 'factory_bot_rails'
 
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-
 # Initialize the review counter
-ReviewCounter.create(count: 0)
+ReviewCounter.find_or_create_by(count: 0)
 
 if Rails.env.development?
   # Create custom countries
-  countries = [
-    FactoryBot.create(:country, name: "Chile"),
-  ]
+  countries = [FactoryBot.create(:country, name: "Chile")]
 
   # Create custom addresses
   addresses = [
@@ -37,15 +25,9 @@ if Rails.env.development?
   additional_bars_count = 5
   additional_bars = additional_bars_count.times.map do
     address = FactoryBot.create(:address, city: "Santiago", country: countries.first)
-    FactoryBot.create(:bar, 
-      name: "Additional Bar #{Faker::Address.unique.street_name}", 
-      address: address,
-      latitude: Faker::Address.latitude.to_s,
-      longitude: Faker::Address.longitude.to_s
-    )
+    FactoryBot.create(:bar, name: "Additional Bar #{Faker::Address.unique.street_name}", address: address, latitude: Faker::Address.latitude.to_s, longitude: Faker::Address.longitude.to_s)
   end
 
-  # Combine custom and additional bars
   all_bars = bars + additional_bars
 
   # Create a set of beers
@@ -53,13 +35,8 @@ if Rails.env.development?
 
   # Associate beers with bars and add reviews
   all_bars.each do |bar|
-    # Add random beers to each bar
     bar.beers << beers.sample(rand(1..5))
-
-    # Add reviews for each beer in this bar
-    bar.beers.each do |beer|
-      FactoryBot.create(:review, user: User.all.sample, beer: beer)
-    end
+    bar.beers.each { |beer| FactoryBot.create(:review, user: User.all.sample, beer: beer) }
   end
 
   # Create users with random addresses
@@ -67,20 +44,20 @@ if Rails.env.development?
     user.address.update(country: countries.sample)
   end
 
+  # Create the admin user with friends
+  admin = FactoryBot.create(:user, email: "admin@admin.com", password: "admin1", handle: "admin")
+  admin_friends = users.sample(2)
+  admin_friends.each { |friend| FactoryBot.create(:friendship, user: admin, friend: friend, bar: all_bars.sample) }
+
   # Create breweries with custom countries
-  countries.each do |country|
-    FactoryBot.create(:brewery_with_brands_with_beers, countries: [country])
-  end
+  countries.each { |country| FactoryBot.create(:brewery_with_brands_with_beers, countries: [country]) }
 
   # Create events
-  events = all_bars.map do |bar|
-    FactoryBot.create(:event, bar: bar)
-  end
+  events = all_bars.map { |bar| FactoryBot.create(:event, bar: bar) }
 
   # Create friendships for all users
   users.each do |user|
-    other_users = users - [user] # Exclude the current user
-    other_users.each do |other_user|
+    (users - [user]).each do |other_user|
       FactoryBot.create(:friendship, user: user, friend: other_user, bar: all_bars.sample)
     end
   end
@@ -94,15 +71,21 @@ if Rails.env.development?
 
   # Create reviews for users and beers
   users.each do |user|
-    beers = Beer.all.sample(rand(1..3))
-    beers.each do |beer|
-      FactoryBot.create(:review, user: user, beer: beer)
-    end
+    beers.sample(rand(1..3)).each { |beer| FactoryBot.create(:review, user: user, beer: beer) }
   end
+
+  # Create a special short-duration event (3 minutes)
+  short_event = FactoryBot.create(:event, bar: all_bars.sample)
+  short_event.update(
+    start_date: Time.current,
+    end_date: Time.current + 3.minutes
+  )
 end
-Event.all.each do |event|
+
+# Update all other events to start in the past and end in the future
+Event.where.not(id: short_event.id).each do |event|
   event.update(
-    start_date: Time.current + 1.day,   # Fecha de inicio en un día desde ahora
-    end_date: Time.current + 2.days     # Fecha de fin en dos días desde ahora
+    start_date: Time.current - 1.day,
+    end_date: Time.current + 2.days
   )
 end

@@ -6,6 +6,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Notifications from 'expo-notifications';
+import { Video } from 'expo-av';
 
 const EventDetails = () => {
   const route = useRoute();
@@ -24,6 +25,9 @@ const EventDetails = () => {
   const [isTagging, setIsTagging] = useState(false);
   const [query, setQuery] = useState('');
   const [userSuggestions, setUserSuggestions] = useState([]);
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [isVideoModalVisible, setIsVideoModalVisible] = useState(false); 
   const inputRef = useRef(null);
   const [users, setUsers] = useState([]);
 
@@ -35,12 +39,13 @@ const EventDetails = () => {
 
   const fetchEventDetails = async () => {
     try {
-      const eventData = await fetchData(`${BACKEND_URL}/api/v1/events`);
-      const selectedEvent = eventData.events.find((e) => e.id === id);
+      const eventData = await fetchData(`${BACKEND_URL}/api/v1/events/${id}`);
+      const selectedEvent = eventData.event;
 
       if (!selectedEvent) return setEvent(null);
 
       setEvent(selectedEvent);
+      setVideoUrl(selectedEvent.video_url);
 
       const [barData, attendanceData, friendsData, users] = await Promise.all([
         fetchData(`${BACKEND_URL}/api/v1/bars/${selectedEvent.bar_id}`),
@@ -53,7 +58,7 @@ const EventDetails = () => {
       setBarId(selectedEvent.bar_id);
       setAttendees(attendanceData.attendees);
       setFriends(friendsData);
-      setUsers(users.users)
+      setUsers(users.users);
       const currentUserId = await SecureStore.getItemAsync('userId');
       setHasConfirmed(attendanceData.attendees.includes(parseInt(currentUserId)));
 
@@ -72,6 +77,27 @@ const EventDetails = () => {
     } catch (error) {
       console.error('Error fetching event pictures:', error);
       setStatus((prevStatus) => ({ ...prevStatus, error: 'Error fetching event pictures' }));
+    }
+  };
+
+  const generateEventVideo = async () => {
+    setIsGeneratingVideo(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/v1/events/${id}/generate_summary`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Video Generation', data.message);
+      } else {
+        Alert.alert('Error', data.error || 'Could not generate the video');
+      }
+    } catch (error) {
+      console.error('Error generating video:', error);
+      Alert.alert('Error', 'An error occurred while generating the video');
+    } finally {
+      setIsGeneratingVideo(false);
     }
   };
 
@@ -161,7 +187,6 @@ const EventDetails = () => {
   };
 
   const uploadImage = async () => {
-    // Prevent uploading if the event has ended
     if (hasEventEnded) {
       Alert.alert('Upload Not Allowed', 'The event has ended. You cannot upload more images.');
       return;
@@ -262,17 +287,41 @@ const EventDetails = () => {
       )}
       <Text style={styles.attendees}>Attendees: {attendees.length}</Text>
 
-      {!hasEventEnded ? (
+      {/* Check if video URL exists and display "Watch Video" button or "Summary" button */}
+      {hasEventEnded ? (
+        videoUrl ? (
+          <>
+            <Button title="Watch Video" onPress={() => setIsVideoModalVisible(true)} />
+            <Modal
+              visible={isVideoModalVisible}
+              animationType="slide"
+              onRequestClose={() => setIsVideoModalVisible(false)}
+            >
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Video
+                  source={{ uri: `${BACKEND_URL}${videoUrl}` }}
+                  rate={1.0}
+                  volume={1.0}
+                  isMuted={false}
+                  resizeMode="cover"
+                  shouldPlay
+                  style={{ width: '100%', height: 300 }}
+                />
+                <Button title="Close Video" onPress={() => setIsVideoModalVisible(false)} />
+              </View>
+            </Modal>
+          </>
+        ) : (
+          <Button title={isGeneratingVideo ? "Generating video..." : "Summary"} onPress={generateEventVideo} disabled={isGeneratingVideo} />
+        )
+      ) : (
         hasConfirmed ? (
           <Text style={styles.confirmedText}>Attendance confirmed</Text>
         ) : (
           <Button title="Confirm Attendance" onPress={confirmAttendance} />
         )
-      ) : (
-        <Button title="Summary" onPress={() => Alert.alert('Summary', 'Here is the summary of the event.')} />
       )}
 
-      {/* Disable the Upload Image button if the event has ended */}
       {!hasEventEnded && (
         <Button title="Upload Image" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
       )}
@@ -330,13 +379,12 @@ const styles = StyleSheet.create({
   attendees: { fontSize: 16, marginBottom: 8 },
   confirmedText: { fontSize: 16, color: 'green', marginVertical: 10 },
   expiredText: { fontSize: 16, color: 'red', marginVertical: 10 },
+  bold: { fontWeight: 'bold' },
   pictureContainer: { marginBottom: 16 },
   picture: { width: '100%', height: 200, resizeMode: 'cover' },
   modalContent: { flex: 1, justifyContent: 'center', padding: 16 },
   descriptionInput: { borderWidth: 1, borderColor: '#ccc', padding: 8, marginBottom: 8 },
   suggestionText: { padding: 8, backgroundColor: '#f0f0f0', marginBottom: 4 },
-  errorText: { color: 'red', textAlign: 'center' },
-  selectedImage: { width: 200, height: 200, marginVertical: 10 },
 });
 
 export default EventDetails;
