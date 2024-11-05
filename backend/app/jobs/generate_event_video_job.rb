@@ -1,6 +1,6 @@
 require 'open-uri'
 require 'fileutils'
-
+require 'net/http'
 class GenerateEventVideoJob < ApplicationJob
   queue_as :default
 
