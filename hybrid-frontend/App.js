@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
+import * as Notifications from 'expo-notifications'; // Importa las notificaciones
 import BeerList from './components/BeerList';
 import BarList from './components/BarList';
 import UserList from './components/UserList';
@@ -79,9 +80,7 @@ function Tabs() {
           headerShown: false,
         }}
       />
-
     </Tab.Navigator>
-    
   );
 }
 
@@ -92,6 +91,16 @@ export default function App() {
     const checkLoginStatus = async () => {
       const token = await SecureStore.getItemAsync('jwtToken');
       setIsLoggedIn(!!token);
+
+      if (token) {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Una Chelita???',
+            body: 'Sigues Logeado en BeerHub...'
+          },
+          trigger: null,
+        });
+      }
     };
 
     checkLoginStatus();
@@ -100,11 +109,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
-      <AuthProvider>
-        <NavigationContainer>
-          <MainNavigator isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-        </NavigationContainer>
-      </AuthProvider>
+        <AuthProvider>
+          <NavigationContainer>
+            <MainNavigator isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+          </NavigationContainer>
+        </AuthProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -157,7 +166,7 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
       <Stack.Screen
         name="EventDetails"
         component={EventDetails}
-        options={{headerTitle: "Event Details" }}
+        options={{ headerTitle: "Event Details" }}
       />
       <Stack.Screen
         name="Bar"
@@ -183,7 +192,7 @@ function RefreshHandler() {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('Refrescando datos en cada redirección...');
+      console.log('Refrescando datos en cada redirecciÃ³n...');
     });
 
     return unsubscribe; 

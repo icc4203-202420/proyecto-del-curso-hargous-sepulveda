@@ -39,20 +39,37 @@ end
 
   # POST /api/v1/events/:event_id/event_pictures
   def create
-    # Create a new EventPicture record
     @event_picture = @event.event_pictures.build(description: event_picture_params[:description], user_id: event_picture_params[:user_id])
-
+  
     if params[:event_picture][:flyer_base64].present?
       begin
-        # Decode the base64 image
         decoded_flyer = decode_base64_image(params[:event_picture][:flyer_base64])
-
+  
         if decoded_flyer
-          # Attach decoded flyer
           @event_picture.flyers.attach(io: decoded_flyer[:io], filename: decoded_flyer[:filename], content_type: decoded_flyer[:content_type])
-
+  
           if @event_picture.save && @event_picture.flyers.attached?
-            flyer_url = url_for(@event_picture.flyers.last) # Get the URL of the last attached flyer
+            flyer_url = url_for(@event_picture.flyers.last)
+  
+
+            tagged_usernames = @event_picture.description.scan(/@([\w.]+)/).flatten
+            puts "Tagged usernames: #{tagged_usernames.inspect}"
+
+            tagged_users = User.where(handle: tagged_usernames).where.not(push_token: [nil, ''])
+            puts "Found #{tagged_users.count} tagged users with push tokens:"
+            tagged_users.each { |user| puts "User: #{user.handle}, Push Token: #{user.push_token}" }
+            
+            tagged_users.each do |tagged|
+              if tagged.push_token.present?
+                PushNotificationService.send_notification(
+                  to: tagged.push_token,
+                  title: "Eres Famoso!!!",
+                  body: "#{@event_picture.user.handle} te etiquetó en una foto del evento #{@event.name}",
+                  data: {}
+                )
+              end
+            end
+  
             render json: { message: 'Flyer uploaded successfully', flyer_url: flyer_url, event_picture: @event_picture }, status: :created
           else
             render json: { error: 'Error saving EventPicture or attaching flyer' }, status: :unprocessable_entity
@@ -67,6 +84,8 @@ end
       render json: { error: 'No file provided' }, status: :unprocessable_entity
     end
   end
+  
+  
   
   # DELETE /api/v1/event_pictures/:id
   def destroy

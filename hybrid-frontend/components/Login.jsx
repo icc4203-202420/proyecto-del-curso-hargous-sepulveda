@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'; 
 import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env'; 
-
+import { registerForPushNotificationsAsync } from './Notifications'
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Email no válido').required('El email es requerido'),
   password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es requerida'),
@@ -24,6 +24,7 @@ const Login = ({ navigation }) => {
         body: new URLSearchParams({
           'user[email]': values.email,
           'user[password]': values.password,
+          'user[push_token]': await registerForPushNotificationsAsync(),
         }).toString(),
       });
 

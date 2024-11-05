@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './SignupStyles'; 
 import { BACKEND_URL } from '@env';
-
+import { registerForPushNotificationsAsync } from './Notifications'
 const Signup = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -89,6 +89,7 @@ const Signup = () => {
             handle: formData.handle,
             password: formData.password,
             password_confirmation: formData.passwordConfirmation,
+            push_token: await registerForPushNotificationsAsync(),
           },
         }),
       });

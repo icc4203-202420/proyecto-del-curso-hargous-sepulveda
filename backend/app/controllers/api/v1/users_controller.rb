@@ -79,6 +79,14 @@ class API::V1::UsersController < ApplicationController
   
     # Guarda la amistad
     if friendship.save
+      if friend.push_token.present?
+        PushNotificationService.send_notification(
+          to: friend.push_token,
+          title: "Nuevo pana cervecero",
+          body: "#{user.handle} te agrego como amigo",
+          data: {}
+        )
+      end
       render json: friendship, status: :created
     else
       render json: friendship.errors, status: :unprocessable_entity
@@ -112,7 +120,7 @@ class API::V1::UsersController < ApplicationController
 
   def user_params
     params.fetch(:user, {}).permit(
-      :id, :first_name, :last_name, :email, :age,
+      :id, :first_name, :last_name, :email, :age, :push_token,
       { address_attributes: [:id, :line1, :line2, :city, :country, :country_id,
                             country_attributes: [:id, :name]],
         reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]

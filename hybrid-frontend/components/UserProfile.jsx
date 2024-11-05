@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { Card } from "react-native-elements";
 import { BACKEND_URL } from '@env';
 import * as SecureStore from 'expo-secure-store';
+import * as Notifications from 'expo-notifications';
 
 const UserProfile = () => {
   const navigation = useNavigation();

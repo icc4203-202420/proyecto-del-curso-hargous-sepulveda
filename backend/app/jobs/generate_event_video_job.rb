@@ -75,7 +75,14 @@ class GenerateEventVideoJob < ApplicationJob
   def notify_users(event)
     if event.attendances
       event.attendances.each do |user|
-        NotificationService.send_event_video_ready(user, event)
+        if user.push_token.present?
+          PushNotificationService.send_notification(
+            to: user.push_token,
+            title: "Mamá salí en la tele!",
+            body: "Ya esta el resumen de #{@event.name}",
+            data: {}
+          )
+        end
       end
     else
       Rails.logger.error("Event #{event.id} does not have an 'attendees' association or method.")
