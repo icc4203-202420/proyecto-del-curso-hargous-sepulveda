@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BeerHub",
-    "slug": "BeerHub",
+    "slug": "beerhub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +25,12 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f7922d87-f0e7-4e12-aa58-1af49770d5ed"
+      }
+    },
+    "owner": "martinhargous"
   }
 }

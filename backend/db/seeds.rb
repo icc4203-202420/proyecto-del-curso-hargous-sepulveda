@@ -29,7 +29,7 @@ if Rails.env.development?
   end
 
   all_bars = bars + additional_bars
-
+  evento = FactoryBot.create( :event, name: "Raid casa Fuenza", description: "esta es una descripcion", date: Time.current, start_date: Time.current, end_date: Time.current + 6.minutes, bar: bars.third)
   # Create a set of beers
   beers = FactoryBot.create_list(:beer, 10)
 
@@ -43,7 +43,7 @@ if Rails.env.development?
   users = FactoryBot.create_list(:user, 10) do |user|
     user.address.update(country: countries.sample)
   end
-
+  yo = FactoryBot.create(:user, email: "mmhargous@gmail.com", password: "123456", handle: "Sturmtiger")
   # Create the admin user with friends
   admin = FactoryBot.create(:user, email: "admin@admin.com", password: "admin1", handle: "admin")
   admin_friends = users.sample(2)
