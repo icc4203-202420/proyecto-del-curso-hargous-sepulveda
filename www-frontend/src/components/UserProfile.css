@@ -1,0 +1,154 @@
+
+
+#content {
+    position: relative;
+    padding: 16px;
+}
+
+#content img {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.show-profile {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  max-height: 81vh;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.profile-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 20px auto;
+  max-width: 95%;
+}
+
+.close-button {
+  background-color: #9E9CB2;
+  color: #1D1B20;
+  margin-right: 16px;
+  margin-top: 8px;
+  align-self: flex-end;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 700px;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-card img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+
+.profile-card-content {
+  padding: 1rem;
+}
+
+.profile-card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+
+.profile-card-text {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+
+.profile-card-strong {
+  font-weight: bold;
+}
+
+
+.average-rating-bubble, .rating {
+  padding: 8px;
+  background-color: #2E2E42;
+  border-radius: 20px;
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.rating_bubble {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 100%;
+}
+
+
+.bar-section {
+  background-color: #9E9CB2;
+  border-radius: 16px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+
+.bar-section-sub {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #9E9CB2;
+  border-radius: 16px;
+  white-space: nowrap;
+}
+
+.reviews-section {
+  background-color: #9E9CB2;
+  border-radius: 16px;
+  padding: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.reviews-section_sub {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #9E9CB2;
+  border-radius: 16px;
+  scroll-behavior: smooth;
+}
+
+.review-card {
+  background-color: #CCCBCE;
+  border-radius: 8px;
+  min-width: 300px;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-rating {
+  color: #2E2E42;
+  margin-bottom: 8px;
+}
+
+
+.review-text {
+  color: #2E2E42;
+  font-size: 1rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}

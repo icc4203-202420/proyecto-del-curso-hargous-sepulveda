@@ -1,0 +1,120 @@
+#fondo {    
+    background-color: #2E2E42; 
+    width: 100%;
+  }
+  
+  .css-13p3xcz-MuiContainer-root {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    background-color: #2E2E42;
+    margin-top: 0% !important;
+  }
+  
+  .MuiCardContent-root {
+    min-width: 200px !important; 
+  }
+  
+  .user-list-content {
+    max-width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    overflow-y: auto;
+    width: 100%;
+    max-height: 80vh; 
+    padding-top: 1vh;
+    min-width: 200px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    align-items: center;
+  }
+  
+  /* Default user List Styling */
+  .user-list {
+    margin-bottom: 1rem !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    min-width: 200px;
+    max-width: 400px;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 1rem;
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .user-card-link {
+    max-width: 400px !important;
+    text-decoration: none; /* Optional to remove link underline */
+  }
+  
+  .user-card {
+    padding: 0 !important;
+    display: flex;
+    max-width: 400px !important;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    min-width: 200px;
+    background-color: #BDBBC1;
+    width: 100%; /* Full width on smaller screens */
+  }
+  
+  /* Responsive Media Queries */
+  
+  /* Small screens (mobile) */
+  @media (max-width: 600px) {
+    .user-list {
+      max-width: 90% !important;
+      padding: 0.3rem;
+    }
+    .user-list-content {
+
+        max-height: 73vh; 
+        padding-top: 1vh;
+
+      }
+    .user-card-link,
+    .user-card {
+      min-width: 90%;
+      padding: 8px;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .MuiCardContent-root {
+      min-width: 100px !important;
+    }
+  }
+  
+  /* Medium screens (tablets) */
+  @media (min-width: 600px) and (max-width: 960px) {
+    .user-list {
+      padding: 1rem;
+      max-width: 400px !important;
+    }
+  
+    .user-card-link,
+    .user-card {
+      min-width: 300px;
+      max-width: 400px !important;
+    }
+  }
+  
+  /* Large screens (desktops) */
+  @media (min-width: 960px) {
+    .user-list {
+      max-width: 400px !important;
+    }
+  
+    .user-card-link,
+    .user-card {
+      min-width: 400px;
+      max-width: 500px !important;
+    }
+  }
+  

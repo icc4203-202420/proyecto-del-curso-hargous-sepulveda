@@ -10,7 +10,40 @@ class API::V1::BarsController < ApplicationController
     @bars = Bar.all
     render json: { bars: @bars }, status: :ok
   end
+  def search
+    query = params[:q]
+  
+    if query.present?
+      @bars = Bar.joins(address: :country)
+                 .where("LOWER(bars.name) LIKE LOWER(:query) OR 
+                         LOWER(addresses.line1) LIKE LOWER(:query) OR 
+                         LOWER(addresses.line2) LIKE LOWER(:query) OR
+                         LOWER(addresses.city) LIKE LOWER(:query) OR
+                         LOWER(countries.name) LIKE LOWER(:query)", query: "%#{query}%")
+    else
+      @bars = Bar.all
+    end
+  
+    render json: @bars.to_json(include: { address: { include: :country } })
+  end
 
+  def beers
+    @bar = Bar.find(params[:id])
+    @beers = @bar.beers 
+    render json: @beers
+  end
+  def addresses
+    @bar = Bar.find(params[:id])
+    @address = @bar.address
+    render json: @address
+  end
+  def countrys
+    @bar = Bar.find(params[:id])
+    @address = @bar.address
+    @country = @address.country 
+
+    render json: { country: @country }, status: :ok
+  end
   def show
     if @bar.image.attached?
       render json: @bar.as_json.merge({ 

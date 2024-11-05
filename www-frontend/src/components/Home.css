@@ -1,3 +1,13 @@
+.css-13p3xcz-MuiContainer-root {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  background-color: #2E2E42;
+  margin-top: 0% !important;
+  display: flex;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
 .container {
   display: flex;
   justify-content: center;

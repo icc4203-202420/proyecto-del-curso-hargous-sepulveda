@@ -1,54 +1,91 @@
 require 'factory_bot_rails'
 
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-
 # Initialize the review counter
-ReviewCounter.create(count: 0)
+ReviewCounter.find_or_create_by(count: 0)
 
 if Rails.env.development?
+  # Create custom countries
+  countries = [FactoryBot.create(:country, name: "Chile")]
 
-  # Crear países
-  countries = FactoryBot.create_list(:country, 5)
+  # Create custom addresses
+  addresses = [
+    FactoryBot.create(:address, line1: "Francisco Bulnes Correa 1156", line2: "7610588 Las Condes", city: "Santiago", country: countries.first),
+    FactoryBot.create(:address, line1: "Av. Pdte. Kennedy Lateral", line2: "7560009 Las Condes", city: "Santiago", country: countries.first),
+    FactoryBot.create(:address, line1: "Camino de la Huerta 3848", line2: "7700944 Lo Barnechea", city: "Santiago", country: countries.first)
+  ]
+  
+  # Create custom bars with predefined coordinates
+  bars = [
+    FactoryBot.create(:bar, name: "Sturmtiger's Bar", address: addresses.first, latitude: "-33.39132546864838", longitude: "-70.51527317976134"),
+    FactoryBot.create(:bar, name: "Checho's Bar", address: addresses.second, latitude: "-33.39081201541005", longitude: "-70.5496134876965"),
+    FactoryBot.create(:bar, name: "El Sacacorcho's Bar", address: addresses.third, latitude: "-33.346435892829774", longitude: "-70.55061262015269")
+  ]
 
-  # Crear cervecerías (breweries) con marcas (brands) y cervezas (beers)
-  countries.map do |country|
-    FactoryBot.create(:brewery_with_brands_with_beers, countries: [country])
+  # Create additional bars with random coordinates
+  additional_bars_count = 5
+  additional_bars = additional_bars_count.times.map do
+    address = FactoryBot.create(:address, city: "Santiago", country: countries.first)
+    FactoryBot.create(:bar, name: "Additional Bar #{Faker::Address.unique.street_name}", address: address, latitude: Faker::Address.latitude.to_s, longitude: Faker::Address.longitude.to_s)
   end
 
-  # Crear usuarios con direcciones asociadas
-  users = FactoryBot.create_list(:user, 10) do |user, i|
+  all_bars = bars + additional_bars
+  evento = FactoryBot.create( :event, name: "Raid casa Fuenza", description: "esta es una descripcion", date: Time.current, start_date: Time.current, end_date: Time.current + 6.minutes, bar: bars.third)
+  # Create a set of beers
+  beers = FactoryBot.create_list(:beer, 10)
+
+  # Associate beers with bars and add reviews
+  all_bars.each do |bar|
+    bar.beers << beers.sample(rand(1..5))
+    bar.beers.each { |beer| FactoryBot.create(:review, user: User.all.sample, beer: beer) }
+  end
+
+  # Create users with random addresses
+  users = FactoryBot.create_list(:user, 10) do |user|
     user.address.update(country: countries.sample)
   end
+  yo = FactoryBot.create(:user, email: "mmhargous@gmail.com", password: "123456", handle: "Sturmtiger")
+  # Create the admin user with friends
+  admin = FactoryBot.create(:user, email: "admin@admin.com", password: "admin1", handle: "admin")
+  admin_friends = users.sample(2)
+  admin_friends.each { |friend| FactoryBot.create(:friendship, user: admin, friend: friend, bar: all_bars.sample) }
 
-  # Crear bares con direcciones y cervezas asociadas
-  bars = FactoryBot.create_list(:bar, 5) do |bar|
-    bar.address.update(country: countries.sample)
-    bar.beers << Beer.all.sample(rand(1..3))
+  # Create breweries with custom countries
+  countries.each { |country| FactoryBot.create(:brewery_with_brands_with_beers, countries: [country]) }
+
+  # Create events
+  events = all_bars.map { |bar| FactoryBot.create(:event, bar: bar) }
+
+  # Create friendships for all users
+  users.each do |user|
+    (users - [user]).each do |other_user|
+      FactoryBot.create(:friendship, user: user, friend: other_user, bar: all_bars.sample)
+    end
   end
 
-  # Crear eventos asociados a los bares
-  events = bars.map do |bar|
-    FactoryBot.create(:event, bar: bar)
-  end
-
-  # Crear relaciones de amistad entre usuarios
-  users.combination(2).to_a.sample(5).each do |user_pair|
-    FactoryBot.create(:friendship, user: user_pair[0], friend: user_pair[1], bar: bars.sample)
-  end
-
-  # Crear attendances (asistencia) de usuarios a eventos
+  # Create attendances for users and events
   users.each do |user|
     events.sample(rand(1..3)).each do |event|
       FactoryBot.create(:attendance, user: user, event: event, checked_in: [true, false].sample)
     end
   end
 
+  # Create reviews for users and beers
+  users.each do |user|
+    beers.sample(rand(1..3)).each { |beer| FactoryBot.create(:review, user: user, beer: beer) }
+  end
+
+  # Create a special short-duration event (3 minutes)
+  short_event = FactoryBot.create(:event, bar: all_bars.sample)
+  short_event.update(
+    start_date: Time.current,
+    end_date: Time.current + 3.minutes
+  )
+end
+
+# Update all other events to start in the past and end in the future
+Event.where.not(id: short_event.id).each do |event|
+  event.update(
+    start_date: Time.current - 1.day,
+    end_date: Time.current + 2.days
+  )
 end
