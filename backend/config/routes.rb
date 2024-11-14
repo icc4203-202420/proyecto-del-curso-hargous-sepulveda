@@ -62,7 +62,7 @@ Rails.application.routes.draw do
       
       # Ruta para eliminar event_pictures de manera independiente (por ID)
       resources :event_pictures, only: [:destroy]
-
+      resources :feed, only: [:show]
       # Rutas para usuarios
       resources :users do
         collection do

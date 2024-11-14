@@ -25,7 +25,7 @@ const UserList = () => {
       }
       const data = await response.json();
       
-      // Filter out the current user
+      console.log(userId);
       const filteredUsers = data.users.filter(user => user.id !== parseInt(userId));
       setUsers(filteredUsers);
     } catch (err) {
@@ -52,7 +52,7 @@ const UserList = () => {
       }
       const data = await response.json();
       
-      // Filter out the current user
+      
       const filteredUsers = data.users.filter(user => user.id !== parseInt(userId));
       setUsers(filteredUsers);
     } catch (err) {

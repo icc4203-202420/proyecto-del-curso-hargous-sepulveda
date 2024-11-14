@@ -3,15 +3,19 @@ import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-nativ
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 
-export default function Header({ onSearch }) { 
+export default function Header({ onSearch }) {
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
   const route = useRoute();
 
   const handleSearch = () => {
     if (onSearch) {
-      onSearch(query); 
+      onSearch(query);
     }
+  };
+
+  const getButtonStyle = (pageName) => {
+    return route.name === pageName ? styles.currentPage : styles.navButtonText;
   };
 
   return (
@@ -33,16 +37,16 @@ export default function Header({ onSearch }) {
       {route.name !== 'Home' && (
         <View style={styles.buttonGroupContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('Beers')}>
-            <Text style={styles.navButtonText}>Beers</Text>
+            <Text style={getButtonStyle('Beers')}>Beers</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Bars')}>
-            <Text style={styles.navButtonText}>Bars</Text>
+            <Text style={getButtonStyle('Bars')}>Bars</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Events')}>
-            <Text style={styles.navButtonText}>Events</Text>
+            <Text style={getButtonStyle('Events')}>Events</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('UserList')}>
-            <Text style={styles.navButtonText}>Users</Text>
+            <Text style={getButtonStyle('UserList')}>Users</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -76,7 +80,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   navButtonText: {
-    color: '#fff',
+    color: '#525277',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -89,6 +93,11 @@ const styles = StyleSheet.create({
     padding: 0,
     borderRadius: 16,
     backgroundColor: '#2E2E42',
+  },
+  currentPage: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
