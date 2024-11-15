@@ -287,7 +287,7 @@ const EventDetails = () => {
       )}
       <Text style={styles.attendees}>Attendees: {attendees.length}</Text>
 
-      {/* Check if video URL exists and display "Watch Video" button or "Summary" button */}
+
       {hasEventEnded ? (
         videoUrl ? (
           <>
