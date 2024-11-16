@@ -136,7 +136,7 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
       <Stack.Screen
         name="Signup"
         component={Signup}
-        options={{ headerShown: true, headerTitle: "Sign Up" }}
+        options={{ headerShown: false, headerTitle: "Sign Up" }}
       />
       <Stack.Screen
         name="Home"
@@ -161,17 +161,17 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
       <Stack.Screen
         name="Beer"
         component={Beer}
-        options={{ headerTitle: "Beer Details" }}
+        options={{ headerTitle: "Detalles de la Cerveza" }}
       />
       <Stack.Screen
         name="EventDetails"
         component={EventDetails}
-        options={{ headerTitle: "Event Details" }}
+        options={{ headerTitle: "Detalles del Evento" }}
       />
       <Stack.Screen
         name="Bar"
         component={Bar}
-        options={{ headerTitle: "Bar Details" }}
+        options={{ headerTitle: "Detalles del Bar" }}
       />
       <Stack.Screen
         name="UserList"
@@ -181,7 +181,7 @@ function MainNavigator({ isLoggedIn, setIsLoggedIn }) {
       <Stack.Screen
         name="UserProfile"
         component={UserProfile}
-        options={{ headerTitle: "User Details" }}
+        options={{ headerTitle: "Detalles del Usuario" }}
       />
     </Stack.Navigator>
   );

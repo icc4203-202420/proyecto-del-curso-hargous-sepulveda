@@ -5,10 +5,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8', // Fondo opcional para el contenedor
+    backgroundColor: '#2E2E42', 
   },
   signupForm: {
-    width: '90%', // Usa un porcentaje en lugar de un maxWidth
+    width: '90%',
     maxWidth: 400,
     padding: 20,
     borderWidth: 1,
@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 0 },
-    elevation: 5, // Sombra para Android
-    alignSelf: 'center', // Center the form within the container
+    elevation: 5, 
+    alignSelf: 'center',
   },
   signupInput: {
     width: '100%',
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#f0f2f5',
     color: '#000',
-    textAlign: 'left', // Asegura que el texto dentro del input esté alineado a la izquierda
+    textAlign: 'left', 
   },
   signupButton: {
     width: '100%',
@@ -46,9 +46,20 @@ const styles = StyleSheet.create({
   signupButtonHover: {
     backgroundColor: '#165dbb',
   },
+  link: {
+    marginTop: 15,
+    color: '#007bff',
+    textAlign: 'center',
+  },
   error: {
     color: 'red',
     fontSize: 12,
+  },
+  title: {
+    marginBottom: 20,
+    fontSize: 24,
+    color: '#333',
+    textAlign: 'center',
   },
 });
 

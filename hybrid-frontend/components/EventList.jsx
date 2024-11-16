@@ -108,7 +108,7 @@ const EventList = () => {
               <TouchableOpacity key={event.id} onPress={() => handleEventPress(event.id)} style={styles.eventCard}>
                 <View style={styles.cardContent}>
                   <Text style={styles.eventName}>{event.name}</Text>
-                  <Text style={styles.eventDate}>Date: {new Date(event.start_date).toLocaleString()}</Text>
+                  <Text style={styles.eventDate}>Fecha: {new Date(event.start_date).toLocaleString()}</Text>
                 </View>
               </TouchableOpacity>
             ))}

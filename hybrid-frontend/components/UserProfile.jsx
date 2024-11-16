@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { StyleSheet, View, Text, Button, ActivityIndicator, TouchableOpacity, Modal, TextInput, FlatList, ScrollView } from "react-native";
+import { StyleSheet, View, Text, Button, ActivityIndicator, TouchableOpacity, Modal, TextInput, FlatList } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { Card } from "react-native-elements";
 import { BACKEND_URL } from '@env';
 import * as SecureStore from 'expo-secure-store';
-import * as Notifications from 'expo-notifications';
 
 const UserProfile = () => {
   const navigation = useNavigation();
@@ -14,17 +12,17 @@ const UserProfile = () => {
 
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [errorUser, setErrorUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [isFriend, setIsFriend] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEventTitle, setSelectedEventTitle] = useState("");
   const [eventSuggestions, setEventSuggestions] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
-  const [eventError, setEventError] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
+
     const fetchUserDetailsAndReviews = async () => {
       try {
         const userResponse = await fetch(`${BACKEND_URL}/api/v1/users/${id}`);
@@ -38,7 +36,6 @@ const UserProfile = () => {
         setIsFriend(isFriend);
         const reviewResponse = await fetch(`${BACKEND_URL}/api/v1/users/${id}/reviews`);
         const reviewData = await reviewResponse.json();
-        console.log(reviewData);
         if (reviewData.reviews.length > 0) {
           const beerIds = [...new Set(reviewData.reviews.map((review) => review.beer_id))];
           const beerPromises = beerIds.map((beerId) =>
@@ -46,7 +43,6 @@ const UserProfile = () => {
               .then(res => res.json())
               .then(data => data.beer)
           );
-
           const beers = await Promise.all(beerPromises);
           const beerMap = {};
           beers.forEach((beer) => {
@@ -66,17 +62,28 @@ const UserProfile = () => {
         const eventsResponse = await fetch(`${BACKEND_URL}/api/v1/events`);
         const eventsData = await eventsResponse.json();
         setEventSuggestions(eventsData.events);
-        
+
+        setFilteredEvents([])
         setLoadingUser(false);
         setLoadingEvents(false);
       } catch (error) {
-        setErrorUser("Error fetching user details or reviews");
         setLoadingUser(false);
+        setLoadingEvents(false);
       }
     };
 
     fetchUserDetailsAndReviews();
   }, [id]);
+
+  const handleSearchEvent = (searchText) => {
+    setSelectedEventTitle(searchText);
+
+    const filtered = eventSuggestions.filter(event => 
+      event.name && event.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+    
+    setFilteredEvents(filtered);
+  };
 
   const handleAddFriend = () => {
     setModalVisible(true);
@@ -127,41 +134,49 @@ const UserProfile = () => {
         {user?.bio && <Text style={styles.bio}>{user.bio}</Text>}
         <TouchableOpacity onPress={isFriend ? handleRemoveFriend : handleAddFriend} style={styles.friendButton}>
           <Icon name={isFriend ? "person-remove" : "person-add"} size={24} style={styles.icon} />
-          <Text style={styles.friendButtonText}>{isFriend ? "Remove Friend" : "Add Friend"}</Text>
+          <Text style={styles.friendButtonText}>{isFriend ? "Quitar Amigo" : "Añadir Amigo"}</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.sectionHeader}>Reviews</Text>
-      
-        <FlatList
-          data={reviews}
-          keyExtractor={(review) => review.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.reviewCard}>
-              <Text style={styles.reviewRating}>Rating: {item.rating}/5</Text>
-              <Text style={styles.reviewText}>Beer: {item.beer?.name || "Unknown Beer"}</Text>
-              <Text style={styles.reviewText}>{item.text}</Text>
-            </View>
-          )}
-          ListEmptyComponent={<Text style={styles.emptyMessage}>{user.handle} hasn't left any reviews yet.</Text>}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
-        />
-      
+      <Text style={styles.sectionHeader}>Reseñas</Text>
+      <FlatList
+        data={reviews}
+        keyExtractor={(review) => review.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.reviewCard}>
+            <Text style={styles.reviewRating}>Calificación: {item.rating}/5</Text>
+            <Text style={styles.reviewText}>Cerveza: {item.beer?.name || "Unknown Beer"}</Text>
+            <Text style={styles.reviewText}>{item.text}</Text>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.emptyMessage}>{user.handle} no ha dejado reseñas aún.</Text>}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 10 }}
+      />
 
       <Modal visible={modalVisible} animationType="fade" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Add Friend</Text>
+            <Text style={styles.modalTitle}>Añadir Amigo</Text>
             <TextInput
-              placeholder="Select Event"
+              placeholder="Buscar Evento (Opcional)"
               style={styles.input}
               value={selectedEventTitle}
-              onChangeText={setSelectedEventTitle}
+              onChangeText={handleSearchEvent}
             />
-            <Button title="Confirm" onPress={handleConfirmAddFriend} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} color="red" />
+            <FlatList
+              data={filteredEvents}
+              keyExtractor={(event) => event.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => setSelectedEventTitle(item.name)}>
+                  <Text style={styles.eventText}>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={<Text>No hay eventos que coincidan.</Text>}
+            />
+            <Button title="Confirmar" onPress={handleConfirmAddFriend} />
+            <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
           </View>
         </View>
       </Modal>
@@ -229,36 +244,36 @@ const styles = StyleSheet.create({
   },
   emptyMessage: {
     fontSize: 14,
-    color: "#777",
-    textAlign: "center",
-    marginVertical: 20,
+    color: '#777',
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.7)", // Dark overlay for modal
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
-    width: "80%",
+    backgroundColor: 'white',
     padding: 20,
-    backgroundColor: "white", // White background for the modal content
     borderRadius: 10,
+    width: 300,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 15,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   input: {
+    height: 40,
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
     marginBottom: 15,
+    paddingHorizontal: 10,
+  },
+  eventText: {
+    fontSize: 16,
+    color: '#007bff',
+    marginBottom: 5,
   },
 });
 

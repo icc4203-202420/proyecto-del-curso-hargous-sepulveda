@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Image } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup'; 
 import * as SecureStore from 'expo-secure-store';
@@ -73,6 +73,10 @@ const Login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Image 
+        source={require("../assets/BeerHub_logo.png")}
+        style={{ width: 200, height: 200 }} 
+      />
       <Formik
         initialValues={{ email: '', password: '' }}
         validationSchema={validationSchema}
@@ -132,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f1f4f7',
+    backgroundColor: '#2E2E42',
     padding: 20,
   },
   form: {

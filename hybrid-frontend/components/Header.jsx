@@ -22,7 +22,7 @@ export default function Header({ onSearch }) {
     <View style={styles.headerContainer}>
       <View style={styles.searchContainer}>
         <TextInput
-          placeholder="Search for Beers, Bars, Events or Users"
+          placeholder="Buscar Cervezas, Bares, Eventos o Usuarios"
           style={styles.searchInput}
           value={query}
           onChangeText={setQuery}
@@ -37,16 +37,16 @@ export default function Header({ onSearch }) {
       {route.name !== 'Home' && (
         <View style={styles.buttonGroupContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('Beers')}>
-            <Text style={getButtonStyle('Beers')}>Beers</Text>
+            <Text style={getButtonStyle('Beers')}>Cervezas</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Bars')}>
-            <Text style={getButtonStyle('Bars')}>Bars</Text>
+            <Text style={getButtonStyle('Bars')}>Bares</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Events')}>
-            <Text style={getButtonStyle('Events')}>Events</Text>
+            <Text style={getButtonStyle('Events')}>Eventos</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('UserList')}>
-            <Text style={getButtonStyle('UserList')}>Users</Text>
+            <Text style={getButtonStyle('UserList')}>Usuarios</Text>
           </TouchableOpacity>
         </View>
       )}

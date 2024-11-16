@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
+import { View, Text, TextInput, Button, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './SignupStyles'; 
 import { BACKEND_URL } from '@env';
@@ -144,7 +144,13 @@ const Signup = () => {
   };
 
   return (
+    <View style={styles.container}>
+      <Image 
+        source={require("../assets/BeerHub_logo.png")}
+        style={{ width: 200, height: 200 }} 
+      />
     <View style={styles.signupForm}>
+      <Text style={styles.title}>Crear Cuenta</Text>
       <TextInput
         style={styles.signupInput}
         placeholder="Nombre"
@@ -199,10 +205,12 @@ const Signup = () => {
       <Button title="Registrarse" onPress={handleSubmit} />
       {successMessage !== '' && <Text style={styles.successMessage}>{successMessage}</Text>}
 
-      <Text>
-        ¿Ya tienes una cuenta?{' '}
-        <Text style={styles.link} onPress={() => navigation.navigate('Login')}>Iniciar sesión</Text>
-      </Text>
+      <Pressable onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.link}>
+                ¿Ya tienes una cuenta? Inicia Sesión aquí
+              </Text>
+      </Pressable>
+    </View>
     </View>
   );
 };

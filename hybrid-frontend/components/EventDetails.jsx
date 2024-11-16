@@ -271,27 +271,27 @@ const EventDetails = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.eventTitle}>{event?.title || 'Event Title'}</Text>
+      <Text style={styles.eventTitle}>{event?.name || 'Event Title'}</Text>
       <Text style={styles.barName}>
         <Text style={styles.link}>Bar: {barName || 'Bar Name'}</Text>
       </Text>
       <Text style={styles.description}>{event?.description || 'Event description not available'}</Text>
       <Text style={styles.date}>
-        <Text style={styles.bold}>Start Date:</Text> {new Date(event?.start_date).toLocaleString() || 'Not available'}
+        <Text style={styles.bold}>Fecha de Inicio:</Text> {new Date(event?.start_date).toLocaleString() || 'Not available'}
       </Text>
       <Text style={styles.date}>
-        <Text style={styles.bold}>End Date:</Text> {endDate.toLocaleString() || 'Not available'}
+        <Text style={styles.bold}>Fecha de Termino:</Text> {endDate.toLocaleString() || 'Not available'}
       </Text>
       {hasEventEnded && (
-        <Text style={styles.expiredText}>This event has ended.</Text>
+        <Text style={styles.expiredText}>Este evento ha terminado.</Text>
       )}
-      <Text style={styles.attendees}>Attendees: {attendees.length}</Text>
+      <Text style={styles.attendees}>Asistentes: {attendees.length}</Text>
 
 
       {hasEventEnded ? (
         videoUrl ? (
           <>
-            <Button title="Watch Video" onPress={() => setIsVideoModalVisible(true)} />
+            <Button title="Ver Video" onPress={() => setIsVideoModalVisible(true)} />
             <Modal
               visible={isVideoModalVisible}
               animationType="slide"
@@ -307,23 +307,23 @@ const EventDetails = () => {
                   shouldPlay
                   style={{ width: '100%', height: 300 }}
                 />
-                <Button title="Close Video" onPress={() => setIsVideoModalVisible(false)} />
+                <Button title="Cerrar Video" onPress={() => setIsVideoModalVisible(false)} />
               </View>
             </Modal>
           </>
         ) : (
-          <Button title={isGeneratingVideo ? "Generating video..." : "Summary"} onPress={generateEventVideo} disabled={isGeneratingVideo} />
+          <Button title={isGeneratingVideo ? "Generando Video..." : "Resumen"} onPress={generateEventVideo} disabled={isGeneratingVideo} />
         )
       ) : (
         hasConfirmed ? (
           <Text style={styles.confirmedText}>Attendance confirmed</Text>
         ) : (
-          <Button title="Confirm Attendance" onPress={confirmAttendance} />
+          <Button title="Confirmar Asistencia" onPress={confirmAttendance} />
         )
       )}
 
       {!hasEventEnded && (
-        <Button title="Upload Image" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
+        <Button title="Subir Imagen" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
       )}
       
       <Text style={styles.bold}>Event Pictures:</Text>
@@ -340,8 +340,8 @@ const EventDetails = () => {
       <Modal visible={modalData.open} animationType="slide" onRequestClose={closeTaggingModal}>
         <View style={styles.modalContent}>
 
-          <Button title="Camera" onPress={() => handleImageChange('camera')} />
-          <Button title="Library" onPress={() => handleImageChange('library')} />
+          <Button title="Cámara" onPress={() => handleImageChange('camera')} />
+          <Button title="Galería" onPress={() => handleImageChange('library')} />
           <TextInput
             ref={inputRef}
             placeholder="Description"
@@ -361,8 +361,8 @@ const EventDetails = () => {
             />
           )}
 
-          <Button title="Upload" onPress={uploadImage} />
-          <Button title="Close" onPress={closeTaggingModal} />
+          <Button title="Subir" onPress={uploadImage} />
+          <Button title="Cerrar" onPress={closeTaggingModal} />
         </View>
       </Modal>
     </ScrollView>
