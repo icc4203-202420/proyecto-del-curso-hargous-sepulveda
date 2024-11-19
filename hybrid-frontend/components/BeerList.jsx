@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BACKEND_URL } from '@env';
-import Header from "./Header";
+import Header from './Header';
+import initializeWebSocket from '../src/services/WebSockets'; 
+import * as SecureStore from 'expo-secure-store'; 
 
 const BeerList = () => {
   const navigation = useNavigation();
-  const [query, setQuery] = useState(''); 
+  const [query, setQuery] = useState('');
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
 
   const fetchAllBeers = async () => {
     setLoading(true);
@@ -29,9 +32,10 @@ const BeerList = () => {
     }
   };
 
+
   const searchBeers = async () => {
     if (!query.trim()) {
-      fetchAllBeers(); 
+      fetchAllBeers();
       return;
     }
     setLoading(true);
@@ -51,12 +55,58 @@ const BeerList = () => {
     }
   };
 
+
   const handleBeerPress = (id) => {
     navigation.navigate('Beer', { id });
   };
 
+
+  useEffect(() => {
+    const setupWebSocket = async () => {
+      const userToken = await SecureStore.getItemAsync('jwtToken');
+      const userId = await SecureStore.getItemAsync('userId');
+      if (!userToken || !userId) {
+        console.error('Error: No se encontró el token o el userId');
+        return;
+      }
+
+      const socket = initializeWebSocket(userToken, userId);
+
+      socket.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+
+        if (response.message) {
+          if (response.message.type === 'new_beer') {
+            console.log('Nueva cerveza añadida:', response.message.beer);
+            setBeers((prevBeers) => [...prevBeers, response.message.beer]);
+          } else if (response.message.type === 'update_beer') {
+            console.log('Cerveza actualizada:', response.message.beer);
+            setBeers((prevBeers) =>
+              prevBeers.map((beer) => (beer.id === response.message.beer.id ? response.message.beer : beer))
+            );
+          }
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error('Error en WebSocket:', error);
+      };
+
+      socket.onclose = () => {
+        console.log('WebSocket desconectado');
+      };
+
+      return () => {
+        socket.close(); 
+      };
+    };
+
+    setupWebSocket();
+  }, []);
+
+
   const beersByType = beers.reduce((acc, beer) => {
-    const style = beer.style || 'Unknown'; 
+    const style = beer.style || 'Unknown';
     if (!acc[style]) {
       acc[style] = { type: style, data: [] };
     }
@@ -65,18 +115,20 @@ const BeerList = () => {
   }, {});
 
   const flatListData = Object.keys(beersByType).reduce((acc, style) => {
-    acc.push({ type: 'header', style }); 
-    acc.push(...beersByType[style].data.map(beer => ({ type: 'beer', ...beer }))); 
+    acc.push({ type: 'header', style });
+    acc.push(...beersByType[style].data.map((beer) => ({ type: 'beer', ...beer })));
     return acc;
   }, []);
 
+
   useEffect(() => {
     searchBeers();
-  }, [query]); 
+  }, [query]);
 
   const handleSearch = (searchQuery) => {
     setQuery(searchQuery);
   };
+
 
   const renderItem = ({ item }) => {
     if (item.type === 'header') {
@@ -88,7 +140,9 @@ const BeerList = () => {
             <View style={styles.textContent}>
               <Text style={styles.beerName}>{item.name}</Text>
               <Text style={styles.beerRating}>
-                {item.avg_rating !== undefined ? `Calificación Promedio: ${Math.round(item.avg_rating * 10) / 10}/5` : 'No Rating'}
+                {item.avg_rating !== undefined
+                  ? `Calificación Promedio: ${Math.round(item.avg_rating * 10) / 10}/5`
+                  : 'No Rating'}
               </Text>
               <Text style={styles.beerInfo}>IBU: {item.ibu || 'N/A'}</Text>
               <Text style={styles.beerInfo}>Alcohol: {item.alcohol || 'N/A'}</Text>
@@ -116,7 +170,7 @@ const BeerList = () => {
         ) : flatListData.length > 0 ? (
           <FlatList
             data={flatListData}
-            keyExtractor={(item, index) => `${item.type}-${item.id || index}`} // Unique key
+            keyExtractor={(item, index) => `${item.type}-${item.id || index}`}
             renderItem={renderItem}
           />
         ) : (
@@ -173,7 +227,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 8,
-    backgroundColor: '#ccc', // Fallback background color
+    backgroundColor: '#ccc',
   },
   noResults: {
     marginTop: 20,
@@ -196,6 +250,3 @@ const styles = StyleSheet.create({
 });
 
 export default BeerList;
-
-
-

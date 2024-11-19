@@ -4,9 +4,11 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { BACKEND_URL } from '@env';
 import { Icon } from 'react-native-elements';
+
 const Home = () => {
   const [feedData, setFeedData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null); // WebSocket instance
   const [feedBars, setFeedBars] = useState([]);
   const [feedCountries, setFeedCountries] = useState([]);
   const [users, setUsers] = useState([]);
@@ -15,7 +17,7 @@ const Home = () => {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedBeers, setSelectedBeers] = useState([]);
   const [selectedBars, setSelectedBars] = useState([]);
-  const [selectedCountries, setSelectedCountries] = useState([])
+  const [selectedCountries, setSelectedCountries] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
@@ -37,7 +39,7 @@ const Home = () => {
       const beersData = await beersResponse.json();
       const friendsResponse = await fetch(`${BACKEND_URL}/api/v1/users/${parseInt(userId)}/friendships`);
       const friendsData = await friendsResponse.json();
-      
+
       setFriends(friendsData);
       setUsers(usersData.users);
       setBeers(beersData.beers);
@@ -57,26 +59,74 @@ const Home = () => {
       ];
 
       const sortedFeed = combinedFeed.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      
+
       setFeedData(sortedFeed);
-      const eventPictures = sortedFeed.filter(item => item.type === "event_picture");
+      const eventPictures = sortedFeed.filter(item => item.type === 'event_picture');
 
       const uniqueBars = [
-        ...new Map(eventPictures.map(item => [item.bar_id, item])).values()
+        ...new Map(eventPictures.map(item => [item.bar_id, item])).values(),
       ];
       const uniqueCountries = [
-        ...new Map(eventPictures.map(item => [item.country_id, item])).values()
-      ];     
+        ...new Map(eventPictures.map(item => [item.country_id, item])).values(),
+      ];
       setFeedBars(uniqueBars);
       setFeedCountries(uniqueCountries);
-  
-
     } catch (error) {
       console.error('Error fetching feed data:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  // WebSocket connection
+  useEffect(() => {
+    const initializeWebSocket = async () => {
+      const token = await SecureStore.getItemAsync('jwtToken');
+      const userId = await SecureStore.getItemAsync('userId');
+      if (!token || !userId) return;
+
+      const wsUrl = BACKEND_URL.replace('http', 'ws');
+      const socketInstance = new WebSocket(`${wsUrl}/cable?token=${encodeURIComponent(token)}`);
+
+      socketInstance.onopen = () => {
+        console.log('WebSocket conectado');
+        socketInstance.send(
+          JSON.stringify({
+            command: 'subscribe',
+            identifier: JSON.stringify({
+              channel: 'FeedChannel',
+              user_id: userId,
+            }),
+          })
+        );
+      };
+
+      socketInstance.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        if (response.type === 'ping') return; // Ignore ping messages
+        if (response.message) {
+          console.log('Mensaje recibido:', response.message);
+          setFeedData((prevFeedData) => [response.message, ...prevFeedData]);
+        }
+      };
+
+      socketInstance.onerror = (error) => {
+        console.error('Error en WebSocket:', error);
+      };
+
+      socketInstance.onclose = () => {
+        console.log('WebSocket desconectado');
+      };
+
+      setSocket(socketInstance);
+    };
+
+    initializeWebSocket();
+
+    return () => {
+      if (socket) socket.close();
+    };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -121,15 +171,16 @@ const Home = () => {
 
   const filteredData = feedData?.filter((item) => {
     if (selectedFriends.length > 0 && !selectedFriends.includes(item.user_id)) return false;
-    
+
     if (selectedBeers.length > 0 && !selectedBeers.includes(item.beer_id)) return false;
-  
+
     if (selectedBars.length > 0 && !selectedBars.includes(item.event_bar_id)) return false;
-    
+
     if (selectedCountries.length > 0 && !selectedCountries.includes(item.country_id)) return false;
-  
+
     return true;
   });
+
   const toggleFriendSelection = (friendId) => {
     setSelectedFriends((prevState) =>
       prevState.includes(friendId) ? prevState.filter(id => id !== friendId) : [...prevState, friendId]

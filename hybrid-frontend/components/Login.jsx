@@ -42,12 +42,12 @@ const Login = ({ navigation }) => {
           const user = data.status.data.user;
 
           if (user) {
-            SecureStore.setItemAsync('jwtToken', receivedToken);
+            SecureStore.setItemAsync('jwtToken', receivedToken.split(' ')[1]);
             SecureStore.setItemAsync('userId', String(user.id));
             SecureStore.setItemAsync('userName', `${user.first_name} ${user.last_name}`);
             
 
-            console.log('Token almacenado:', receivedToken);
+            console.log('Token almacenado:', receivedToken.split(' ')[1]);
             console.log('ID del usuario almacenado:', user.id);
             console.log('Nombre del usuario almacenado:', `${user.first_name} ${user.last_name}`);
 
