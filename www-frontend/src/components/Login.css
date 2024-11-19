@@ -1,0 +1,90 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.css-13p3xcz-MuiContainer-root {  
+  background-color: #2E2E42;
+  margin-top: 0% !important;
+  display:block;
+  align-items: center;
+}
+.login-container {
+  display: flex;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 100vh; 
+  background-color: #f1f4f7;
+  padding: 20px; 
+}
+
+
+.login-form {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+
+.login-form h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  color: #333;
+  background-color: #f7f7f7;
+}
+
+.input-error {
+  border-color: red;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+.error-list {
+  color: red;
+  margin-top: 10px;
+}
+
+.error-item {
+  list-style: none;
+}
+
+.redirect {
+  color: #007bff;
+  margin-top: 10px;
+}
+
+.redirect a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.redirect a:hover {
+  text-decoration: underline;
+}
