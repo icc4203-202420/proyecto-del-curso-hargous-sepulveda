@@ -65,7 +65,9 @@ const Account = () => {
       Alert.alert('Error', 'No se pudo cerrar sesión. Inténtalo de nuevo.');
     }
   };
-
+  const handleUserPress = (id) => {
+    navigation.navigate('UserProfile', { id });
+  };
   useFocusEffect(
     React.useCallback(() => {
       // Reload data every time screen is focused
@@ -94,7 +96,7 @@ const Account = () => {
             </>
           }
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.friendItem}>
+            <TouchableOpacity style={styles.friendItem} onPress={() => handleUserPress(item.id)}>
               <Text style={styles.friendName}>{item.first_name} {item.last_name}</Text>
             </TouchableOpacity>
           )}
