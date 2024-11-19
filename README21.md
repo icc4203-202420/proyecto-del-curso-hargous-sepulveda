@@ -1,4 +1,4 @@
-
+## SDK 5.2
 ## Variables de Entorno
 
 Para probar la aplicación, es necesario establecer las variables de entorno en un archivo `.env`. El archivo debe incluir la siguiente variable:
