@@ -43,9 +43,6 @@ if Rails.env.development?
   users = FactoryBot.create_list(:user, 10) do |user|
     user.address.update(country: countries.sample)
   end
-  yo = FactoryBot.create(:user, email: "mmhargous@gmail.com", password: "123456", handle: "Sturmtiger", first_name: "Martin", last_name: "Hargous")
-  # Create the admin user with friends
-  admin = FactoryBot.create(:user, email: "admin@admin.com", password: "admin1", handle: "admin")
   admin_friends = users.sample(2)
   admin_friends.each { |friend| FactoryBot.create(:friendship, user: admin, friend: friend, bar: all_bars.sample) }
 
@@ -78,7 +75,13 @@ if Rails.env.development?
   short_event = FactoryBot.create(:event, bar: all_bars.sample)
   short_event.update(
     start_date: Time.current,
-    end_date: Time.current + 3.minutes
+    end_date: Time.current + 5.minutes
+  )
+  # Create a special short-duration event (3 minutes)
+  short_event2 = FactoryBot.create(:event, bar: all_bars.sample)
+  short_event2.update(
+    start_date: Time.current,
+    end_date: Time.current + 10.minutes
   )
 end
 
