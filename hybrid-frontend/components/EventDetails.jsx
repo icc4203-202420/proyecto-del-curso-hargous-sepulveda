@@ -320,12 +320,12 @@ const EventDetails = () => {
         hasConfirmed ? (
           <Text style={styles.confirmedText}>Attendance confirmed</Text>
         ) : (
-          <Button title="Confirmar Asistencia" onPress={confirmAttendance} />
+          <Button  style={styles.button} title="Confirmar Asistencia" onPress={confirmAttendance} />
         )
       )}
 
       {!hasEventEnded && (
-        <Button title="Subir Imagen" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
+        <Button style={styles.button} title="Subir Imagen" onPress={() => setModalData((prev) => ({ ...prev, open: true }))} />
       )}
       
       <Text style={styles.bold}>Event Pictures:</Text>
@@ -346,34 +346,53 @@ const EventDetails = () => {
           );
         })}
 
-      <Modal visible={modalData.open} animationType="slide" onRequestClose={closeTaggingModal}>
+    <Modal
+      visible={modalData.open}
+      animationType="fade"
+      onRequestClose={closeTaggingModal}
+      transparent={true}
+    >
+      <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Subir imagen</Text>
+          <View style={styles.buttonGroup}>
+            <Button title="Camara" onPress={() => handleImageChange('camera')} variant="outline" style={styles.button}/>
 
-          <Button title="Cámara" onPress={() => handleImageChange('camera')} />
-          <Button title="Galería" onPress={() => handleImageChange('library')} />
+            <Button title="Galería" onPress={() => handleImageChange('library')} variant="outline" style={styles.button}/>
+          </View>
+              {modalData.image && (
+            <Image source={{ uri: modalData.image.uri }} style={styles.previewImage} />
+              )}
+
           <TextInput
-            ref={inputRef}
             placeholder="Description"
             value={modalData.description}
             onChangeText={handleDescriptionChange}
             style={styles.descriptionInput}
+            multiline
           />
           {isTagging && userSuggestions.length > 0 && (
             <FlatList
               data={userSuggestions}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleTagSelect(item)}>
+                <TouchableOpacity onPress={() => handleTagSelect(item)} style={styles.suggestionItem}>
                   <Text style={styles.suggestionText}>{item.handle}</Text>
                 </TouchableOpacity>
               )}
+              style={styles.suggestionList}
             />
           )}
+          <View style={styles.buttonGroup}>
+            <Button title="Subir" onPress={uploadImage} style={styles.button}/>
 
-          <Button title="Subir" onPress={uploadImage} />
-          <Button title="Cerrar" onPress={closeTaggingModal} />
+            <Button title="Cerrar" onPress={closeTaggingModal} variant="destructive" style={styles.button}/>
+
+
+          </View>
         </View>
-      </Modal>
+      </View>
+    </Modal>
     </ScrollView>
   );
 };
@@ -407,6 +426,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  previewImage: {
+    width: '90%',
+    height: 300,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
   cardImage: {
     width: '100%',
     height: 200,
@@ -419,6 +444,66 @@ const styles = StyleSheet.create({
   userHandle: {
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  button: {
+    marginBottom: 10,
+  },
+  container_b: {
+    flexDirection: 'column',
+    padding: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    marginBottom: 20,
+  },
+  button: {
+    flex: 0,
+    marginHorizontal: 5,
+    minWidth: 100,
+  },
+  descriptionInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 20,
+    width: '100%',
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  suggestionList: {
+    maxHeight: 150,
+    width: '100%',
+    marginBottom: 20,
+  },
+  suggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionText: {
+    fontSize: 16,
   },
 });
 
