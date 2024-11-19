@@ -308,9 +308,17 @@ const Home = () => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Button title="Apply Filters" onPress={() => setModalVisible(false)} />
-            <Button title="Close Filters" onPress={() => setModalVisible(false)} color="red" />
-            <Button title="Reset Filters" onPress={resetFilters} color="gray" />
+            <View style={styles.container_b}>
+                <View style={styles.button}>
+                  <Button title="Aplicar Filtros" onPress={() => setModalVisible(false)} />
+                </View>
+                <View style={styles.button}>
+                  <Button title="Cerrar Filtros" onPress={() => setModalVisible(false)} color="red" />
+                </View>
+                <View style={styles.button}>
+                  <Button title="Borrar Filtros" onPress={resetFilters} color="gray" />
+                </View>
+              </View>
           </View>
         </Modal>
 
@@ -332,6 +340,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#2E2E42',
+  },
+  container_b: {
+    flexDirection: 'column',
+    padding: 10,
+  },
+  button: {
+    marginBottom: 10,
   },
   centered: {
     flex: 1,

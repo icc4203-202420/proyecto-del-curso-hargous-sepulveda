@@ -57,6 +57,6 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:text, :rating, :beer_id, :user_id) # Permitir beer_id y user_id desde el frontend
+    params.require(:review).permit(:text, :rating, :beer_id, :user_id)
   end
 end

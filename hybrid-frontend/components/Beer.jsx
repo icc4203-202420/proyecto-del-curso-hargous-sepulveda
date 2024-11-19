@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Modal, Button, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, Modal, Button, TextInput, TouchableOpacity } from 'react-native';
 import { BACKEND_URL } from '@env';
 import * as SecureStore from 'expo-secure-store';
 import { Icon, Rating } from 'react-native-elements';
@@ -68,6 +68,12 @@ const Beer = ({ route }) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
+    const wordCount = review.trim().split(/\s+/).length;
+    if (wordCount < 15) {
+      Alert.alert('Error', 'Las reseñas debentener al menos 15 palabras');
+      setIsSubmitting(false);
+      return;
+    }
     try {
       const response = await fetch(`${BACKEND_URL}/api/v1/beers/${id}/reviews`, {
         method: 'POST',
@@ -225,10 +231,10 @@ const Beer = ({ route }) => {
               style={styles.rating}
               imageSize={30}
               startingValue={rating}
-              fractions={0} 
+              fractions={1} 
               ratingImage="beer"
               onFinishRating={(value) => setRating(value)}
-              minValue={0}
+              minValue={1}
               maxValue={5}
             />
             
