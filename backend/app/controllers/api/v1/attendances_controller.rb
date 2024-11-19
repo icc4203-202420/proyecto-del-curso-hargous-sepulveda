@@ -15,6 +15,7 @@ class API::V1::AttendancesController < ApplicationController
         if attendance.save
           @event = Event.find_by(id: params[:event_id])
           user = User.find_by(id: params[:user_id])
+        
           if user.push_token.present?
             PushNotificationService.send_notification(
               to: user.push_token,
@@ -23,12 +24,21 @@ class API::V1::AttendancesController < ApplicationController
               data: {}
             )
           end
-          render json: { message: 'Asistencia confirmada', attendance: attendance }, status: :created
-        else
-          render json: { errors: attendance.errors.full_messages }, status: :unprocessable_entity
+        
+          if user.friends.present? 
+            user.friends.each do |friend|
+              if friend.push_token.present?
+                PushNotificationService.send_notification(
+                  to: friend.push_token,
+                  title: "@#{user.handle} se raja con unas chelas!!",
+                  body: "¡Tu amigo/a @#{user.handle} ha confirmado su asistencia al evento #{@event.name}.",
+                  data: {}
+                )
+              end
+            end
+          end
         end
       end
-    
     
 
       private

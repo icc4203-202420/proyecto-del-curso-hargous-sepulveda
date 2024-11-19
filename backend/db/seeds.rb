@@ -78,7 +78,7 @@ if Rails.env.development?
   short_event = FactoryBot.create(:event, bar: all_bars.sample)
   short_event.update(
     start_date: Time.current,
-    end_date: Time.current + 40.minutes
+    end_date: Time.current + 3.minutes
   )
 end
 
@@ -86,6 +86,6 @@ end
 Event.where.not(id: short_event.id).each do |event|
   event.update(
     start_date: Time.current - 1.day,
-    end_date: Time.current + 2.days
+    end_date: Time.current + 1.days
   )
 end

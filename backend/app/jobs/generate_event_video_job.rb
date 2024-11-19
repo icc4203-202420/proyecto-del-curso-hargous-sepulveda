@@ -73,22 +73,30 @@ class GenerateEventVideoJob < ApplicationJob
   end
 
   def notify_users(event)
-    if event.attendances
-      event.attendances.each do |user|
-        if user.push_token.present?
+
+    attendances = event.attendances
+  
+    if attendances.any?
+      attendances.each do |attendance|
+        user = attendance.user
+
+        if user&.push_token.present?
           PushNotificationService.send_notification(
             to: user.push_token,
             title: "Mamá salí en la tele!",
-            body: "Ya esta el resumen de #{@event.name}",
+            body: "Ya está el resumen de #{event.name}",
             data: {}
           )
+        else
+          Rails.logger.info("User #{user.id} does not have a push token.") if user
         end
       end
     else
-      Rails.logger.error("Event #{event.id} does not have an 'attendees' association or method.")
+      Rails.logger.info("Event #{event.id} has no associated attendances.")
     end
-  rescue NameError => e
-    Rails.logger.error("NotificationService not found: #{e.message}")
+  rescue => e
+    Rails.logger.error("Error notifying users for event #{event.id}: #{e.message}")
   end
+  
   
 end

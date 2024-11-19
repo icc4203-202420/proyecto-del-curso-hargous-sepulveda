@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Button, FlatList, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, Button, FlatList, TouchableOpacity, Modal, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { BACKEND_URL } from '@env';
 
@@ -99,34 +99,45 @@ const Bar = () => {
 
                     {/* Modal for events */}
                     <Modal visible={modalVisible} animationType="fade" transparent={true}>
-                        <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                                <Text style={styles.modalTitle}>Events at {bar.name}</Text>
-                                {events.length > 0 ? (
-                                    events.map((event) => (
-                                        <TouchableOpacity key={event.id} onPress={() => navigation.navigate('Event', { id: event.id })}>
-                                            <View style={styles.eventCard}>
-                                                <Text style={styles.eventTitle}>{event.name}</Text>
-                                                <Text><Text style={styles.boldText}>Event ID:</Text> {event.id || 'N/A'}</Text>
-                                                <Text><Text style={styles.boldText}>Description:</Text> {event.description || 'N/A'}</Text>
-                                                <Text><Text style={styles.boldText}>Start Date:</Text> {new Date(event.start_date).toLocaleString() || 'N/A'}</Text>
-                                                <Text><Text style={styles.boldText}>End Date:</Text> {new Date(event.end_date).toLocaleString() || 'N/A'}</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ))
-                                ) : (
-                                    <Text>No events available for this bar.</Text>
-                                )}
-                                <Button title="Close" onPress={() => setModalVisible(false)} />
-                            </View>
-                        </View>
-                    </Modal>
+                  <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                      <ScrollView>
+                        <Text style={styles.modalTitle}>Events at {bar.name}</Text>
+                        {events.length > 0 ? (
+                          events.map((event) => (
+                            <TouchableOpacity
+                              key={event.id}
+                              onPress={() => navigation.navigate('EventDetails', { id: event.id })}
+                              style={styles.eventCard}
+                            >
+                              <Text style={styles.eventTitle}>{event.name}</Text>
+                              <Text style={styles.eventInfo}>
+                                <Text style={styles.boldText}>Descripcion:</Text> {event.description || 'N/A'}
+                              </Text>
+                              <Text style={styles.eventInfo}>
+                                <Text style={styles.boldText}>Fecha Inicio:</Text>{' '}
+                                {new Date(event.start_date).toLocaleString() || 'N/A'}
+                              </Text>
+                              <Text style={styles.eventInfo}>
+                                <Text style={styles.boldText}>Fecha Termino:</Text>{' '}
+                                {new Date(event.end_date).toLocaleString() || 'N/A'}
+                              </Text>
+                            </TouchableOpacity>
+                          ))
+                        ) : (
+                          <Text style={styles.noEventsText}>No events available for this bar.</Text>
+                        )}
+                      </ScrollView>
+                      <Button title="Close" onPress={() => setModalVisible(false)} style={styles.closeButton} />
+                    </View>
+                  </View>
+                </Modal>
                 </View>
             </ScrollView>
         )
     );
 };
-
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -169,39 +180,64 @@ const styles = StyleSheet.create({
     beerRating: {
         fontWeight: 'bold',
     },
-    modalContainer: {
+    modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        flex: 1,
-        padding: 16,
+      },
+      modalContent: {
+        width: width * 0.9,
+        maxHeight: height * 0.8,
         backgroundColor: 'white',
-        borderRadius: 8,
-    },
-    modalTitle: {
-        fontSize: 20,
+        borderRadius: 20,
+        padding: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+      },
+      modalTitle: {
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 16,
-    },
-    eventCard: {
-        padding: 8,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        marginVertical: 4,
-        borderRadius: 4,
-    },
-    eventTitle: {
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#333',
+      },
+      eventCard: {
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 15,
+      },
+      eventTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-    },
-    errorText: {
-        color: 'red',
+        marginBottom: 10,
+        color: '#1a1a1a',
+      },
+      eventInfo: {
+        fontSize: 14,
+        marginBottom: 5,
+        color: '#4a4a4a',
+      },
+      boldText: {
+        fontWeight: 'bold',
+      },
+      noEventsText: {
+        fontSize: 16,
         textAlign: 'center',
+        color: '#666',
         marginTop: 20,
-    },
+      },
+      closeButton: {
+        marginTop: 20,
+        alignSelf: 'center',
+      },
 });
 
 export default Bar;

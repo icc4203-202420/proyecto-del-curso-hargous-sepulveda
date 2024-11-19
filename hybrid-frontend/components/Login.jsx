@@ -101,6 +101,7 @@ const Login = ({ navigation }) => {
               style={styles.input}
               placeholder="Contraseña"
               secureTextEntry
+              autoCapitalize="none"
               value={values.password}
               onChangeText={handleChange('password')}
               onBlur={handleBlur('password')}

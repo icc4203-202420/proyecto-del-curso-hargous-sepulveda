@@ -272,9 +272,11 @@ const EventDetails = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.eventTitle}>{event?.name || 'Event Title'}</Text>
+      <TouchableOpacity key={event.bar_id} onPress={() => navigation.navigate('Bar', { id: event.bar_id })}>
       <Text style={styles.barName}>
         <Text style={styles.link}>Bar: {barName || 'Bar Name'}</Text>
       </Text>
+      </TouchableOpacity>
       <Text style={styles.description}>{event?.description || 'Event description not available'}</Text>
       <Text style={styles.date}>
         <Text style={styles.bold}>Fecha de Inicio:</Text> {new Date(event?.start_date).toLocaleString() || 'Not available'}
@@ -327,15 +329,22 @@ const EventDetails = () => {
       )}
       
       <Text style={styles.bold}>Event Pictures:</Text>
-      {eventPictures.map((picture, index) => (
-        <View key={index} style={{ marginVertical: 10, paddingBottom: 15 }}>
+      {eventPictures.map((picture, index) => {
+        const user = users.find(user => user.id === picture.user_id);
+            
+        return (
+        <View key={index} style={styles.card}>
           <Image 
             source={{ uri: picture.flyer_urls[0] }} 
-            style={{ width: 200, height: 200 }} 
+            style ={styles.cardImage}
           />
-          <Text>{renderDescriptionWithTags(picture.description)}</Text>
+          <View style={styles.cardContent}>
+            <Text style={styles.userHandle}>{user ? user.handle : 'Desconocido'}</Text>
+            <Text>{renderDescriptionWithTags(picture.description)}</Text>
+          </View>
         </View>
-      ))}
+          );
+        })}
 
       <Modal visible={modalData.open} animationType="slide" onRequestClose={closeTaggingModal}>
         <View style={styles.modalContent}>
@@ -385,6 +394,32 @@ const styles = StyleSheet.create({
   modalContent: { flex: 1, justifyContent: 'center', padding: 16 },
   descriptionInput: { borderWidth: 1, borderColor: '#ccc', padding: 8, marginBottom: 8 },
   suggestionText: { padding: 8, backgroundColor: '#f0f0f0', marginBottom: 4 },
+  card: {
+    marginVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  cardImage: {
+    width: '100%',
+    height: 200,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  cardContent: {
+    padding: 10,
+  },
+  userHandle: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
 });
 
 export default EventDetails;

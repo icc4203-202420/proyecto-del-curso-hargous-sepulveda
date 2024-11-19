@@ -171,6 +171,7 @@ const Signup = () => {
         style={styles.signupInput}
         placeholder="Correo electrónico"
         value={formData.email}
+        autoCapitalize='none'
         onChangeText={(value) => handleChange('email', value)}
         keyboardType="email-address"
       />
@@ -190,6 +191,7 @@ const Signup = () => {
         value={formData.password}
         onChangeText={(value) => handleChange('password', value)}
         secureTextEntry
+        autoCapitalize='none'
       />
       {errors.password ? <Text style={styles.error}>{errors.password}</Text> : null}
 
@@ -199,6 +201,7 @@ const Signup = () => {
         value={formData.passwordConfirmation}
         onChangeText={(value) => handleChange('passwordConfirmation', value)}
         secureTextEntry
+        autoCapitalize='none'
       />
       {errors.passwordConfirmation ? <Text style={styles.error}>{errors.passwordConfirmation}</Text> : null}
 
