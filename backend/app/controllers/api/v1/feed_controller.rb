@@ -32,7 +32,39 @@ class API::V1::FeedController < ApplicationController
       event_pictures: @event_pictures
     }, status: :ok
   end
+  def broadcast_update
+    friend_ids = @user.friends.pluck(:id) + [@user.id]
 
+    reviews = Review.where(user_id: friend_ids)
+
+    event_pictures = EventPicture.where(user_id: friend_ids).map do |event_picture|
+      bar = event_picture.event.bar
+      country = bar.address.country
+
+      {
+        id: event_picture.id,
+        event_id: event_picture.event_id,
+        event_name: event_picture.event.name,
+        event_bar_id: event_picture.event.bar_id,
+        user_id: event_picture.user_id,
+        description: event_picture.description,
+        created_at: event_picture.created_at,
+        updated_at: event_picture.updated_at,
+        flyer_urls: event_picture.flyers.map { |flyer| url_for(flyer) },
+        bar_name: bar.name,
+        country_name: country.name,
+        country_id: country.id
+      }
+    end
+
+    ActionCable.server.broadcast(
+      "feed_channel_#{@user.id}",
+      {
+        reviews: reviews,
+        event_pictures: event_pictures
+      }
+    )
+  end
   private
 
   def set_user

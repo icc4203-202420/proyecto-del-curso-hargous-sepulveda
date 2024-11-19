@@ -106,7 +106,7 @@ const Home = () => {
         if (response.type === 'ping') return; // Ignore ping messages
         if (response.message) {
           console.log('Mensaje recibido:', response.message);
-          setFeedData((prevFeedData) => [response.message, ...prevFeedData]);
+          fetchFeed();
         }
       };
 

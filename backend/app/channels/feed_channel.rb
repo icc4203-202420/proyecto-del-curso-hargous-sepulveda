@@ -1,7 +1,7 @@
 # app/channels/feed_channel.rb
 class FeedChannel < ApplicationCable::Channel
   def subscribed
-    stream_from "feed_channel_#{current_user.id}"
+    stream_from "feed_channel_#{params[:user_id]}"
   end
 
   def unsubscribed
@@ -9,6 +9,6 @@ class FeedChannel < ApplicationCable::Channel
   end
 
   def send_message(data)
-    ActionCable.server.broadcast("feed_channel_#{current_user.id}", data)
+    ActionCable.server.broadcast("feed_channel_#{params[:user_id]}", data)
   end
 end

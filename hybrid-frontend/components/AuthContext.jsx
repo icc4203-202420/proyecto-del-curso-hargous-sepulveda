@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
           socketInstance.onmessage = (event) => {
             const response = JSON.parse(event.data);
             if (response.message) {
-              console.log('Mensaje recibido:', response.message);
+              // console.log('Mensaje recibido:', response.message);
               setFeedData((prevFeedData) => [response.message, ...prevFeedData]);
             }
           };
